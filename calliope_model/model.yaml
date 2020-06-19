@@ -27,7 +27,7 @@ group_constraints:
     - solar
     locs:
     - region_0
-    resource_area_max: 34.010000000000005
+    resource_area_max: 135.4975
   region_group_1:
     techs:
     - wind

@@ -43,7 +43,6 @@ class Power():
                 power_profile = [round(ds_c['population'].loc[nuts_2_id].values.item()/population_sum * int(x),3) for x in load_profile.load_in_MW]
                 ds['power'].loc[nuts_2_id] = power_profile
 
-
 class Heat():
 
     def __init__(self,nuts_2, decentralized=False, **kwargs):

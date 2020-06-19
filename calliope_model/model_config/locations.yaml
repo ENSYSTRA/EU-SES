@@ -5,9 +5,15 @@ locations:
       lon: 5.28
     techs:
       supply_gas:
+      boiler:
+      heat_pump_air:
+      heat_pump_ground:
       demand_electricity:
         constraints:
           resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
       biomass:
         constraints:
           energy_cap_equals: 0.0
@@ -44,7 +50,7 @@ locations:
       wind_offshore:
         constraints:
           resource_area_min: 348.320895522388
-          resource_area_max: 0.0
+          resource_area_max: 1867.0
       hdam:
         constraints:
           energy_cap_equals: 0.0
@@ -60,9 +66,15 @@ locations:
       lon: 6.03
     techs:
       supply_gas:
+      boiler:
+      heat_pump_air:
+      heat_pump_ground:
       demand_electricity:
         constraints:
           resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
       biomass:
         constraints:
           energy_cap_equals: 0.0
@@ -99,7 +111,7 @@ locations:
       wind_offshore:
         constraints:
           resource_area_min: 30.0
-          resource_area_max: 0.0
+          resource_area_max: 160.8
       hdam:
         constraints:
           energy_cap_equals: 0.0
