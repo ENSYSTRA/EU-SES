@@ -1,0 +1,37 @@
+import:
+- model_config/techs.yaml
+- model_config/locations.yaml
+model:
+  name: ESES model
+  calliope_version: 0.6.5
+  timeseries_data_path: timeseries_data
+  subset_time:
+  - '2010-01-01'
+  - '2010-12-31'
+  time:
+    function: resample
+    function_options:
+      resolution: 3H
+run:
+  solver: gurobi
+  ensure_feasibility: 'false'
+  bigM: 1000000.0
+  zero_threshold: 1e-10
+  mode: plan
+  objective_options.cost_class:
+    monetary: 1
+group_constraints:
+  region_group_0:
+    techs:
+    - wind
+    - solar
+    locs:
+    - region_0
+    resource_area_max: 34.010000000000005
+  region_group_1:
+    techs:
+    - wind
+    - solar
+    locs:
+    - region_1
+    resource_area_max: 29.217599999999997
