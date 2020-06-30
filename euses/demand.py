@@ -3,8 +3,7 @@ import geopandas as gpd
 import numpy as np
 from . import parameters as pr
 from rasterstats import zonal_stats
-import pyproj
-from shapely.ops import transform
+
 
 import bisect
 
