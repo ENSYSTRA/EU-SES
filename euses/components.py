@@ -121,10 +121,14 @@ class Dataset():
         zones['flh_max']=zones.loc[zones.pv_pot_e<zones.wind_on_pot_e].wind_on_pot_e
         zones.update(pd.Series(zones.loc[zones.pv_pot_e>zones.wind_on_pot_e].pv_pot_e, name='flh_max'))
         zones.update(pd.Series(zones.loc[zones.wind_off_pot_e>zones.flh_max].wind_off_pot_e, name='flh_max'))
+        zones['flh_max'] = zones['flh_max'].fillna(0)
+
+        zones['storage'] = ds['hydro_storage'].sum(axis=1)
+        zones['population'] = ds['population']
 
         zones['minimum_threshold'] = zones.geometry.area
 
-        method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','PHS_e_jrc'],
+        method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','storage'],
                         'poli_regions':2,'poli_regions_nuts3':3}
 
         if method in ['rdm_regions','max_p_regions']:
@@ -136,7 +140,6 @@ class Dataset():
                 zones['nuts'] = zones['id'].str[:2]
                 nuts_array = zones['nuts'].unique()
                 class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
-
 
         if method in ['poli_regions','poli_regions_nuts3']:
             zones['nuts'] = zones['id'].str[:method_dir.get(method)]
