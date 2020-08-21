@@ -13,7 +13,7 @@ class Wind_Offshore():
         year = nuts_2.year
         time_range = nuts_2.ds.time.values
 
-        wind_offshore = gpd.read_file('data/resource/Wind farms/Emodnet_HA_WindFarms_pt_20181120.shp')
+        wind_offshore = gpd.read_file('data/resource/EMODnet_HA_WindFarms_20200305/EMODnet_HA_WindFarms_pt_20200305.shp')
 
 
         def poly_np(poly,turbine_point):
@@ -172,7 +172,6 @@ class Heat_Pumps():
             for nuts_2_id in ds_c.coords['nuts_2'].values:
                 ds['cop_air'].loc[nuts_2_id] = (temperature_to_load.cop_air*cop_max_air).to_list()
                 ds['cop_ground'].loc[nuts_2_id] = (temperature_to_load.cop_ground*cop_max_ground).to_list()
-
 
 class VRE_Capacity_Factor():
     def __init__(self, nuts_2, technologies = ['wind','pv','wind_offshore']):

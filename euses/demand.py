@@ -3,8 +3,7 @@ import geopandas as gpd
 import numpy as np
 from . import parameters as pr
 from rasterstats import zonal_stats
-import pyproj
-from shapely.ops import transform
+
 
 import bisect
 
@@ -42,7 +41,6 @@ class Power():
             for nuts_2_id in ds_c.coords['nuts_2']:
                 power_profile = [round(ds_c['population'].loc[nuts_2_id].values.item()/population_sum * int(x),3) for x in load_profile.load_in_MW]
                 ds['power'].loc[nuts_2_id] = power_profile
-
 
 class Heat():
 

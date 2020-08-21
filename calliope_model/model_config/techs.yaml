@@ -2,6 +2,11 @@
 ##
 # TECHNOLOGY DEFINITIONS
 ##
+tech_groups:
+    supply_power:
+        essentials:
+            parent: supply_plus
+            carrier: power
 
 techs:
     supply_gas:
@@ -16,9 +21,22 @@ techs:
         costs:
             monetary:
                 interest_rate: 0.10
-                om_con: 0.044 # 4.4p/kWh gas price #ppt
-                energy_cap: 1
+                om_con: 0.44 # 4.4p/kWh gas price #ppt
 
+    supply_grid_power:
+        essentials:
+            name: 'National grid import'
+            color: '#C5ABE3'
+            parent: supply
+            carrier: power
+        constraints:
+            resource: inf
+            energy_cap_max: 2000
+            lifetime: 25
+        costs:
+            monetary:
+                interest_rate: 0.10
+                om_con: 0.4 # 10p/kWh electricity price #ppt
 
 ##-Renewables-##
 
@@ -27,7 +45,7 @@ techs:
         essentials:
             name: 'Solar'
             color: '#ffcc00'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 0.95 #inverter losses
@@ -35,7 +53,7 @@ techs:
             resource: file=pv_cf.csv
             force_resource: true
             resource_unit: energy_per_cap
-            resource_area_per_energy_cap: 0.08
+            resource_area_per_energy_cap: 0.007
         costs:
             monetary:
                 interest_rate: 0.10
@@ -47,14 +65,14 @@ techs:
         essentials:
             name: 'Onshore Wind'
             color: '#1aa39c'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1
             lifetime: 20
             resource: file=wind_cf.csv
             resource_unit: energy_per_cap
-            resource_area_per_energy_cap: 0.25
+            resource_area_per_energy_cap: 0.01
         costs:
             monetary:
                 interest_rate: 0.10
@@ -66,7 +84,7 @@ techs:
         essentials:
             name: 'Offshore Wind'
             color: '#4ca3dd'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1 #inverter losses
@@ -84,7 +102,7 @@ techs:
         essentials:
             name: 'Coal'
             color: '#636466'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1 #inverter losses
@@ -102,7 +120,7 @@ techs:
         essentials:
             name: 'Nuclear'
             color: '#636466'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1 #inverter losses
@@ -119,7 +137,7 @@ techs:
         essentials:
             name: 'Other'
             color: '#636466'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1 #inverter losses
@@ -136,7 +154,7 @@ techs:
         essentials:
             name: 'Waste'
             color: '#636466'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1 #inverter losses
@@ -153,7 +171,7 @@ techs:
         essentials:
             name: 'Oil'
             color: '#636466'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1 #inverter losses
@@ -166,28 +184,12 @@ techs:
                 energy_cap: 1120  # USD per kW
                 om_con: 0.14  # USD per kWh
 
-    cogeneration:
-        essentials:
-            name: 'Cogeneration'
-            color: '#636466'
-            parent: supply
-            carrier_out: power
-        constraints:
-            energy_eff: 1 #inverter losses
-            lifetime: 40
-            resource: inf
-            resource_unit: energy_per_cap
-        costs:
-            monetary:
-                interest_rate: 0.10
-                energy_cap: 1120  # USD per kW
-                om_con: 0.14  # USD per kWh
 
     geothermal:
         essentials:
             name: 'Geothermal'
             color: '#636466'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1 #inverter losses
@@ -200,15 +202,43 @@ techs:
                 energy_cap: 1120  # USD per kW
                 om_con: 0.14  # USD per kWh
 
+    #
+    # Heat Sources
+    #
+
+    cogeneration:
+        essentials:
+            name: 'Cogeneration'
+            color: '#E4AB97'
+            parent: conversion_plus
+            primary_carrier_out: power
+            carrier_in: gas
+            carrier_out: power
+            carrier_out_2: heat
+        constraints:
+            export_carrier: power
+            energy_eff: 0.405
+            carrier_ratios.carrier_out_2.heat: 0.8
+            lifetime: 25
+        costs:
+            monetary:
+                interest_rate: 0.10
+                energy_cap: 750
+                om_prod: 0.004  # .4p/kWh for 4500 operating hours/year
+
     biomass:
         essentials:
             name: 'Biomass'
             color: '#afe31b'
-            parent: conversion
-            carrier_out: power
+            parent: conversion_plus
+            primary_carrier_out: power
             carrier_in: gas
+            carrier_out: power
+            carrier_out_2: heat
         constraints:
-            energy_eff: 0.48
+            export_carrier: power
+            energy_eff: 0.405
+            carrier_ratios.carrier_out_2.heat: 0.8
             lifetime: 25
         costs:
             monetary:
@@ -218,23 +248,71 @@ techs:
                 om_prod: 0.15  # 4p/kWh for 4500 operating hours/year
 
 
-# Conventional
-    gas:
+    heat_pump_air:
         essentials:
-            name: 'Natural Gas'
-            color: '#f4a460'
+            name: 'Air-Sourced Heat Pump'
+            color: '#1eaa9d'
             parent: conversion
-            carrier_out: power
-            carrier_in: gas
+            carrier_out: heat
+            carrier_in: power
         constraints:
-            energy_eff: 0.405
+            energy_eff: file=cop_air.csv
             lifetime: 25
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 495 # € per KW
-                om_annual: 6.5 # € per year
-                om_prod: 0.4  # 4p/kWh for 4500 operating hours/year
+                om_con: 0.004  # .4p/kWh
+
+    heat_pump_ground:
+        essentials:
+            name: 'Ground-Sourced Heat Pump'
+            color: '#e2b044'
+            parent: conversion
+            carrier_out: heat
+            carrier_in: power
+        constraints:
+            energy_eff: file=cop_ground.csv
+            lifetime: 25
+        costs:
+            monetary:
+                interest_rate: 0.10
+                om_con: 0.004  # .4p/kWh
+
+    boiler:
+        essentials:
+            name: 'Natural gas boiler'
+            color: '#5a297b'
+            parent: conversion
+            carrier_out: heat
+            carrier_in: gas
+        constraints:
+            energy_eff: 0.85
+            lifetime: 25
+        costs:
+            monetary:
+                interest_rate: 0.10
+                om_con: 0.004  # .4p/kWh
+
+
+    gas:
+        essentials:
+            name: 'Natural Gas'
+            color: '#f4a460'
+            parent: conversion_plus
+            primary_carrier_out: power
+            carrier_in: gas
+            carrier_out: power
+            carrier_out_2: heat
+        constraints:
+            export_carrier: power
+            energy_eff: 0.405
+            carrier_ratios.carrier_out_2.heat: 0.8
+            lifetime: 25
+        costs:
+            monetary:
+                interest_rate: 0.10
+                energy_cap: 750
+                om_prod: 0.004  # .4p/kWh for 4500 operating hours/year
             # emissions:
             #   co2: 0.19
 
@@ -285,7 +363,7 @@ techs:
         essentials:
             name: 'Hydro'
             color: '#c6e2ff'
-            parent: supply
+            parent: supply_power
             carrier_out: power
         constraints:
             energy_eff: 1
@@ -349,6 +427,12 @@ techs:
             parent: demand
             carrier: power
 
+    demand_heat:
+        essentials:
+            name: 'Heat demand'
+            color: '#072486'
+            parent: demand
+            carrier: heat
     ##
     # Transmission
     ##
