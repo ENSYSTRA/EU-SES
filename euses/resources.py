@@ -8,6 +8,7 @@ import geokit as gk
 from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
 import geopandas as gpd
 
+
 class Power_Plants():
     def __init__(self, nuts_2):
 
@@ -69,7 +70,6 @@ class Power_Plants():
 
         nuts_2.ds = ds
 
-
 class Area():
     def __init__(self, nuts_2, scenario='Holtinger2016_med'):
         year =  nuts_2.year
@@ -107,7 +107,7 @@ class Area():
             else:
                 region_org=gk.geom.polygon(nuts_2_geo.buffer(0.001).exterior.coords, srs=srs)
                 ec = ec_scenario(scenario)
-                area_available = ec.areaAvailable/1e8
+                area_available = ec.areaAvailable/1e6
 
             ds['land_area'].loc[nuts_2_id] = area_available
 
@@ -115,23 +115,15 @@ class Offshore_Area():
     def __init__(self, nuts_2):
         ds = nuts_2.ds
         eez = gpd.read_file('data/resource/World_EEZ_v10_20180221/eez_v10.shp')
-        wdpa = gpd.read_file('data/resource/WDPA_Nov2018_marine-shapefile/WDPA_Nov2018_marine-shapefile-polygons.shp')
 
-        def filter_shapes_iso(shp,iso_3_id,shp_out):
-            shp_filt = shp.loc[shp.ISO3 == iso_3_id]
-            shp_filt.to_file(shp_out)
+        gl.Priors.loadDirectory('data/resource/glaes_offshore_data')
+
 
         def ec_area_calc(shp,list):
-            region=gk.geom.polygon(shp.buffer(0.001).exterior.coords)
-            ec = gl.ExclusionCalculator(region)
-            ec.excludeRasterType('data/resource/gebco/GEBCO_2019_-17_75_15_30_Geotiff.tif',value=(-1e6,-60))
-            ec.excludeRasterType('data/resource/gebco/GEBCO_2019_15_75_37_30_Geotiff.tif',value=(-1e6,-60))
-            ec = gl.ExclusionCalculator(region)
-            ec.excludeRasterType('data/resource/EMODnet_HA_Vessel_Density_2017avg_part2/2017_st_All_avg.tif', value=(0.5,1e6))
-            # ec.excludeVectorType('tmp/wdpa_filt.shp')
-            ec.excludeVectorType('data/spatial/NUTS/NUTS_RG_10M_2013_3035_LEVL_0.geojson',srs = gk.srs.EPSG3035, buffer=22e3)
-            ec.excludeVectorType('data/resource/Emodnet_HA_Pipelines_20171220/Emodnet_HA_Pipelines_20171220.shp', buffer=1.8e3)
-            list.append(ec.areaAvailable/1e8)
+            region = gk.geom.polygon(shp.buffer(0.001).exterior.coords)
+            ec = gl.predefinedExclusions.ExclusionSets.Wind.Gusatu2020_StatusQuo(region)
+            ec.excludePrior("ocean_depth_threshold", value=(-110,-60))
+            list.append(ec.areaAvailable/1e6)
 
 
         ds['offshore_area'] = (('nuts_2'),(np.array([0.0]*len(ds.nuts_2))))
@@ -144,7 +136,6 @@ class Offshore_Area():
                 iso_id = pr.get_metadata(c,'iso_3')
                 eez_c =  eez.query('MRGID =='+str(offshore_mrgid))
                 eez_geo = eez_c.iloc[0].geometry
-                # filter_shapes_iso(wdpa,iso_id,'tmp/wdpa_filt.shp')
                 area_available_list = []
                 if type(eez_geo) is MultiPolygon:
                     for j in range(len(eez_geo)):

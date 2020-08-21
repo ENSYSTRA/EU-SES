@@ -30,7 +30,7 @@ def create_location_yaml(regions_geo, ds_regions):
     else:
         dict_file = {'locations': {}}
 
-    tech_area = {'Solar':12 , 'Wind':4 , 'Wind Offshore':5.36}
+    tech_area = {'Solar':145 , 'Wind':10 , 'Wind Offshore':5.36}
 
     line_lenght = [0]
     for i, row in regions_geo.iterrows():
@@ -88,10 +88,10 @@ def create_model_yaml(regions_geo, ds_regions):
     dict_file['model']['name'] = 'ESES model'
     dict_file['model']['calliope_version'] = '0.6.5'
     dict_file['model']['timeseries_data_path'] = 'timeseries_data'
-    dict_file['model']['subset_time'] = ['2010-01-01', '2010-12-31']
-    dict_file['model']['time'] = {'function':'resample','function_options':{'resolution': '3H'}}
+    dict_file['model']['subset_time'] = ['2010-01-01', '2010-06-30']
+    # dict_file['model']['time'] = {'function':'resample','function_options':{'resolution': '3H'}}
 
-    dict_file['run']['solver'] = 'gurobi'
+    dict_file['run']['solver'] = 'cbc'
     dict_file['run']['ensure_feasibility'] = 'false'
     dict_file['run']['bigM'] = 1e6
     dict_file['run']['zero_threshold'] = 1e-10

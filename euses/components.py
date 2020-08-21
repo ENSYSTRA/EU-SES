@@ -5,9 +5,7 @@ import xarray as xr
 from rasterstats import zonal_stats
 from shapely import wkt
 
-import pyproj
 from shapely.ops import transform
-transformer = pyproj.Transformer.from_crs('epsg:3035','esri:54009')
 
 from . import parameters as pr
 from .utilib import download_re_ninja
