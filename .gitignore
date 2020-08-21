@@ -1,4 +1,5 @@
 data/
 eu.nc
-calliope_model/__pycache__
-euses/__pycache__
+eu-31.nc
+calliope_model/
+euses/__pycache__/

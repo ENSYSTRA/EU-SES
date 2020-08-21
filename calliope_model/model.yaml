@@ -7,13 +7,9 @@ model:
   timeseries_data_path: timeseries_data
   subset_time:
   - '2010-01-01'
-  - '2010-12-31'
-  time:
-    function: resample
-    function_options:
-      resolution: 3H
+  - '2010-06-30'
 run:
-  solver: gurobi
+  solver: cbc
   ensure_feasibility: 'false'
   bigM: 1000000.0
   zero_threshold: 1e-10
@@ -27,11 +23,11 @@ group_constraints:
     - solar
     locs:
     - region_0
-    resource_area_max: 135.4975
+    resource_area_max: 3335.7599999999998
   region_group_1:
     techs:
     - wind
     - solar
     locs:
     - region_1
-    resource_area_max: 29.217599999999997
+    resource_area_max: 1694.6639
