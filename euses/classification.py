@@ -34,8 +34,6 @@ def aggregation(ds, groups):
             ds_is =  dsc.sel(nuts_2=nuts)
             group_area = sum([i.area for i in ds_is['geometry'].values])
             offshore_area_sum = ds_is['offshore_area'].sum()
-            for var in sums_vars:
-                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
 
             for var in area_weighted_vars:
                 for n in nuts:
@@ -43,6 +41,9 @@ def aggregation(ds, groups):
                         ds_is[var].loc[n] = dsc[var].loc[n] * dsc['offshore_area'].loc[n] / offshore_area_sum
                     else:
                         ds_is[var].loc[n] = dsc[var].loc[n] * dsc['geometry'].loc[n].values.item().area / group_area
+                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+
+            for var in sums_vars:
                 dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
 
             dsc['geometry'].loc[nuts[0]] = np.array(str(unary_union(ds_is['geometry'].loc[nuts].values)))
