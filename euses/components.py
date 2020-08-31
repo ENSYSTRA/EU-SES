@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 from rasterstats import zonal_stats
 from shapely import wkt
+import copy
 
 from shapely.ops import transform
 
@@ -168,14 +169,11 @@ class Dataset():
         create_model_yaml(regions_geo, ds_regions)
 
     def filter_countries(self, countries):
-
-        self.countries = countries
-
-        ds_filt = self.ds.copy(deep=True)
-
+        filt_ds = copy.deepcopy(self)
         nuts_0s = [pr.get_metadata(c,'nuts_id') for c in countries]
-        for i in nuts_0s:
-            ds_filt =  self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).copy()
-        ds_filt = ds_filt.sel(nuts_0=nuts_0s)
+        filt_ds.ds = self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).copy()
+        filt_ds.ds['wind_offshore_cf'] = self.ds['wind_offshore_cf'].sel(nuts_0=nuts_0s)
+        filt_ds.ds['temperature'] = self.ds['temperature'].sel(nuts_0=nuts_0s)
+        filt_ds.countries = countries
 
-        self.ds = ds_filt
+        return filt_ds
