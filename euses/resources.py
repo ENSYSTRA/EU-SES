@@ -143,7 +143,7 @@ class Offshore_Area():
                 else:
                     ec_area_calc(eez_geo,area_available_list)
 
-                nuts_gdp = gpd.GeoDataFrame(ds.sel(nuts_0=nuts_0)['geometry'].to_dataframe())
+                nuts_gdp = gpd.GeoDataFrame(ds.where(ds['country_code'].isin(nuts_0), drop = True)['geometry'].to_dataframe())
                 eez_c_geo = eez_c.to_crs({'init': 'epsg:3035'}).iloc[0].geometry
 
                 area_series = nuts_gdp['geometry'].buffer(100).intersection(eez_c_geo.buffer(22000)).area
