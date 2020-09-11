@@ -1,0 +1,12 @@
+scenarios:
+  no_nuclear_operation: ['no_nuclear']
+
+
+overrides:
+  no_nuclear:
+    group_constraints:
+      systemwide_no_nuclear:
+        techs:
+        - nuclear
+        carrier_prod_max:
+          power: 0
