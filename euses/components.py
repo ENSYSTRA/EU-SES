@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 from rasterstats import zonal_stats
 from shapely import wkt
+import copy
 
 from shapely.ops import transform
 
@@ -154,7 +155,10 @@ class Dataset():
 
         self.ds_regions = ds
 
-    def create_calliope_model(self):
+    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap=None):
+        '''
+        op_mode: either 'plan' or 'operate'
+        '''
         ds_regions = self.ds_regions
 
         regions_geo = gpd.GeoDataFrame(columns=['geometry'], geometry=ds_regions['geometry'].values)
@@ -164,18 +168,15 @@ class Dataset():
         regions_geo = regions_geo.to_crs({'init': 'epsg:4326'})
 
         create_timeseries_csv(regions_geo, ds_regions)
-        create_location_yaml(regions_geo, ds_regions)
-        create_model_yaml(regions_geo, ds_regions)
+        create_location_yaml(regions_geo, ds_regions,sectors)
+        create_model_yaml(self.ds, regions_geo, ds_regions, sectors, op_mode, co2_cap)
 
     def filter_countries(self, countries):
-
-        self.countries = countries
-
-        ds_filt = self.ds.copy(deep=True)
-
+        filt_ds = copy.deepcopy(self)
         nuts_0s = [pr.get_metadata(c,'nuts_id') for c in countries]
-        for i in nuts_0s:
-            ds_filt =  self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).copy()
-        ds_filt = ds_filt.sel(nuts_0=nuts_0s)
+        filt_ds.ds = self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).copy()
+        filt_ds.ds['wind_offshore_cf'] = self.ds['wind_offshore_cf'].sel(nuts_0=nuts_0s)
+        filt_ds.ds['temperature'] = self.ds['temperature'].sel(nuts_0=nuts_0s)
+        filt_ds.countries = countries
 
-        self.ds = ds_filt
+        return filt_ds

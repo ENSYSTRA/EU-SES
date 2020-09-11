@@ -1,5 +1,6 @@
 data/
 eu.nc
-eu-31.nc
-calliope_model/
 euses/__pycache__/
+test_file.py
+eu_28.nc
+nl.nc

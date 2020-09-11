@@ -1,127 +1,66 @@
 locations:
   region_0:
     coordinates:
-      lat: 52.32
-      lon: 6.19
+      lat: 51.11
+      lon: 10.39
     techs:
-      supply_gas:
-      boiler:
-      heat_pump_air:
-      heat_pump_ground:
       demand_electricity:
         constraints:
           resource: file=power.csv
       demand_heat:
         constraints:
           resource: file=heat.csv
-      biomass:
-        constraints:
-          energy_cap_equals: 0.0
-      coal:
-        constraints:
-          energy_cap_equals: 2150.0
-      cogeneration:
-        constraints:
-          energy_cap_equals: 0.0
-      gas:
-        constraints:
-          energy_cap_equals: 4882.0
-      geothermal:
-        constraints:
-          energy_cap_equals: 0.0
-      nuclear:
-        constraints:
-          energy_cap_equals: 0.0
-      oil:
-        constraints:
-          energy_cap_equals: 0.0
-      other:
-        constraints:
-          energy_cap_equals: 0.0
-      solar:
-        constraints:
-          resource_area_min: 0.0
-      waste:
-        constraints:
-          energy_cap_equals: 0.0
-      wind:
-        constraints:
-          resource_area_min: 30.35
-      wind_offshore:
-        constraints:
-          resource_area_min: 20.149253731343283
-          resource_area_max: 4914.49
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 0.0
-  region_1:
-    coordinates:
-      lat: 52.21
-      lon: 5.06
-    techs:
       supply_gas:
-      boiler:
+      supply_biogas:
       heat_pump_air:
       heat_pump_ground:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
       biomass:
         constraints:
-          energy_cap_equals: 0.0
+          energy_cap_equals: 1655.3000000000004
       coal:
         constraints:
-          energy_cap_equals: 2760.0
+          energy_cap_min: 47772.9
       cogeneration:
         constraints:
-          energy_cap_equals: 0.0
+          energy_cap_min: 0.0
       gas:
         constraints:
-          energy_cap_equals: 4430.0
+          energy_cap_min: 24212.249999999996
       geothermal:
         constraints:
           energy_cap_equals: 0.0
       nuclear:
         constraints:
-          energy_cap_equals: 485.0
+          energy_cap_min: 11171.0
       oil:
         constraints:
-          energy_cap_equals: 0.0
+          energy_cap_min: 2851.2
       other:
         constraints:
-          energy_cap_equals: 0.0
+          energy_cap_min: 756.9000000000001
       solar:
         constraints:
-          resource_area_min: 0.0
+          energy_cap_min: 44859.5553570046
       waste:
         constraints:
-          energy_cap_equals: 0.0
+          energy_cap_equals: 1588.8000000000002
       wind:
         constraints:
-          resource_area_min: 29.359
+          energy_cap_min: 53105.6793330002
       wind_offshore:
         constraints:
-          resource_area_min: 358.17164179104475
-          resource_area_max: 18846.56
+          energy_cap_min: 4151.3
+          resource_area_max: 16551.75
       hdam:
         constraints:
-          energy_cap_equals: 0.0
+          energy_cap_equals: 202.8
+          storage_cap_equals: 1216.8000000000002
       hphs:
         constraints:
-          energy_cap_equals: 0.0
+          energy_cap_equals: 7428.620000000001
+          storage_cap_equals: 35400.0
       hror:
         constraints:
-          energy_cap_equals: 0.0
-links:
-  region_0,region_1:
-    techs:
-      ac_transmission:
+          energy_cap_equals: 3479.022804375153
+      battery:
+      hydrogen:

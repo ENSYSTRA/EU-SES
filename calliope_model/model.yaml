@@ -1,6 +1,7 @@
 import:
-- model_config/techs.yaml
+- model_config/techs_elec_heat.yaml
 - model_config/locations.yaml
+- scenarios.yaml
 model:
   name: ESES model
   calliope_version: 0.6.5
@@ -11,23 +12,24 @@ model:
 run:
   solver: cbc
   ensure_feasibility: 'false'
-  bigM: 1000000.0
-  zero_threshold: 1e-10
+  bigM: 1000000000.0
+  zero_threshold: 1e-15
   mode: plan
   objective_options.cost_class:
     monetary: 1
 group_constraints:
-  region_group_0:
+  region_0_land_area_cap:
     techs:
     - wind
     - solar
     locs:
     - region_0
-    resource_area_max: 3335.7599999999998
-  region_group_1:
+    resource_area_max: 37356.3161
+  systemwide_co2_cap:
+    cost_max:
+      co2: 3000000000.0
+  systemwide_biogas_cap:
     techs:
-    - wind
-    - solar
-    locs:
-    - region_1
-    resource_area_max: 1694.6639
+    - supply_biogas
+    carrier_prod_max:
+      gas: 128813559.32203391
