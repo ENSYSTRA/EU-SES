@@ -107,8 +107,12 @@ class Dataset():
 
         wind_offshore_to_nuts2(ds) # add wind-offshore capacity factor to nuts_2 areas
 
-        island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0']]
+        island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
+
         ds = aggregation(ds, island_groups)
+
+        if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
+            ds = aggregation(ds, [['BE34','LU00']])
 
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
@@ -178,6 +182,9 @@ class Dataset():
         if 'EE00' in nuts_0s:
             nuts_0s.remove('EE00')
             nuts_0s.append('EE')
+        if 'GR' in nuts_0s:
+            nuts_0s.remove('GR')
+            nuts_0s.append('EL')
         nuts_0s_invers = [pr.get_metadata(c,'nuts_id') for c in filt_ds.countries]
         nuts_2s = self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).coords['nuts_2'].values
         nuts_2s_invers = list(self.ds.coords['nuts_2'].values)
