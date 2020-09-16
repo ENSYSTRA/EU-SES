@@ -62,8 +62,8 @@ techs:
         costs:
             monetary:
                 interest_rate: 0.10
-                om_annual: 13600
-                energy_cap: 800000
+                om_annual: 10880
+                energy_cap: 640000
                 om_prod: 0
             co2:
                 om_prod: 0
@@ -76,16 +76,16 @@ techs:
             carrier_out: power
         constraints:
             energy_eff: 1
-            lifetime: 22
+            lifetime: 25
             resource: file=wind_cf.csv
             resource_unit: energy_per_cap
             resource_area_per_energy_cap: 0.01
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 135000
+                energy_cap: 130000
                 om_prod: 0
-                om_annual: 32400
+                om_annual: 28600
             co2:
                 om_prod: 0
 
@@ -97,16 +97,16 @@ techs:
             carrier_out: power
         constraints:
             energy_eff: 1
-            lifetime: 20
+            lifetime: 30
             resource: file=wind_offshore_cf.csv
             resource_unit: energy_per_cap
             resource_area_per_energy_cap: 0.19  # wind farm density with 5.36 MW/km_2 and 56% use of comercially available sea area https://windeurope.org/wp-content/uploads/files/about-wind/reports/Unleashing-Europes-offshore-wind-potential.pdf
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 2880000
+                energy_cap: 2580000
                 om_prod: 0
-                om_annual: 92160
+                om_annual: 77400
             co2:
                 om_prod: 0
 
@@ -129,7 +129,7 @@ techs:
                 om_annual: 40000
                 om_con: 10.08 # IDA's Energy Vision 2050 : 2.8 €2015/GJ * 3.6 GJ/MWh
             co2:
-                om_prod:  880
+                om_prod:  840
 
     nuclear: # [1] - 11 Nuclear fission - 11. 1 Generation II - Table 34. Generation II LWR
         essentials:
@@ -138,8 +138,8 @@ techs:
             parent: supply
             carrier_out: power
         constraints:
-            energy_eff: 1
-            lifetime: 50
+            energy_eff: 0.33
+            lifetime: 60
             resource: inf
             resource_unit: energy_per_cap
         costs:
@@ -202,16 +202,16 @@ techs:
             parent: supply
             carrier_out: power
         constraints:
-            energy_eff: 1
-            lifetime: 40
+            energy_eff: 23.9
+            lifetime: 30
             resource: inf
             resource_unit: energy_per_cap
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 4970000
+                energy_cap: 4470000
                 # om_prod: 1  # [4]
-                om_annual: 79520
+                om_annual: 80460
             co2:
                 om_prod: 122
     #
@@ -225,14 +225,14 @@ techs:
             parent: supply
             carrier_out: power
         constraints:
-            energy_eff: 0.59
-            lifetime: 25
+            energy_eff: 0.61
+            lifetime: 30
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 1000000
+                energy_cap: 990000
                 om_prod: 4
-                om_annual: 39000
+                om_annual: 38610.0
                 om_con: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
             co2:
                 om_prod: 230
@@ -244,17 +244,17 @@ techs:
             parent: supply
             carrier_out: power
         constraints:
-            energy_eff: 0.30
-            lifetime: 25
+            energy_eff: 0.61
+            lifetime: 30
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 6300000
-                om_prod: 9.3
-                om_annual: 281000 
-                om_con: 21.6 # [2] : 6 €2015/GJ * 3.6 GJ/MWh - Biomass
+                energy_cap: 990000
+                om_prod: 4
+                om_annual: 38610.0
+                om_con: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
             co2:
-                om_prod: 0
+                om_prod: 230
 
     waste: # [1] - Bioenergy power generation - 13.5 Municipal solid waste incinerator
         essentials:
@@ -282,17 +282,17 @@ techs:
             parent: supply
             carrier_out: power
         constraints:
-            energy_eff: 0.60
-            lifetime: 25
+            energy_eff: 0.61
+            lifetime: 30
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 850000
-                om_prod: 2
-                om_annual: 21250
+                energy_cap: 990000
+                om_prod: 4
+                om_annual: 38610.0
                 om_con: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
             co2:
-                om_prod: 360
+                om_prod: 230
 
     hror: # [1] - 6.4 Hydropower run-of-a-river
         essentials:
@@ -326,7 +326,7 @@ techs:
             storage_cap_max: inf
             # energy_cap_per_storage_cap_max: 2
             energy_eff: 0.90  # round trip efficiency
-            storage_loss: 0  # No loss over time assumed
+            storage_loss: 0.001  # No loss over time assumed
             lifetime: 10
         costs:
             monetary:
@@ -367,7 +367,7 @@ techs:
             parent: supply_plus
             carrier_out: power
         constraints:
-            # energy_cap_per_storage_cap_equals: 0.008
+            energy_cap_per_storage_cap_equals: 0.008
             resource: file=hydro_inflow.csv
             resource_unit: energy_per_cap
             energy_eff: 1
