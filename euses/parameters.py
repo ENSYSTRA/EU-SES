@@ -16,7 +16,7 @@ countries =[
         "nuts_id": "BE",
         "dh_share": 0.62,
         "MRGID": 3293,
-        "iso_3": "BEL"
+        "iso_3": "BEL",
         "co_2_1990": 23537
         },
         {
@@ -31,8 +31,8 @@ countries =[
         "renewables_nj_id": "HR",
         "nuts_id": "HR",
         "dh_share": 0.22,
-        },
         "co_2_1990": 3729
+        },
         {
         "name": "Czech Rep.",
         "renewables_nj_id": "CZ",
@@ -46,7 +46,7 @@ countries =[
         "nuts_id": "DK",
         "dh_share": 0.51,
         "MRGID": 5674,
-        "iso_3": "DNK"
+        "iso_3": "DNK",
         "co_2_1990": 24697
         },
         {
@@ -64,7 +64,7 @@ countries =[
         "dh_share": 0.39,
         "MRGID": 5676,
         "iso_3": "FIN",
-        "psh_e": 5000
+        "psh_e": 5000,
         "co_2_1990": 16453
         },
         {
@@ -74,7 +74,7 @@ countries =[
         "dh_share": 0.50,
         "MRGID": 5677,
         "iso_3": "FRA",
-        "psh_e": 9800
+        "psh_e": 9800,
         "co_2_1990": 49161
         },
         {
@@ -83,7 +83,7 @@ countries =[
         "nuts_id": "DE",
         "dh_share": 0.59,
         "MRGID": 5669,
-        "iso_3": "DEU"
+        "iso_3": "DEU",
         "co_2_1990": 338451
         },
         {
@@ -92,7 +92,7 @@ countries =[
         "nuts_id": "GR",
         "hotmaps_id": "EL",
         "dh_share": 0.42,
-        "psh_e": 2400
+        "psh_e": 2400,
         "co_2_1990": 40617
         },
         {
@@ -108,7 +108,7 @@ countries =[
         "nuts_id": "IE",
         "dh_share": 0.46,
         "MRGID": 5681,
-        "iso_3": "IRL"
+        "iso_3": "IRL",
         "co_2_1990": 10876
         },
         {
@@ -137,7 +137,7 @@ countries =[
         "renewables_nj_id": "LU",
         "nuts_id": "LU",
         "dh_share": 0.55,
-        "co_2_1990": 33
+        "co_2_1990": 33,
         },
         {
         "name": "Netherlands",
@@ -145,7 +145,7 @@ countries =[
         "nuts_id": "NL",
         "dh_share": 0.68,
         "MRGID": 5668,
-        "iso_3": "NLD"
+        "iso_3": "NLD",
         "co_2_1990": 40027
         },
         {
@@ -155,7 +155,7 @@ countries =[
         "dh_share": 0.36,
         "MRGID": 5686,
         "iso_3": "NOR",
-        "psh_e": 84000
+        "psh_e": 84000,
         "co_2_1990": 418
         },
         {
@@ -170,7 +170,7 @@ countries =[
         "renewables_nj_id": "PT",
         "nuts_id": "PT",
         "dh_share": 0.23,
-        "psh_e": 2600
+        "psh_e": 2600,
         "co_2_1990": 14355
         },
         {
@@ -178,15 +178,15 @@ countries =[
         "renewables_nj_id": "RO",
         "nuts_id": "RO",
         "dh_share": 0.23,
-        },
         "co_2_1990": 66280
+        },
         {
         "name": "Slovakia",
         "renewables_nj_id": "SK",
         "nuts_id": "SK",
         "dh_share": 0.27,
-        },
         "co_2_1990": 14700
+        },
         {
         "name": "Slovenia",
         "renewables_nj_id": "SI",
@@ -199,7 +199,7 @@ countries =[
         "renewables_nj_id": "ES",
         "nuts_id": "ES",
         "dh_share": 0.48,
-        "psh_e": 18400
+        "psh_e": 18400,
         "co_2_1990": 65575
         },
         {
@@ -209,7 +209,7 @@ countries =[
         "dh_share": 0.41,
         "MRGID": 5694,
         "iso_3": "SWE",
-        "psh_e": 34000
+        "psh_e": 34000,
         "co_2_1990": 7714
         },
         {
@@ -217,7 +217,7 @@ countries =[
         "renewables_nj_id": "CH",
         "nuts_id": "CH",
         "dh_share": 0.70,
-        "psh_e": 8400
+        "psh_e": 8400,
         "co_2_1990": 2152
         },
         {
@@ -226,7 +226,7 @@ countries =[
         "nuts_id": "UK",
         "dh_share": 0.75,
         "MRGID": 5696,
-        "iso_3": "GBR"
+        "iso_3": "GBR",
         "co_2_1990": 203116
         },
     ]
