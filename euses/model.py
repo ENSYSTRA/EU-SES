@@ -4,9 +4,11 @@ import sys
 import ruamel.yaml
 from geopy import distance
 yaml = ruamel.yaml.YAML()
+from . import parameters as pr
 
 
 tech_area = {'Solar':145 , 'Wind':5 , 'Wind Offshore':5.36}
+dc_links = pd.read_csv('data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = pd.DataFrame(index= ds_regions.time.values)
@@ -86,21 +88,32 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                 trans_dic = {'techs':{'ac_transmission': None }}
                 dict_file['links']['{},{}'.format(region, region_to)] = trans_dic
 
+    for i,rows in dc_links.iterrows():
+        rows_filtr_from = regions_geo[regions_geo.id.astype(str).str.contains(rows['from'],regex=True)]
+        rows_filtr_to = regions_geo[regions_geo.id.astype(str).str.contains(rows['to'],regex=True)]
+        if (rows_filtr_to.empty or rows_filtr_from.empty) == False:
+            fr_index = 'region_{}'.format(rows_filtr_from.index.values[0])
+            to_index = 'region_{}'.format(rows_filtr_to.index.values[0])
+            if rows_filtr_from.iloc[0].id != rows_filtr_to.iloc[0].id:
+                trans_dic = {'techs':{'dc_transmission': {'constraints':{'energy_cap_equals':rows.capacity}} }}
+                dict_file['links']['{},{}'.format(fr_index, to_index)] = trans_dic
+
+
     with open(r'calliope_model/model_config/locations.yaml', 'w') as file:
         documents = yaml.dump(dict_file, file)
 
-def create_model_yaml(ds, regions_geo, ds_regions, sectors, op_mode, co2_cap):
+def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
+    ds_regions = self.ds_regions
+    pop_factor = ds_regions["population"].sum()/500.9e6
+    year = self.year
 
     dict_file = {'import': {}, 'model': {}, 'run': {}}
     dict_file['import'] = ['model_config/techs_elec.yaml','model_config/locations.yaml', 'scenarios.yaml']
 
-    if 'heat' in sectors:
-        dict_file['import'] = ['model_config/techs_elec_heat.yaml','model_config/locations.yaml']
-
     dict_file['model']['name'] = 'ESES model'
     dict_file['model']['calliope_version'] = '0.6.5'
     dict_file['model']['timeseries_data_path'] = 'timeseries_data'
-    dict_file['model']['subset_time'] = ['2010-01-01', '2010-06-30']
+    dict_file['model']['subset_time'] = ['{}-01-01'.format(year), '{}-12-31'.format(year)]
     # dict_file['model']['time'] = {'function':'resample','function_options':{'resolution': '3H'}}
 
     dict_file['run']['solver'] = 'cbc'
@@ -110,8 +123,8 @@ def create_model_yaml(ds, regions_geo, ds_regions, sectors, op_mode, co2_cap):
     dict_file['run']['mode'] = op_mode
     dict_file['run']['objective_options.cost_class'] = {'monetary': 1}
 
+    dict_file['group_constraints'] = {}
     if op_mode == 'plan':
-        dict_file['group_constraints'] = {}
         for i,rows in regions_geo.iterrows():
             dict_file['group_constraints']['region_{}_land_area_cap'.format(i)] = {}
             dict_file['group_constraints']['region_{}_land_area_cap'.format(i)]['techs'] =['wind','solar']
@@ -119,22 +132,26 @@ def create_model_yaml(ds, regions_geo, ds_regions, sectors, op_mode, co2_cap):
             area_max = ds_regions['land_area'].loc[rows.id].values.item()
             wind_solar_area = (ds_regions['power_plants'].loc[rows.id,'Solar'].values.item() / tech_area.get('Solar')) +  (ds_regions['power_plants'].loc[rows.id,'Wind'].values.item() / tech_area.get('Wind'))
             if area_max < wind_solar_area:
-                area_max = wind_solar_area
+                area_max = wind_solar_area + 1
             dict_file['group_constraints']['region_{}_land_area_cap'.format(i)]['resource_area_max'] = area_max
 
         # CO2 emissions constraint
-        if co2_cap!=None:
-            dict_file['group_constraints']['systemwide_co2_cap'] = {'cost_max':{'co2':co2_cap}}
+        if co2_cap_factor!=None:
+            c02_vol = sum([pr.get_metadata(c,'co_2_1990') for c in self.countries])*1e6
+            dict_file['group_constraints']['systemwide_co2_cap'] = {'cost_max':{'co2':co2_cap_factor*c02_vol}}
 
     else:
-        dict_file['import'] = ['model_config/techs_elec_heat.yaml','model_config/locations.yaml']
+        dict_file['import'] = ['model_config/techs_elec.yaml','model_config/locations.yaml']
         dict_file['run']['operation'] = {'horizon': 48, 'window': 24}
 
+
     # biogas cap
-    pop_factor = ds_regions["population"].sum()/ds["population"].sum()
-    biogas_cap = float(pop_factor) * 76e6 /0.59
+    biogas_cap = float(pop_factor) * 116.4e6
     constraint = {'techs':['supply_biogas'],'carrier_prod_max':{'gas':biogas_cap}}
     dict_file['group_constraints']['systemwide_biogas_cap'] = constraint
+
+    if 'heat' in sectors:
+        dict_file['import'] = ['model_config/techs_elec_heat.yaml','model_config/locations.yaml', 'scenarios.yaml']
 
     with open(r'calliope_model/model.yaml', 'w') as file:
         documents = yaml.dump(dict_file, file)
