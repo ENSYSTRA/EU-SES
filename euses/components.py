@@ -101,7 +101,7 @@ class Dataset():
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
         return self
 
-    def create_regions(self, method, area_factor, initial_val=1, initial_seed=1):
+    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1):
 
         ds = self.ds.copy(deep=True)
 
@@ -155,7 +155,7 @@ class Dataset():
 
         self.ds_regions = ds
 
-    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap=None):
+    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap_factor=None):
         '''
         op_mode: either 'plan' or 'operate'
         '''
@@ -169,14 +169,21 @@ class Dataset():
 
         create_timeseries_csv(regions_geo, ds_regions)
         create_location_yaml(regions_geo, ds_regions,sectors)
-        create_model_yaml(self.ds, regions_geo, ds_regions, sectors, op_mode, co2_cap)
+        create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor)
 
     def filter_countries(self, countries):
         filt_ds = copy.deepcopy(self)
+        [filt_ds.countries.remove(c) for c in countries]
         nuts_0s = [pr.get_metadata(c,'nuts_id') for c in countries]
-        filt_ds.ds = self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).copy()
-        filt_ds.ds['wind_offshore_cf'] = self.ds['wind_offshore_cf'].sel(nuts_0=nuts_0s)
-        filt_ds.ds['temperature'] = self.ds['temperature'].sel(nuts_0=nuts_0s)
+        if 'EE00' in nuts_0s:
+            nuts_0s.remove('EE00')
+            nuts_0s.append('EE')
+        nuts_0s_invers = [pr.get_metadata(c,'nuts_id') for c in filt_ds.countries]
+        nuts_2s = self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).coords['nuts_2'].values
+        nuts_2s_invers = list(self.ds.coords['nuts_2'].values)
+        [nuts_2s_invers.remove(n2) for n2 in nuts_2s]
+        filt_ds.ds = filt_ds.ds.drop(nuts_0s_invers,dim='nuts_0')
+        filt_ds.ds = filt_ds.ds.drop(nuts_2s_invers,dim='nuts_2')
         filt_ds.countries = countries
 
         return filt_ds
