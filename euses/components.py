@@ -159,14 +159,19 @@ class Dataset():
 
         self.ds_regions = ds
 
-    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap_factor=None):
+    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap_factor=None, national=False):
         '''
         op_mode: either 'plan' or 'operate'
         '''
         ds_regions = self.ds_regions
 
         regions_geo = gpd.GeoDataFrame(columns=['geometry'], geometry=ds_regions['geometry'].values)
-        regions_geo['id'] = ds_regions['geometry'].coords['regions']
+        regions_geo['id'] = ['region_'+str(e) for e,id in enumerate(ds_regions['geometry'].coords['regions'].values)]
+        regions_geo['nuts_2s'] = ds_regions['geometry'].coords['regions'].values
+
+        if national == True:
+            regions_geo['id'] = ds_regions['country_code'].values
+
         regions_geo.crs = {'init': 'epsg:3035'}
 
         regions_geo = regions_geo.to_crs({'init': 'epsg:4326'})
