@@ -7,7 +7,7 @@ yaml = ruamel.yaml.YAML()
 from . import parameters as pr
 
 
-tech_area = {'Solar':145 , 'Wind':5 , 'Wind Offshore':5.36}
+tech_area = {'Solar':170 , 'Wind':5 , 'Wind Offshore':5.36}
 dc_links = pd.read_csv('data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
@@ -54,13 +54,13 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             for tech in ds_regions.coords[tech_coords].values:
                 installed_capacity = ds_regions[tech_var].loc[rows.nuts_2s,tech].values.item()
                 if tech != 'Hydro':
-                    dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_max':installed_capacity}}
+                    dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = None #{'constraints':{'energy_cap_max':installed_capacity}}
                     if tech in ['Wind Offshore','Wind','Solar']:
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
                     if tech == 'Wind Offshore':
                         area_max = ds_regions['offshore_area'].loc[rows.nuts_2s].values.item()
                         if area_max*tech_area.get(tech) < installed_capacity:
-                            area_max = installed_capacity / tech_area.get(tech)
+                            area_max = (installed_capacity / tech_area.get(tech))+1 
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['resource_area_max'] = area_max
                     if tech in ['HPHS', 'HDAM']:
                         storage_capacity = ds_regions['hydro_storage'].loc[rows.nuts_2s,tech].values.item()
