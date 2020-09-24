@@ -93,8 +93,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             fr_index = rows_filtr_from.id.values[0]
             to_index = rows_filtr_to.id.values[0]
             if rows_filtr_from.iloc[0].id != rows_filtr_to.iloc[0].id:
-                trans_dic = {'techs':{'dc_transmission': {'constraints':{'energy_cap_equals':rows.capacity}},
-                                                          'distance':rows.length/10 }}
+                trans_dic = {'techs':{'dc_transmission': {'constraints':{'energy_cap_equals':rows.capacity},'distance':rows.length/10} }}
                 dict_file['links']['{},{}'.format(fr_index, to_index)] = trans_dic
 
 
