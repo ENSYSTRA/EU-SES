@@ -93,7 +93,7 @@ techs:
             lifetime: 25
             resource: file=pv_cf.csv
             resource_unit: energy_per_cap
-            resource_area_per_energy_cap: 0.007
+            resource_area_per_energy_cap: 0.00588
         costs:
             monetary:
                 interest_rate: 0.10
@@ -115,11 +115,11 @@ techs:
             lifetime: 25
             resource: file=wind_cf.csv
             resource_unit: energy_per_cap
-            resource_area_per_energy_cap: 0.01
+            resource_area_per_energy_cap: 0.1
         costs:
             monetary:
                 interest_rate: 0.10
-                energy_cap: 130000
+                energy_cap: 1300000
                 om_prod: 0
                 om_annual: 28600
             co2:
@@ -286,7 +286,7 @@ techs:
             monetary:
                 interest_rate: 0.10
                 energy_cap: 5600000
-                om_prod: 5
+                om_prod: 0 #5
                 om_annual: 8400
             co2:
                 om_prod: 0
@@ -483,7 +483,7 @@ techs:
                 om_annual: 67500
                 # storage_cap: 15  # €/MWh storage capacity
                 energy_cap: 4500000
-                om_prod: 5
+                om_prod: 0 # 5
             co2:
                 om_prod: 0
 
@@ -505,7 +505,7 @@ techs:
                 om_annual: 45000 # €/MW per year
                 storage_cap: 15  # €/MWh storage capacity
                 energy_cap: 3000000
-                om_prod: 0.5
+                om_prod: 0 # 0.5
             co2:
                 om_prod: 0
 
