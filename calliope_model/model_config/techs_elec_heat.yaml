@@ -538,7 +538,7 @@ techs:
             carrier: power
         constraints:
             energy_cap_max: 2000
-            energy_eff: 0.98
+            energy_eff_per_distance: 0.95 # in per 1000 km
             lifetime: 25
         costs:
             monetary:
@@ -553,7 +553,7 @@ techs:
             carrier: power
         constraints:
             # energy_cap_max: 2000
-            energy_eff: 0.98
+            energy_eff_per_distance: 0.98 # in per 1000 km
             lifetime: 25
         costs:
             monetary:
