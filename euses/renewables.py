@@ -112,16 +112,16 @@ class Hydro():
         ds['hydro_storage'] = (('nuts_2','hydro_storage_tech'),(np.array(data_mwh).T))
 
         ds['hydro_inflow'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
-        for nuts_0_id in ds.coords['nuts_0'].values:
-            ds_c = ds.where(ds['country_code'] == nuts_0_id, drop = True)
+        for c in nuts_2.countries:
+            ds_c = nuts_2.filter_countries([c]).ds
+            id = pr.get_metadata(c,'renewables_nj_id')
+            replacement_dic = {'GR':'EL','LU':'CH','GB':'UK'}
             sum_hydro = ds_c['hydro_capacity'].sum().values.item()
-
             if sum_hydro > 0:
-                replacement_dic = {'GR':'EL','LU':'CH'}
-                if nuts_0_id in replacement_dic.keys():
-                    df_inflow = pd.read_csv('data/resource/Hydro_Inflow/Hydro_Inflow_'+replacement_dic.get(nuts_0_id)+'.csv').query('Year == '+ str(year))
+                if id in replacement_dic.keys():
+                    df_inflow = pd.read_csv('data/resource/Hydro_Inflow/Hydro_Inflow_'+replacement_dic.get(id)+'.csv').query('Year == '+ str(year))
                 else:
-                    df_inflow = pd.read_csv('data/resource/Hydro_Inflow/Hydro_Inflow_'+nuts_0_id+'.csv').query('Year == '+str(year))
+                    df_inflow = pd.read_csv('data/resource/Hydro_Inflow/Hydro_Inflow_'+id+'.csv').query('Year == '+str(year))
 
                 days = pd.date_range(str(year),str(year+1), freq='D')[:-1]
                 df_inflow_norm = pd.Series((df_inflow['Inflow [GWh]']/df_inflow['Inflow [GWh]'].max()).tolist(),index=days)
@@ -145,12 +145,15 @@ class Heat_Pumps():
         ds['cop_air'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
         ds['cop_ground'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
 
-        for nuts0_id in ds.coords['nuts_0']:
+        # for nuts0_id in ds.coords['nuts_0']:
+        for c in nuts_2.countries:
+            ds_c = nuts_2.filter_countries([c]).ds
+            # nuts0_id = c_ds.ds['country_code'].values[0]
             temperature_to_load = pd.DataFrame(
                 index=time_range.values,
                 columns=['temp_air', 'temp_ground', 'cop_air', 'cop_ground'])
 
-            temperature_to_load['temp_air'] = ds['temperature'].loc[nuts0_id]
+            temperature_to_load['temp_air'] = ds_c['temperature'].sum(axis=0)
                 # check hour, temperature_to_load starts with 0 which should be 24
 
             temp_air_3x = temperature_to_load.temp_air.to_list()*3
@@ -167,7 +170,7 @@ class Heat_Pumps():
                 temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] > 1,'cop_{}'.format(v)]  = 1
                 temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] < 1/cop_max_air,'cop_{}'.format(v)] = 1/k
 
-            ds_c = ds.where(ds['country_code'] == nuts0_id, drop = True)
+            # ds_c = ds.where(ds['country_code'] == nuts0_id, drop = True)
 
             for nuts_2_id in ds_c.coords['nuts_2'].values:
                 ds['cop_air'].loc[nuts_2_id] = (temperature_to_load.cop_air*cop_max_air).to_list()
@@ -192,7 +195,7 @@ class VRE_Capacity_Factor():
                 print(tech,c)
                 re_id = pr.get_metadata(c,'renewables_nj_id')
                 nuts0_id = pr.get_metadata(c,'nuts_id')
-                ds_c = ds.where(ds['country_code'] == re_id, drop = True)
+                ds_c = nuts_2.filter_countries([c]).ds
                 if tech != 'wind_offshore':
                     data = download_re_ninja(year, re_id, tech)
                     data = data.filter(items=[c for c in data.columns if c[3:] != 'TOTAL'])
@@ -203,11 +206,6 @@ class VRE_Capacity_Factor():
                             ds[tech+'_cf'].loc[nuts2_id] = data[nuts2_id]
 
                 else:
-                    if re_id in ['NL','DE','FI','DK','SE','NO','GB','IE','BE','FR']:
+                    if re_id in ['NL','DE','FI','DK','SE','NO','GB','IE','BE','FR','GR','EE']:
                         data = download_re_ninja(year, re_id, tech).filter(items=['national'])
                         ds['wind_offshore_cf'].loc[nuts0_id] = data['national']
-
-
-            # if tech != 'wind_offshore':
-            #     ds[tech+'_cf'] = (('nuts_2','time'),data_list)
-            #     ds[tech+'_cf'].attrs['unit'] = 'per unit of capacity'

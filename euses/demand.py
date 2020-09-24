@@ -4,7 +4,6 @@ import numpy as np
 from . import parameters as pr
 from rasterstats import zonal_stats
 
-
 import bisect
 
 class Power():
@@ -19,6 +18,8 @@ class Power():
         ds['power'].attrs['unit'] = 'MW'
 
         def entsoe_hourly(id,year):
+            if id == 'UK':
+                id = 'GB'
             n_rows = int(len(time_range) / 24)
             load_ger_range = load_excel.query('Year == {} & Country == "{}"'.format(year,id))
             load_sep = load_ger_range.drop(['Country','Year','Month','Day','Coverage ratio'], axis=1)[0:n_rows]
@@ -33,7 +34,9 @@ class Power():
 
         for c in nuts_2.countries:
             id = pr.get_metadata(c,'renewables_nj_id')
-            ds_c = ds.where(ds['country_code'] == id, drop = True)
+            ds_c = nuts_2.filter_countries([c]).ds
+
+            # ds_c = ds.where(ds['country_code'] == id, drop = True)
             load_profile = entsoe_hourly(id,year)
 
             population_sum = ds_c['population'].sum().item()
@@ -75,7 +78,7 @@ class Heat():
 
                 total_heat_ued = sh_dhw.query('topic == "Total useful heating demand - residential and service sector [TWh/y]"').value.iloc[0]
 
-                ds_c = ds.where(ds['country_code'] == id, drop = True)
+                ds_c = nuts_2.filter_countries([c]).ds
 
                 for sector, end_use in dict(zip(sectors,[end_uses,end_uses])).items():
                     sh_share = sh_dhw.query('feature == "Total useful heating demand,  per country - '+ sector +' sector [TWh/y]"').value.iloc[0]/total_heat_ued
