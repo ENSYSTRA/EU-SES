@@ -16,25 +16,21 @@ def group_power_plants(input_set,output_var):
 
 group_power_plants(['Gas','Cogeneration','Biomass'],'Cogeneration')
 
+north_east = ['Norway','Sweden','Denmark','Germany','Great Britain','Netherlands']
 
-
-north_east = ['Norway','Sweden','Finland','Estonia','Denmark','Germany','Ireland',
-                'Latvia','Lithuania','Great Britain','Netherlands','Spain','Italy','Switzerland','Austria',
-                'Belgium','France','Luxembourg']
-
-# central_west1 = ['Portugal','Spain','Italy','Switzerland','Austria']
+central_west1 = ['Portugal','Spain','Italy','Switzerland','Austria']
 
 # central_west2 = ['Spain','Italy','Switzerland','Austria','Netherlands','Belgium','France','Luxembourg',]
 #
-# south_east = ['Czech Rep.','Croatia','Bulgaria','Greece','Hungary','Romania',
-#                 'Slovakia','Slovenia','Poland']
+south_east = ['Czech Rep.','Croatia','Bulgaria','Greece','Hungary','Romania',
+                 'Slovakia','Slovenia','Poland']
 
 # fix greece,
 # slovenia infeasible
 # push to gihub
 # model = None
 
-filt_ds = eu_ds.filter_countries(north_east)
+filt_ds = eu_ds.filter_countries(central_west1)
 filt_ds.create_regions('poli_regions')
 filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.05, national=True)
 
@@ -42,6 +38,35 @@ filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_fa
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi','run.solver_options.DualReductions': 0} )
 
 model.run()
+
+model.plot.timeseries(subset={'costs': ['monetary']},array='power')#(array='carrier_con')
+
+
+model.plot.timeseries(array='storage')
+
+hror_mw = model.get_formatted_array('energy_cap').loc[:,'hror',]
+
+model.get_formatted_array('resource').loc[:,'hror',].max()
+
+hror_resource_ghw = model.get_formatted_array('resource').loc[:,'hror',].sum() * hror_mw /1e3
+
+hror_prod_ghw = model.get_formatted_array('carrier_prod').loc['power',:,'hror',].sum() /1e3
+
+model.get_formatted_array('carrier_prod').loc['power',:,'hror',].max()
+
+model.get_formatted_array('systemwide_capacity_factor').loc['power'].to_pandas()
+model.get_formatted_array('energy_cap').sum(axis=0).to_pandas()
+
+# model.to_netcdf('central_west1.nc')
+#
+# hdam_cap = model.get_formatted_array('energy_cap').loc['NO','hdam']
+# hdam_prod = model.get_formatted_array('carrier_prod').loc['power','NO','hdam',:].sum()
+# model.get_formatted_array('resource').loc['NO','hdam',:].sum()*hdam_cap
+#
+# model.plot.capacity(array='systemwide_capacity_factor')
+#
+# model.plot.timeseries(subset={'locs': ['NO'],'costs': ['monetary']})
+
 
 # model = calliope.Model('calliope_model/model.yaml')
 # model.plot.summary(to_file='calliope_model/plots1.html')
