@@ -7,7 +7,7 @@ yaml = ruamel.yaml.YAML()
 from . import parameters as pr
 
 
-tech_area = {'Solar':170 , 'Wind':5 , 'Wind Offshore':5.36}
+tech_area = {'Solar':76.6 , 'Wind':5 , 'Wind Offshore':5.36}
 dc_links = pd.read_csv('data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):

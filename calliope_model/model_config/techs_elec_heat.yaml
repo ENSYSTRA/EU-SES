@@ -21,7 +21,7 @@
 # [3]	A. Schröder, F. Kunz, J. Meiss, R. Mendelevitch, Current and Prospective Costs of Electricity Generation until 2050, (n.d.) 105.
 # [4]	Danish Energy Agency and Energinet, Technology Data for heating installations, (n.d.). https://ens.dk/sites/ens.dk/files/Analyser/technology_data_catalogue_for_individual_heating_installations.pdf (accessed June 29, 2020).
 # [5]	Darío R. Gómez, John D. Watterson, Branca B. Americano, Chia Ha, Gregg Marland, Emmanuel Matsika, Lemmy Nenge Namayanga, Balgis Osman-Elasha, John D. Kalenga Saka, Karen Treanton, Roberta Quadrelli, 2006 IPCC Guidelines for National Greenhouse Gas Inventories - Chapter 2 Stationary Combustion, 2006. https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf (accessed September 8, 2020).
-# [6]	V. Jülch, Comparison of electricity storage options using levelized cost of storage (LCOS) method, Appl. Energy. 183 (2016) 1594–1606. https://doi.org/10.1016/j.apenergy.2016.08.165
+# [6]	V. Jülch, Comparison of electricity storage options using levelized cost of storage (LCOS) method, Appl. Energy. 183 (2016) 1594–1606. https://doi.org/10.0716/j.apenergy.2016.08.165
 ##
 
 tech_groups:
@@ -42,7 +42,7 @@ techs:
             lifetime: 25
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 om_prod: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
             co2:
                 om_prod: 230
@@ -57,7 +57,7 @@ techs:
             resource: inf
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 om_prod: 21.6 # [2] : 6 €2015/GJ * 3.6 GJ/MWh - Biomass
             co2:
                 om_prod: 0
@@ -74,7 +74,7 @@ techs:
             lifetime: 25
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 om_prod: 40 # 40€/MWh electricity price #ppt
             co2:
                 om_con: 230
@@ -93,10 +93,10 @@ techs:
             lifetime: 25
             resource: file=pv_cf.csv
             resource_unit: energy_per_cap
-            resource_area_per_energy_cap: 0.00588
+            resource_area_per_energy_cap: 0.013
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 om_annual: 10880
                 energy_cap: 640000
                 om_prod: 0
@@ -118,7 +118,7 @@ techs:
             resource_area_per_energy_cap: 0.1
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 1300000
                 om_prod: 0
                 om_annual: 28600
@@ -139,7 +139,7 @@ techs:
             resource_area_per_energy_cap: 0.19  # wind farm density with 5.36 MW/km_2 and 56% use of comercially available sea area https://windeurope.org/wp-content/uploads/files/about-wind/reports/Unleashing-Europes-offshore-wind-potential.pdf
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 2580000
                 om_prod: 0
                 om_annual: 77400
@@ -159,7 +159,7 @@ techs:
             resource_unit: energy_per_cap
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 1600000
                 om_prod: 0 #3.6
                 om_annual: 40000
@@ -180,7 +180,7 @@ techs:
             resource_unit: energy_per_cap
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 6000000  # [3] - 3.1  Nuclear
                 om_prod: 1
                 om_annual: 126000
@@ -201,7 +201,7 @@ techs:
             resource_unit: energy_per_cap
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 343000 # [4]
                 om_prod: 6  # [4]
                 om_annual: 8800 # [4]
@@ -222,7 +222,7 @@ techs:
             resource_unit: energy_per_cap
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 343000 # [4]
                 om_prod: 6  # [4]
                 om_annual: 8800 # [4]
@@ -244,7 +244,7 @@ techs:
             resource_unit: energy_per_cap
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 4470000
                 # om_prod: 1  # [4]
                 om_annual: 80460
@@ -263,7 +263,7 @@ techs:
             lifetime: 25
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 5630000  # €/MW
                 om_prod: 6.9  # €/MWh
                 om_annual: 168900 # €/MW per year
@@ -284,7 +284,7 @@ techs:
             resource_unit: energy_per_cap
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 5600000
                 om_prod: 0 #5
                 om_annual: 8400
@@ -311,7 +311,7 @@ techs:
             lifetime: 30
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 990000
                 om_prod: 4
                 om_annual: 38610
@@ -335,7 +335,7 @@ techs:
             lifetime: 30
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 990000
                 om_prod: 4
                 om_annual: 38610
@@ -355,7 +355,7 @@ techs:
             lifetime: 20
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 1780000
                 om_annual: 17800
 
@@ -371,7 +371,7 @@ techs:
             lifetime: 25
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 3200000
                 om_annual: 32000
 
@@ -387,7 +387,7 @@ techs:
     #         lifetime: 25
     #     costs:
     #         monetary:
-    #             interest_rate: 0.10
+    #             interest_rate: 0.07
     #             energy_cap: 60000  # €/MW
     #             om_prod: 1.1  # €/MWh
     #             om_annual: 1950 # €/MW per year
@@ -409,7 +409,7 @@ techs:
             lifetime: 30
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap: 990000
                 om_prod: 4
                 om_annual: 38610
@@ -432,7 +432,7 @@ techs:
             lifetime: 10
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 storage_cap: 255000
                 energy_cap: 170000
                 om_prod: 2.6
@@ -454,7 +454,7 @@ techs:
             lifetime: 25
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 om_annual: 10756.2 #(0.06/100*727 + 1.6/100*645)*1e3 # €/MW per year
                 storage_cap: 450000  # €/MWh storage capacity
                 energy_cap: 1372000 # (645 + 727)*1e3 €/MW
@@ -479,7 +479,7 @@ techs:
             resource_cap_equals_energy_cap: true
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 om_annual: 67500
                 # storage_cap: 15  # €/MWh storage capacity
                 energy_cap: 4500000
@@ -501,7 +501,7 @@ techs:
             lifetime: 80
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 om_annual: 45000 # €/MW per year
                 storage_cap: 15  # €/MWh storage capacity
                 energy_cap: 3000000
@@ -542,7 +542,7 @@ techs:
             lifetime: 25
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 energy_cap_per_distance: 0.01
 
     dc_transmission:
@@ -557,5 +557,5 @@ techs:
             lifetime: 25
         costs:
             monetary:
-                interest_rate: 0.10
+                interest_rate: 0.07
                 # energy_cap_per_distance: 0.01
