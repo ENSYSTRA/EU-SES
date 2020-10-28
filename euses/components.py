@@ -90,14 +90,15 @@ class Dataset():
     def save_dataset(self, dir):
         geo_list = [str(geo) for geo in self.ds['geometry'].values]
         self.ds['geometry'] = (('nuts_2'),(geo_list))
-        self.ds.to_netcdf(dir)
+        encoding = {k: {'zlib': True, 'shuffle': True} for k in ds.variables}
+        self.ds.to_netcdf(dir, encoding=encoding)
 
     def import_dataset(dir):
         ds = xr.open_dataset(dir)
         countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
         year = pd.to_datetime(ds.coords['time'].values)[0].year
         self = Dataset(countries,year,import_ds=True)
-        self.ds = xr.open_dataset(dir)
+        self.ds = ds
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
         return self
 
