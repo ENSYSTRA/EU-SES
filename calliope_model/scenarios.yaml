@@ -1,5 +1,6 @@
 scenarios:
-  no_nuclear_operation: ['no_nuclear']
+  no_nuclear_operation: [time_resampling','no_nuclear']
+  time_3H: ['time_resampling']
 
 
 overrides:
@@ -10,3 +11,17 @@ overrides:
         - nuclear
         carrier_prod_max:
           power: 0
+  no_coal_geothermal_oil:
+    group_constraints:
+      systemwide_no_nuclear:
+        techs:
+        - oil
+        - coal
+        - geothermal
+        carrier_prod_max:
+          power: 0
+  time_resampling:
+    model:
+      time:
+        function: resample
+        function_options: {'resolution': '3H'}

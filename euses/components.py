@@ -90,25 +90,30 @@ class Dataset():
     def save_dataset(self, dir):
         geo_list = [str(geo) for geo in self.ds['geometry'].values]
         self.ds['geometry'] = (('nuts_2'),(geo_list))
-        self.ds.to_netcdf(dir)
+        encoding = {k: {'zlib': True, 'shuffle': True} for k in ds.variables}
+        self.ds.to_netcdf(dir, encoding=encoding)
 
     def import_dataset(dir):
         ds = xr.open_dataset(dir)
         countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
         year = pd.to_datetime(ds.coords['time'].values)[0].year
         self = Dataset(countries,year,import_ds=True)
-        self.ds = xr.open_dataset(dir)
+        self.ds = ds
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
         return self
 
-    def create_regions(self, method, area_factor, initial_val=1, initial_seed=1):
+    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1):
 
         ds = self.ds.copy(deep=True)
 
         wind_offshore_to_nuts2(ds) # add wind-offshore capacity factor to nuts_2 areas
 
-        island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0']]
+        island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
+
         ds = aggregation(ds, island_groups)
+
+        if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
+            ds = aggregation(ds, [['BE34','LU00']])
 
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
@@ -155,28 +160,43 @@ class Dataset():
 
         self.ds_regions = ds
 
-    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap=None):
+    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap_factor=None, national=False):
         '''
         op_mode: either 'plan' or 'operate'
         '''
         ds_regions = self.ds_regions
 
         regions_geo = gpd.GeoDataFrame(columns=['geometry'], geometry=ds_regions['geometry'].values)
-        regions_geo['id'] = ds_regions['geometry'].coords['regions']
+        regions_geo['id'] = ['region_'+str(e) for e,id in enumerate(ds_regions['geometry'].coords['regions'].values)]
+        regions_geo['nuts_2s'] = ds_regions['geometry'].coords['regions'].values
+
+        if national == True:
+            regions_geo['id'] = ds_regions['country_code'].values
+
         regions_geo.crs = {'init': 'epsg:3035'}
 
         regions_geo = regions_geo.to_crs({'init': 'epsg:4326'})
 
         create_timeseries_csv(regions_geo, ds_regions)
         create_location_yaml(regions_geo, ds_regions,sectors)
-        create_model_yaml(self.ds, regions_geo, ds_regions, sectors, op_mode, co2_cap)
+        create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor)
 
     def filter_countries(self, countries):
         filt_ds = copy.deepcopy(self)
+        [filt_ds.countries.remove(c) for c in countries]
         nuts_0s = [pr.get_metadata(c,'nuts_id') for c in countries]
-        filt_ds.ds = self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).copy()
-        filt_ds.ds['wind_offshore_cf'] = self.ds['wind_offshore_cf'].sel(nuts_0=nuts_0s)
-        filt_ds.ds['temperature'] = self.ds['temperature'].sel(nuts_0=nuts_0s)
+        if 'EE00' in nuts_0s:
+            nuts_0s.remove('EE00')
+            nuts_0s.append('EE')
+        if 'GR' in nuts_0s:
+            nuts_0s.remove('GR')
+            nuts_0s.append('EL')
+        nuts_0s_invers = [pr.get_metadata(c,'nuts_id') for c in filt_ds.countries]
+        nuts_2s = self.ds.where(self.ds['country_code'].isin(nuts_0s), drop = True).coords['nuts_2'].values
+        nuts_2s_invers = list(self.ds.coords['nuts_2'].values)
+        [nuts_2s_invers.remove(n2) for n2 in nuts_2s]
+        filt_ds.ds = filt_ds.ds.drop(nuts_0s_invers,dim='nuts_0')
+        filt_ds.ds = filt_ds.ds.drop(nuts_2s_invers,dim='nuts_2')
         filt_ds.countries = countries
 
         return filt_ds

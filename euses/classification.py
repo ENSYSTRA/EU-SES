@@ -25,7 +25,7 @@ def aggregation(ds, groups):
     sums_vars = ['power', 'population', 'heat', 'power_plants', 'offshore_area', 'land_area',
                  'hydro_capacity', 'hydro_storage']
     area_weighted_vars = ['wind_cf', 'pv_cf', 'wind_offshore_cf',
-                          'cop_air','cop_ground']
+                          'cop_air','cop_ground','hydro_inflow']
 
     sep=','
     new_coords = dsc.coords['nuts_2'].values
