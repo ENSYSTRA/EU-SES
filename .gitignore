@@ -1,4 +1,6 @@
-data/
+data/load
+data/resource
+data/spatial
 eu.nc
 euses/__pycache__/
 test_file.py
