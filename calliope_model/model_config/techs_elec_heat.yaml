@@ -115,7 +115,7 @@ techs:
             lifetime: 25
             resource: file=wind_cf.csv
             resource_unit: energy_per_cap
-            resource_area_per_energy_cap: 0.1
+            resource_area_per_energy_cap: 0.2
         costs:
             monetary:
                 interest_rate: 0.07
