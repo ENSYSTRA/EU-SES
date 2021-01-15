@@ -102,7 +102,7 @@ class Area():
                 for j in range(len(nuts_2_geo)):
                     region_org=gk.geom.polygon(nuts_2_geo[j].buffer(0.001).exterior.coords, srs=srs)
                     ec = ec_scenario(scenario)
-                    area_available_list.append(ec.areaAvailable/1e8)
+                    area_available_list.append(ec.areaAvailable/1e6)
                 area_available = sum(area_available_list)
             else:
                 region_org=gk.geom.polygon(nuts_2_geo.buffer(0.001).exterior.coords, srs=srs)
