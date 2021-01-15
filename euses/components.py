@@ -90,7 +90,7 @@ class Dataset():
     def save_dataset(self, dir):
         geo_list = [str(geo) for geo in self.ds['geometry'].values]
         self.ds['geometry'] = (('nuts_2'),(geo_list))
-        encoding = {k: {'zlib': True, 'shuffle': True} for k in ds.variables}
+        encoding = {k: {'zlib': True, 'shuffle': True} for k in self.ds.variables}
         self.ds.to_netcdf(dir, encoding=encoding)
 
     def import_dataset(dir):
