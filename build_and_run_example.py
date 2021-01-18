@@ -46,17 +46,17 @@ model.run()
 model.to_netcdf('calliope_model/results/de_max-calliope-3h.nc')
 
 #--------------------------------------------------------------------------#
-# Germany political regions model (GER-nuts0)
+# Germany administrative regions model (GER-nuts1)
 
 # Filter and keep only NUTS 2 areas of Germany in dataset
 filt_ds = eu_ds.filter_countries(['Germany'])
 
-# Build regions dataset using political regions method
-filt_ds.create_regions('poli_regions')
+# Build regions dataset using administrative regions method (NUTS 1)
+filt_ds.create_regions('poli_regions_nuts1')
 filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],
 co2_cap_factor=0.05, national=False)
 
 # Build and solve calliope model
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
 model.run()
-model.to_netcdf('calliope_model/results/de_nuts0-calliope-3h.nc')
+model.to_netcdf('calliope_model/results/de_nuts1-calliope-3h.nc')

@@ -133,7 +133,7 @@ class Dataset():
         zones['minimum_threshold'] = zones.geometry.area
 
         method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','storage'],
-                        'poli_regions':2,'poli_regions_nuts3':3}
+                        'poli_regions':2,'poli_regions_nuts1':3}
 
         if method in ['rdm_regions','max_p_regions']:
             np.random.seed(initial_seed)
@@ -145,7 +145,7 @@ class Dataset():
                 nuts_array = zones['nuts'].unique()
                 class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
 
-        if method in ['poli_regions','poli_regions_nuts3']:
+        if method in ['poli_regions','poli_regions_nuts1']:
             zones['nuts'] = zones['id'].str[:method_dir.get(method)]
             nuts_array = zones['nuts'].unique()
             class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
