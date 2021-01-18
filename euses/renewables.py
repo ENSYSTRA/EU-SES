@@ -135,15 +135,13 @@ class Hydro():
                     ds['hydro_inflow'].loc[nuts_2_id] = df_inflow_norm_h
 
 class Heat_Pumps():
-    def __init__(self, nuts_2, cop_max_air=2.5, cop_max_ground=3.5,temp_room = 21):
+    def __init__(self, nuts_2, cop_max_air=2.5, temp_room = 21):
         year =  nuts_2.year
         ds = nuts_2.ds
         time_range = ds.coords['time']
 
         cop_air = []
-        cop_ground = []
         ds['cop_air'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
-        ds['cop_ground'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
 
         # for nuts0_id in ds.coords['nuts_0']:
         for c in nuts_2.countries:
@@ -151,30 +149,22 @@ class Heat_Pumps():
             # nuts0_id = c_ds.ds['country_code'].values[0]
             temperature_to_load = pd.DataFrame(
                 index=time_range.values,
-                columns=['temp_air', 'temp_ground', 'cop_air', 'cop_ground'])
+                columns=['temp_air', 'cop_air'])
 
             temperature_to_load['temp_air'] = ds_c['temperature'].sum(axis=0)
                 # check hour, temperature_to_load starts with 0 which should be 24
 
-            temp_air_3x = temperature_to_load.temp_air.to_list()*3
 
-            for e,t in enumerate(temperature_to_load.index):
-                temperature_to_load.loc[t,'temp_ground'] = mean(temp_air_3x[8424+e:9432+e]) + (mean(temp_air_3x[0:8759]) - mean(temp_air_3x[8424+e:9432+e]))/4
-
-            temperature_to_load['temp_room'] = temp_room
-
-            for v,k in set(zip(['air','ground'],[cop_max_air,cop_max_ground])):
+            for v,k in set(zip(['air'],[cop_max_air])):
                 base = (temperature_to_load.temp_room + 273) / ((temperature_to_load.temp_room + 274) - (
                             temperature_to_load[['temp_room', 'temp_{}'.format(v)]].min(axis=1) + 273))
                 temperature_to_load['cop_{}'.format(v)] = (base/base.mean())
                 temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] > 1,'cop_{}'.format(v)]  = 1
                 temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] < 1/cop_max_air,'cop_{}'.format(v)] = 1/k
 
-            # ds_c = ds.where(ds['country_code'] == nuts0_id, drop = True)
-
             for nuts_2_id in ds_c.coords['nuts_2'].values:
                 ds['cop_air'].loc[nuts_2_id] = (temperature_to_load.cop_air*cop_max_air).to_list()
-                ds['cop_ground'].loc[nuts_2_id] = (temperature_to_load.cop_ground*cop_max_ground).to_list()
+
 
 class VRE_Capacity_Factor():
     def __init__(self, nuts_2, technologies = ['wind','pv','wind_offshore']):

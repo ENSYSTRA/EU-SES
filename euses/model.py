@@ -21,7 +21,7 @@ def export_timeseries(regions_geo, ds_regions,data_name,sign):
 def create_timeseries_csv(regions_geo, ds_regions):
     data_list = [{'power':-1}, {'heat':-1}, {'pv_cf':1}, {'wind_cf':1},
                     {'wind_offshore_cf':1}, {'hydro_inflow':1},
-                    {'cop_air':1}, {'cop_ground':1}]
+                    {'cop_air':1}]
 
     for series in data_list:
         v, k = series.popitem()
@@ -46,7 +46,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
 
         if 'heat' in sectors:
             dict_file['locations'][rows.id]['techs']['demand_heat'] = {'constraints':{'resource':'file=heat.csv'}}
-            for add_tech in ['supply_gas','supply_biogas', 'heat_pump_air', 'heat_pump_ground']:
+            for add_tech in ['supply_gas','supply_biogas', 'heat_pump_air']:
                 dict_file['locations'][rows.id]['techs'][add_tech] = None
 
         for tech_dic in [{'tech':'power_plants'}, {'hydro_tech':'hydro_capacity'}]:

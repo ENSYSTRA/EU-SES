@@ -1,30 +1,9 @@
 scenarios:
-  no_nuclear_operation: [time_resampling','no_nuclear']
   time_3H: ['time_resampling']
-  time_3H_no_ghsp: ['time_resampling','no_ghsp']
-
 
 overrides:
-  no_nuclear:
-    group_constraints:
-      systemwide_no_nuclear:
-        techs:
-        - nuclear
-        carrier_prod_max:
-          power: 0
-  no_coal_geothermal_oil:
-    group_constraints:
-      systemwide_no_nuclear:
-        techs:
-        - oil
-        - coal
-        - geothermal
-        carrier_prod_max:
-          power: 0
   time_resampling:
     model:
       time:
         function: resample
         function_options: {'resolution': '3H'}
-  no_ghsp:
-    techs.heat_pump_ground.exists: false
