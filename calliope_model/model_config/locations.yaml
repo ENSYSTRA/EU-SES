@@ -14,36 +14,10 @@ locations:
       supply_biogas:
       heat_pump_air:
       heat_pump_ground:
-      biomass:
-        constraints:
-          energy_cap_equals: 1655.3000000000004
-      coal:
-        constraints:
-          energy_cap_min: 47772.9
       cogeneration:
-        constraints:
-          energy_cap_min: 0.0
-      gas:
-        constraints:
-          energy_cap_min: 24212.249999999996
-      geothermal:
-        constraints:
-          energy_cap_equals: 0.0
-      nuclear:
-        constraints:
-          energy_cap_min: 11171.0
-      oil:
-        constraints:
-          energy_cap_min: 2851.2
-      other:
-        constraints:
-          energy_cap_min: 756.9000000000001
       solar:
         constraints:
           energy_cap_min: 44859.5553570046
-      waste:
-        constraints:
-          energy_cap_equals: 1588.8000000000002
       wind:
         constraints:
           energy_cap_min: 53105.6793330002

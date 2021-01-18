@@ -1,6 +1,7 @@
 scenarios:
   no_nuclear_operation: [time_resampling','no_nuclear']
   time_3H: ['time_resampling']
+  time_3H_no_ghsp: ['time_resampling','no_ghsp']
 
 
 overrides:
@@ -25,3 +26,5 @@ overrides:
       time:
         function: resample
         function_options: {'resolution': '3H'}
+  no_ghsp:
+    techs.heat_pump_ground.exists: false
