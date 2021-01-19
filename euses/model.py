@@ -68,7 +68,9 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                             storage_capacity = 6*installed_capacity
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['storage_cap_equals'] = storage_capacity
-                    if tech in ['Waste','HROR','Geothermal','Biomass']:
+                    if tech in ['Waste','Biomass','Cogeneration','Coal','Nuclear','Oil','Other']:
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
+                    if tech in ['HROR','Geothermal']:
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
 
 

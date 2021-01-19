@@ -537,13 +537,13 @@ techs:
             parent: transmission
             carrier: power
         constraints:
-            energy_cap_max: 2000
+            # energy_cap_max: 2000
             energy_eff_per_distance: 0.95 # in per 1000 km
             lifetime: 25
         costs:
             monetary:
                 interest_rate: 0.07
-                energy_cap_per_distance: 0.01
+                # energy_cap_per_distance: 0.01
 
     dc_transmission:
         essentials:
