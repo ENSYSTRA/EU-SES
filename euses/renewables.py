@@ -154,7 +154,8 @@ class Heat_Pumps():
             temperature_to_load['temp_air'] = ds_c['temperature'].sum(axis=0)
                 # check hour, temperature_to_load starts with 0 which should be 24
 
-
+            temperature_to_load['temp_room'] = temp_room
+            
             for v,k in set(zip(['air'],[cop_max_air])):
                 base = (temperature_to_load.temp_room + 273) / ((temperature_to_load.temp_room + 274) - (
                             temperature_to_load[['temp_room', 'temp_{}'.format(v)]].min(axis=1) + 273))
