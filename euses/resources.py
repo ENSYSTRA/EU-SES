@@ -97,18 +97,17 @@ class Area():
         for nuts in ds['geometry']:
             nuts_2_geo = nuts.values.item()
             nuts_2_id = nuts.coords['nuts_2'].values.item()
+            area_available_list = []
             if type(nuts_2_geo) is MultiPolygon:
-                area_available_list = []
                 for j in range(len(nuts_2_geo)):
                     region_org=gk.geom.polygon(nuts_2_geo[j].buffer(0.001).exterior.coords, srs=srs)
                     ec = ec_scenario(scenario)
                     area_available_list.append(ec.areaAvailable/1e6)
-                area_available = sum(area_available_list)
             else:
                 region_org=gk.geom.polygon(nuts_2_geo.buffer(0.001).exterior.coords, srs=srs)
                 ec = ec_scenario(scenario)
-                area_available = ec.areaAvailable/1e6
-
+                area_available_list.append(ec.areaAvailable/1e6)
+            area_available = sum(area_available_list)
             ds['land_area'].loc[nuts_2_id] = area_available
 
 class Offshore_Area():

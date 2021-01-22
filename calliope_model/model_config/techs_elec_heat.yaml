@@ -1,8 +1,7 @@
 
 ##
 # TECHNOLOGY DEFINITIONS
-# Technology parameters are taken from [1]
-# The values for the year 2020 were used
+# The values for the year 2030 were used
 # except for instances where another reference is provided
 #
 #                       Monetary Costs
@@ -61,23 +60,6 @@ techs:
                 om_prod: 21.6 # [2] : 6 €2015/GJ * 3.6 GJ/MWh - Biomass
             co2:
                 om_prod: 0
-
-    supply_grid_power:
-        essentials:
-            name: 'National grid import'
-            color: '#C5ABE3'
-            parent: supply
-            carrier: power
-        constraints:
-            resource: inf
-            energy_cap_max: 2000
-            lifetime: 25
-        costs:
-            monetary:
-                interest_rate: 0.07
-                om_prod: 40 # 40€/MWh electricity price #ppt
-            co2:
-                om_con: 230
 
 
 ##-Renewables-##
@@ -146,130 +128,7 @@ techs:
             co2:
                 om_prod: 0
 
-    coal: # [1] - 9.3 Pulverised supercriticalcoal/lignite plants - Table 23. Pulverised coal supercritical
-        essentials:
-            name: 'Coal'
-            color: '#696969'
-            parent: supply_power
-            carrier_out: power
-        constraints:
-            energy_eff: 0.46
-            lifetime: 40
-            resource: inf
-            resource_unit: energy_per_cap
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 1600000
-                om_prod: 0 #3.6
-                om_annual: 40000
-                om_con: 10.08 # IDA's Energy Vision 2050 : 2.8 €2015/GJ * 3.6 GJ/MWh
-            co2:
-                om_prod:  880
 
-    nuclear: # [1] - 11 Nuclear fission - 11. 1 Generation II - Table 34. Generation II LWR
-        essentials:
-            name: 'Nuclear'
-            color: '#BC8F8F'
-            parent: supply_power
-            carrier_out: power
-        constraints:
-            energy_eff: 0.33
-            lifetime: 60
-            resource: inf
-            resource_unit: energy_per_cap
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 6000000  # [3] - 3.1  Nuclear
-                om_prod: 1
-                om_annual: 126000
-                om_con: 5.4 # [2] : 1.5 €2015/GJ * 3.6 GJ/MWh
-            co2:
-                om_prod: 0
-
-    other: # [4] Assumed to be Diesel Engine (Gas Oil) fired - 50 Diesel Engine Farm
-        essentials:
-            name: 'Other'
-            color: '#4B0082'
-            parent: supply_power
-            carrier_out: power
-        constraints:
-            energy_eff: 0.37
-            lifetime: 25
-            resource: inf
-            resource_unit: energy_per_cap
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 343000 # [4]
-                om_prod: 6  # [4]
-                om_annual: 8800 # [4]
-                om_con: 41.76 # [2] : 11.6 €2015/GJ * 3.6 GJ/MWh - Fuel Oil
-            co2:
-                om_prod: 592  # [5] : 74.1 kgCO2/GJ * GJ/MWh 3.6 - TABLE 2.2
-
-    oil: # [4] Assumed to be Diesel Engine (Gas Oil) fired - 50 Diesel Engine Farm
-        essentials:
-            name: 'Oil'
-            color: '#191970'
-            parent: supply_power
-            carrier_out: power
-        constraints:
-            energy_eff: 0.37
-            lifetime: 25
-            resource: inf
-            resource_unit: energy_per_cap
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 343000 # [4]
-                om_prod: 6  # [4]
-                om_annual: 8800 # [4]
-                om_con: 41.76 # [2] : 11.6 €2015/GJ * 3.6 GJ/MWh - Fuel Oil
-            co2:
-                om_prod: 592 # [5] : 74.1 kgCO2/GJ * GJ/MWh 3.6 - TABLE 2.2
-
-
-    geothermal: # [1] - 7 Geothermal - 7.1 Flash power plants
-        essentials:
-            name: 'Geothermal'
-            color: '#B0E0E6'
-            parent: supply_power
-            carrier_out: power
-        constraints:
-            energy_eff: 23.9
-            lifetime: 30
-            resource: inf
-            resource_unit: energy_per_cap
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 4470000
-                # om_prod: 1  # [4]
-                om_annual: 80460
-            co2:
-                om_prod: 122
-
-
-    waste: # [1] - Bioenergy power generation - 13.5 Municipal solid waste incinerator
-        essentials:
-            name: 'Waste'
-            color: '#BC8F8F'
-            parent: supply_power
-            carrier_out: power
-        constraints:
-            energy_eff: 0.31
-            lifetime: 25
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 5630000  # €/MW
-                om_prod: 6.9  # €/MWh
-                om_annual: 168900 # €/MW per year
-                om_con: 0 # [2] : 0 €2015/GJ * 3.6 GJ/MWh - Waste
-            co2:
-                om_prod: 0
 
     hror: # [1] - 6.4 Hydropower run-of-a-river
         essentials:
@@ -285,16 +144,40 @@ techs:
         costs:
             monetary:
                 interest_rate: 0.07
-                energy_cap: 5600000
-                om_prod: 0 #5
-                om_annual: 8400
+                om_prod: 5
+                om_annual: 84300
             co2:
                 om_prod: 0
-    #
-    # Heat Sources
-    #
 
 
+    #
+    # Supply Plus
+    #
+    hdam: # [1] - 6 Hydropower - 6.1 Hydropower dam and reservoir, >100 MW
+        essentials:
+            name: 'Storage DAM'
+            color: '#738eb6'
+            parent: supply_plus
+            carrier_out: power
+        constraints:
+            # energy_cap_per_storage_cap_equals: 0.008
+            resource: file=hydro_inflow.csv
+            resource_unit: energy_per_cap
+            energy_eff: 1
+            storage_initial: 1
+            lifetime: 60
+            resource_cap_equals_energy_cap: true
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_annual: 22000
+                om_prod: 3
+            co2:
+                om_prod: 0
+
+    #
+    # Conversion & Conversion Plus
+    #
     cogeneration: # [1] - 14.2 CCGT CHP - Table 53. CCGT advanced CHP.
         essentials:
             name: 'Cogeneration'
@@ -315,33 +198,7 @@ techs:
                 energy_cap: 990000
                 om_prod: 4
                 om_annual: 38610
-                # om_con: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
-            # co2:
-            #     om_prod: 230
 
-    biomass: # [1] - 14 Cogeneration - 14.1 Biomass CHP + Table 53. CCGT advanced CHP.
-        essentials:
-            name: 'Biomass'
-            color: '#afe31b'
-            parent: conversion_plus
-            primary_carrier_out: power
-            carrier_in: gas
-            carrier_out: power
-            carrier_out_2: heat
-        constraints:
-            export_carrier: power
-            energy_eff: 0.61
-            carrier_ratios.carrier_out_2.heat: 0.77 # Todo Check
-            lifetime: 30
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 990000
-                om_prod: 4
-                om_annual: 38610
-                # om_con: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
-            # co2:
-            #     om_prod: 0
 
     heat_pump_air:
         essentials:
@@ -359,66 +216,11 @@ techs:
                 energy_cap: 1780000
                 om_annual: 17800
 
-    heat_pump_ground:
-        essentials:
-            name: 'Ground-Sourced Heat Pump'
-            color: '#e2b044'
-            parent: conversion
-            carrier_out: heat
-            carrier_in: power
-        constraints:
-            energy_eff: file=cop_ground.csv
-            lifetime: 25
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 3200000
-                om_annual: 32000
-
-    # boiler:
-    #     essentials:
-    #         name: 'Natural gas boiler'
-    #         color: '#5a297b'
-    #         parent: conversion
-    #         carrier_out: heat
-    #         carrier_in: gas
-    #     constraints:
-    #         energy_eff: 0.85
-    #         lifetime: 25
-    #     costs:
-    #         monetary:
-    #             interest_rate: 0.07
-    #             energy_cap: 60000  # €/MW
-    #             om_prod: 1.1  # €/MWh
-    #             om_annual: 1950 # €/MW per year
-
-
-    gas: #  - 14.2 CCGT CHP - Table 53. CCGT advanced CHP.
-        essentials:
-            name: 'Natural Gas'
-            color: '#f4a460'
-            parent: conversion_plus
-            primary_carrier_out: power
-            carrier_in: gas
-            carrier_out: power
-            carrier_out_2: heat
-        constraints:
-            export_carrier: power
-            energy_eff: 0.61
-            carrier_ratios.carrier_out_2.heat: 0.77 # Todo Check
-            lifetime: 30
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap: 990000
-                om_prod: 4
-                om_annual: 38610
-                # om_con: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
 
     #
     # Storage
     #
-    battery: # [1] - 16.3 Lithium-ion battery  - Table 61. Li-ion storagebatteryfor power grid applications
+    battery: # [6]
         essentials:
             name: 'Battery'
             color: '#b8cdca'
@@ -427,18 +229,17 @@ techs:
         constraints:
             storage_cap_max: inf
             energy_cap_per_storage_cap_equals: 0.17
-            energy_eff: 0.90  # round trip efficiency
+            energy_eff: 0.95  # round trip efficiency
             storage_loss: 0  # No loss over time assumed
             lifetime: 10
         costs:
             monetary:
                 interest_rate: 0.07
-                storage_cap: 255000
-                energy_cap: 170000
-                om_prod: 2.6
-                om_annual: 2380
-            co2:
+                storage_cap: 420000
+                energy_cap: 65000
                 om_prod: 0
+                om_annual: 1400
+
 
     hydrogen: # [6]
         essentials:
@@ -449,43 +250,19 @@ techs:
         constraints:
             storage_cap_max: inf
             energy_cap_per_storage_cap_equals: 0.007
-            energy_eff: 0.41  # 0.95 * 0.95 = 0.9025 round trip efficiency
+            energy_eff: 0.41
             storage_loss: 0  # No loss over time assumed
-            lifetime: 25
+            lifetime: 30
         costs:
             monetary:
                 interest_rate: 0.07
                 om_annual: 10756.2 #(0.06/100*727 + 1.6/100*645)*1e3 # €/MW per year
-                storage_cap: 450000  # €/MWh storage capacity
+                storage_cap: 450  # €/MWh storage capacity
                 energy_cap: 1372000 # (645 + 727)*1e3 €/MW
-                om_prod: 0.6
-            # emissions:
-            #   co2: 0
+                om_prod: 0.3
 
 
-    hdam: # [1] - 6 Hydropower - 6.3 Hydropower dam and reservoir, <10 MW
-        essentials:
-            name: 'Storage DAM'
-            color: '#738eb6'
-            parent: supply_plus
-            carrier_out: power
-        constraints:
-            # energy_cap_per_storage_cap_equals: 0.008
-            resource: file=hydro_inflow.csv
-            resource_unit: energy_per_cap
-            energy_eff: 1
-            storage_initial: 1
-            lifetime: 60
-            resource_cap_equals_energy_cap: true
-        costs:
-            monetary:
-                interest_rate: 0.07
-                om_annual: 67500
-                # storage_cap: 15  # €/MWh storage capacity
-                energy_cap: 4500000
-                om_prod: 0 # 5
-            co2:
-                om_prod: 0
+
 
     hphs: # [1] - 16.8 Pumped Hydro Storage - Table 67. New PHS including both reservoirs. Uni
         essentials:
@@ -496,16 +273,14 @@ techs:
         constraints:
             # energy_cap_per_storage_cap_min: 0.17
             storage_initial: 1
-            energy_eff: 0.82 #  round trip efficiency
+            energy_eff: 0.85 #  round trip efficiency
             # storage_loss: 0.01  # No loss over time assumed
-            lifetime: 80
+            lifetime: 60
         costs:
             monetary:
                 interest_rate: 0.07
                 om_annual: 45000 # €/MW per year
-                storage_cap: 15  # €/MWh storage capacity
-                energy_cap: 3000000
-                om_prod: 0 # 0.5
+                om_prod: 0
             co2:
                 om_prod: 0
 
@@ -537,13 +312,13 @@ techs:
             parent: transmission
             carrier: power
         constraints:
-            # energy_cap_max: 2000
-            energy_eff_per_distance: 0.95 # in per 1000 km
+            energy_cap_equals: 2000
+            energy_eff_per_distance: 0.995 # in per 1000 km
             lifetime: 25
         costs:
             monetary:
                 interest_rate: 0.07
-                # energy_cap_per_distance: 0.01
+                energy_cap_per_distance: 0.6
 
     dc_transmission:
         essentials:
@@ -553,7 +328,7 @@ techs:
             carrier: power
         constraints:
             # energy_cap_max: 2000
-            energy_eff_per_distance: 0.98 # in per 1000 km
+            energy_eff_per_distance: 0.998 # in per 1000 km
             lifetime: 25
         costs:
             monetary:

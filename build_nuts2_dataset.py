@@ -12,7 +12,8 @@ nuts2_dataset = euses_ds.ds
 data_components_list = ['Power_Plants','Area','Offshore_Area','Wind_Offshore',
 'Hydro','Heat_Pumps','VRE_Capacity_Factor','Power','Heat']
 for data_component in data_components_list:
-    euses_ds.add('Power_Plants')
+    euses_ds.add(data_component)
+    print(data_component + ' addition complete')
 
 # export dataset
 euses_ds.save_dataset('nuts2_dataset_test.nc')

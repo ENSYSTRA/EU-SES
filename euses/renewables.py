@@ -13,7 +13,7 @@ class Wind_Offshore():
         year = nuts_2.year
         time_range = nuts_2.ds.time.values
 
-        wind_offshore = gpd.read_file('data/resource/EMODnet_HA_WindFarms_20200305/EMODnet_HA_WindFarms_pt_20200305.shp')
+        wind_offshore = gpd.read_file('data/resource/Wind farms/EMODnet_HA_WindFarms_pt_20200305.shp')
 
 
         def poly_np(poly,turbine_point):
@@ -135,7 +135,7 @@ class Hydro():
                     ds['hydro_inflow'].loc[nuts_2_id] = df_inflow_norm_h
 
 class Heat_Pumps():
-    def __init__(self, nuts_2, cop_max_air=2.5, temp_room = 21):
+    def __init__(self, nuts_2, cop_max_air=3.2, temp_room = 21):
         year =  nuts_2.year
         ds = nuts_2.ds
         time_range = ds.coords['time']

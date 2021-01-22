@@ -13,8 +13,9 @@ locations:
       supply_gas:
       supply_biogas:
       heat_pump_air:
-      heat_pump_ground:
       cogeneration:
+        constraints:
+          energy_cap_min: 25867.549999999992
       solar:
         constraints:
           energy_cap_min: 44859.5553570046
