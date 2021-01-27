@@ -21,10 +21,12 @@ group_power_plants(['Gas','Cogeneration','Biomass'],'Cogeneration')
 
 # Build regions dataset using political regions method
 eu_ds.create_regions('poli_regions')
+filt_ds = eu_ds.filter_countries(['Germany','Norway','Denmark','Poland','France','Netherlands',
+                                 'Belgium','Austria','Switzerland','Czech Rep.'])
 
 # Build and solve calliope model
-eu_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],
-co2_cap_factor=0.05, national=True)
+filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],
+co2_cap_factor=0.2, national=True)
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
 model.run()
 model.to_netcdf('calliope_model/results/de_eu-calliope-3h.nc')
@@ -45,31 +47,6 @@ model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_d
 model.run()
 model.to_netcdf('calliope_model/results/de_max-calliope-3h.nc')
 
-import matplotlib.pyplot as plt
-import pandas as pd
-df_IC = pd.DataFrame()
-techs= ['solar','wind', 'wind_offshore','cogeneration', 'heat_pump_air','battery', 'hdam',
-        'hphs', 'hror', 'hydrogen']
-installed_capacity = model.get_formatted_array('energy_cap').sum(axis=0)
-df_IC['EU_NUTS0'] = installed_capacity.loc[techs].to_pandas()
-
-model.inputs['colors'].loc['heat_pump_air'] = '#DB691B'
-model.inputs['colors'].loc['hror'] = '#98E0FF'
-model.inputs['colors'].loc['hdam'] = '#7026FF'
-model.inputs['colors'].loc['cogeneration'] = '#635A4D'
-
-colors = model.inputs['colors'].loc[techs].values
-df_IC =df_IC/1e6
-techs_name= ['Solar','Onshore wind', 'Offshore wind','Cogeneration',
- 'Air-sourced heat pump','Battery', 'Reservoir based hydropower',
- 'Pumped-storage', 'Run-of-river hydropower', 'Hydrogen']
-
-fig,ax = plt.subplots()
-df_IC.transpose().plot.bar(ax=ax,stacked=True, color=colors)
-ax.legend(techs_name, loc='upper right', bbox_to_anchor=(1.6, 1))
-ax.set_ylabel('Installed Capacity (TW)')
-plt.xticks(ticks=[0,1,2],labels=['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
-
 #--------------------------------------------------------------------------#
 # Germany administrative regions model (GER-nuts1)
 
@@ -79,7 +56,7 @@ filt_ds = eu_ds.filter_countries(['Germany'])
 # Build regions dataset using administrative regions method (NUTS 1)
 filt_ds.create_regions('poli_regions_nuts1')
 filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],
-co2_cap_factor=0.05, national=False)
+co2_cap_factor=0.2, national=False)
 
 # Build and solve calliope model
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
