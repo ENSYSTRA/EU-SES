@@ -15,4 +15,4 @@ for data_component in data_components_list:
     print(data_component + ' addition complete')
 
 # export dataset
-euses_ds.save_dataset('nuts2_dataset.nc')
+euses_ds.save_dataset('euses_datasets.nc')

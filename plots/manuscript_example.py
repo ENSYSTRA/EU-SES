@@ -13,7 +13,7 @@ import matplotlib.lines as lines
 # illustrate the spatial classification of regions_geo
 
 # Build regions
-eu_ds = euses.Dataset.import_dataset('nuts2_dataset.nc')
+eu_ds = euses.Dataset.import_dataset('euses_datasets.nc')
 
 eu_nuts0_euses = eu_ds.filter_countries(['Germany','Norway','Denmark','Poland','France','Netherlands',
                                  'Belgium','Austria','Switzerland','Czech Rep.'])

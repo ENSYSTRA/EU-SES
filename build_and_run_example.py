@@ -1,7 +1,7 @@
 import euses
 import calliope
 calliope.set_log_verbosity('CRITICAL', include_solver_output=False)
-eu_ds = euses.Dataset.import_dataset('nuts2_dataset.nc')
+eu_ds = euses.Dataset.import_dataset('euses_datasets.nc')
 
 # remove coal, nuclear, waste, oil, other
 techs_removed = ['Coal','Nuclear','Oil','Other','Waste','Geothermal']
