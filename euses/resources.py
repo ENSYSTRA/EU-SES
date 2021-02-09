@@ -1,13 +1,14 @@
 import pandas as pd
 import numpy as np
 from statistics import mean
-from . import parameters as pr
-from .utilib import download_re_ninja
 import glaes as gl
 import geokit as gk
 from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
 import geopandas as gpd
+from datapackage import Package
 
+from . import parameters as pr
+from .utilib import download_re_ninja
 
 class Power_Plants():
     def __init__(self, nuts_2):
@@ -16,17 +17,19 @@ class Power_Plants():
         year = nuts_2.year
         time_range = nuts_2.ds.time.values
 
-        df = pd.read_csv('data/resource/globalpowerplantdatabasev120/global_power_plant_database.csv')
-        geometry = [Point(xy) for xy in zip(df.longitude, df.latitude)]
-        df = df.drop(['longitude', 'latitude'], axis=1)
+        package = Package('https://data.open-power-system-data.org/conventional_power_plants/2020-10-01/datapackage.json')
+        df = pd.DataFrame(package.resources[3].data)
+        geometry = [Point(xy) for xy in zip(df.lon, df.lat)]
+        df = df.drop(['lon', 'lat'], axis=1)
         crs = {'init': 'epsg:4326'}
         gppd = gpd.GeoDataFrame(df, crs=crs, geometry=geometry)
         gppd = gppd.to_crs({'init': 'epsg:3035'})
+        gppd['tech'] = gppd['energy_source'] + ' ' + gppd['technology']
 
         df = pd.DataFrame()
         for nuts_2_geo in nuts_2.ds['geometry']:
             nuts_2_id = nuts_2_geo.coords['nuts_2'].values.item()
-            df1 = pd.DataFrame(gppd.loc[gppd.within(nuts_2_geo.item())].groupby('primary_fuel').sum().capacity_mw.rename(nuts_2_id)).T
+            df1 = pd.DataFrame(gppd.loc[gppd.within(nuts_2_geo.item())].groupby('tech').sum().capacity.rename(nuts_2_id)).T
             df = df.append(df1)
         df = df.fillna(0)
 
@@ -48,7 +51,8 @@ class Power_Plants():
 
         # Add solar and wind capacities from opsd data
 
-        df = pd.read_csv('data/resource/opsd/renewable_power_plants_EU.csv')
+        df = pd.read_csv('https://data.open-power-system-data.org/renewable_power_plants/2020-08-25/renewable_power_plants_EU.csv')
+
         geometry = [Point(xy) for xy in zip(df.lon, df.lat)]
         crs = {'init': 'epsg:4326'}
         opsd_re = gpd.GeoDataFrame(df, crs=crs, geometry=geometry)
@@ -133,7 +137,7 @@ class Offshore_Area():
             nuts_0 = pr.get_metadata(c,'nuts_id')
             if type(offshore_mrgid) == int:
                 iso_id = pr.get_metadata(c,'iso_3')
-                eez_c =  eez.query('MRGID =='+str(offshore_mrgid))
+                eez_c =  gpd.read_file('https://geo.vliz.be/geoserver/MarineRegions/wfs?service=WFS&version=1.0.0&request=GetFeature&typeNames=eez&cql_filter=mrgid={}&outputFormat=application/json'.format(str(offshore_mrgid)))
                 eez_geo = eez_c.iloc[0].geometry
                 area_available_list = []
                 if type(eez_geo) is MultiPolygon:

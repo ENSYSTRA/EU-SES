@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import geopandas as gpd
 import numpy as np
@@ -5,7 +6,11 @@ import xarray as xr
 from rasterstats import zonal_stats
 from shapely import wkt
 import copy
-
+import requests
+import tempfile
+from io import BytesIO
+from zipfile import ZipFile
+from urllib.request import urlopen
 from shapely.ops import transform
 
 from . import parameters as pr
@@ -24,13 +29,11 @@ class Dataset():
         year : reference year
         '''
 
-        raster_path = 'data/spatial/population/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.tif'
-        nuts_geom_eu = gpd.read_file('data/spatial/NUTS/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
-
-
         self.ds = xr.Dataset()
         self.countries = countries
         self.year = year
+
+        nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
 
         if import_ds == False:
 
@@ -64,15 +67,23 @@ class Dataset():
             self.ds['geometry'].attrs['crs'] = 'epsg:3035'
 
             # add population data
-            population_data = []
-            for l in  self.ds.coords['nuts_2']:
-                geo = self.ds.sel(nuts_2=l)['geometry_54009'].values.item()
-                population = zonal_stats(geo, raster_path, stats='sum')[0].get('sum')
-                population_data.append(population)
+            if ['population'] not in list(self.ds.keys()):
+                temp = tempfile.TemporaryDirectory()
+                resp = urlopen("http://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GPW4_GLOBE_R2015A/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k/V1-0/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.zip")
+                zipfile = ZipFile(BytesIO(resp.read()))
+                file = zipfile.open(zipfile.namelist()[3])
+                raster_path = temp.name+'/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.tif'
+                open(raster_path, 'wb').write(zipfile.read(zipfile.namelist()[3]))
+                population_data = []
+                for l in  self.ds.coords['nuts_2']:
+                    geo = self.ds.sel(nuts_2=l)['geometry_54009'].values.item()
+                    population = zonal_stats(geo, raster_path, stats='sum')[0].get('sum')
+                    population_data.append(population)
 
-            self.ds['population'] = (('nuts_2'),(np.array(population_data)))
-            self.ds['population'].attrs['unit'] = 'People'
-            self.ds = self.ds.drop('geometry_54009')
+                self.ds['population'] = (('nuts_2'),(np.array(population_data)))
+                self.ds['population'].attrs['unit'] = 'People'
+                self.ds = self.ds.drop('geometry_54009')
+                temp.cleanup()
 
             # add temperature data
             temperature_data = []
@@ -83,11 +94,15 @@ class Dataset():
             self.ds['temperature'] =  (('nuts_0','time'),(np.array(temperature_data)))
             self.ds['temperature'].attrs['unit'] = 'Degrees Celsius'
 
+
+
     def add(self, component,  **kwargs):
         comp_class = eval(component)
         comp_class(self, **kwargs)
 
     def save_dataset(self, dir):
+        if os.path.exists(dir):
+            os.remove(dir)
         geo_list = [str(geo) for geo in self.ds['geometry'].values]
         self.ds['geometry'] = (('nuts_2'),(geo_list))
         encoding = {k: {'zlib': True, 'shuffle': True} for k in self.ds.variables}

@@ -1,10 +1,14 @@
 import pandas as pd
 import geopandas as gpd
 import numpy as np
-from . import parameters as pr
 from rasterstats import zonal_stats
-
 import bisect
+import requests
+import tempfile
+import io
+from io import BytesIO
+
+from . import parameters as pr
 
 class Power():
     def __init__(self,nuts_2, **kwargs):
@@ -12,7 +16,7 @@ class Power():
         year = nuts_2.year
         time_range = ds.coords['time']
 
-        load_excel = pd.read_excel('data/load/electricity/Monthly-hourly-load-values_2006-2015.xlsx', header=3)
+        load_excel = pd.read_excel('https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Publications/Statistics/Monthly-hourly-load-values_2006-2015.xlsx', header=3)
 
         ds['power'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
         ds['power'].attrs['unit'] = 'MW'
@@ -48,12 +52,18 @@ class Power():
 class Heat():
 
     def __init__(self,nuts_2, decentralized=False, **kwargs):
+        temp = tempfile.TemporaryDirectory()
+
         ds = nuts_2.ds
         year = nuts_2.year
         time_range = ds.coords['time']
 
-        hd_path ='data/load/heat/heat_tot_curr_density.tif'
-        hotmaps_volumes = pd.read_csv('data/load/heat/space_heating_cooling_dhw_top-down.csv', sep=r"\t")
+        r = requests.get('https://gitlab.com/hotmaps/heat/heat_tot_curr_density/-/raw/master/data/heat_tot_curr_density.tif')
+        hd_path = temp.name+'/heat_tot_curr_density.tif'
+        open(hd_path, 'wb').write(r.content)
+
+        r = requests.get('https://gitlab.com/hotmaps/space_heating_cooling_dhw_demand/-/raw/master/data/space_heating_cooling_dhw_top-down.csv')
+        hotmaps_volumes = pd.read_csv(io.StringIO(r.content.decode('utf-8')), sep=r"|")
 
         def heating_volumes():
             sectors = ['residential','service']
@@ -93,8 +103,11 @@ class Heat():
                             ds[sector+'_'+eu].loc[nuts_2_id] = ds_c[sector+'_'+eu].loc[nuts_2_id] * heat_ued
 
         def space_heating():
-            hotmaps_profile_resid_heat = pd.read_csv('data/load/heat/hotmaps_task_2.7_load_profile_residential/heating_generic.csv')
-            hotmaps_profile_tert_heat = pd.read_csv('data/load/heat/hotmaps_task_2.7_load_profile_tertiary/heating_generic.csv')
+            r = requests.get('https://gitlab.com/hotmaps/load_profile/load_profile_tertiary_heating_generic/-/raw/master/data/hotmaps_task_2.7_load_profile_tertiary_heating_generic.csv')
+            hotmaps_profile_tert_heat = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
+
+            r = requests.get('https://gitlab.com/hotmaps/load_profile/load_profile_residential_heating_generic/-/raw/master/data/hotmaps_task_2.7_load_profile_residential_heating_generic.csv')
+            hotmaps_profile_resid_heat = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
 
             space_heating_dic = {
                                  "residential" : hotmaps_profile_resid_heat,
@@ -171,9 +184,11 @@ class Heat():
                     'end_date': '/08/31'
                 },
             ]
+            r = requests.get('https://gitlab.com/hotmaps/load_profile/load_profile_residential_shw_generic/-/raw/master/data/hotmaps_task_2.7_load_profile_residential_shw_generic.csv')
+            hotmaps_profile_resid_shw = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
 
-            hotmaps_profile_resid_shw = pd.read_csv('data/load/heat/hotmaps_task_2.7_load_profile_residential/residential_shw_generic.csv')
-            hotmaps_profile_ter_shw = pd.read_csv('data/load/heat/hotmaps_task_2.7_load_profile_tertiary/shw_generic.csv')
+            r = requests.get('https://gitlab.com/hotmaps/load_profile/load_profile_tertiary_shw_generic/-/raw/master/data/hotmaps_task_2.7_load_profile_tertiary_shw_generic.csv')
+            hotmaps_profile_ter_shw = pd.read_csv(io.StringIO(r.content.decode('utf-8')))
 
             hot_water_dic = {
                                  "residential" : hotmaps_profile_resid_shw,
@@ -265,3 +280,5 @@ class Heat():
 
             ds = ds.drop('heat_sum')
         nuts_2.ds = ds
+
+        temp.cleanup()

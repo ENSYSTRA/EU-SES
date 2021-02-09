@@ -1,10 +1,14 @@
 import pandas as pd
 import numpy as np
 from statistics import mean
-from . import parameters as pr
-from .utilib import download_re_ninja
 from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
 import geopandas as gpd
+from io import BytesIO
+from zipfile import ZipFile
+from urllib.request import urlopen
+
+from . import parameters as pr
+from .utilib import download_re_ninja
 
 class Wind_Offshore():
     def __init__(self, nuts_2):
@@ -13,8 +17,7 @@ class Wind_Offshore():
         year = nuts_2.year
         time_range = nuts_2.ds.time.values
 
-        wind_offshore = gpd.read_file('data/resource/Wind farms/EMODnet_HA_WindFarms_pt_20200305.shp')
-
+        wind_offshore = gpd.read_file('https://ows.emodnet-humanactivities.eu/wfs?SERVICE=WFS&VERSION=1.1.0&request=GetFeature&typeName=windfarms&OUTPUTFORMAT=json')
 
         def poly_np(poly,turbine_point):
             poly_ext = LinearRing(poly.exterior.coords)
@@ -43,9 +46,9 @@ class Wind_Offshore():
             if name == 'Great Britain':
                 name = 'United Kingdom'
 
-            wind_off_filt = wind_offshore.query('COUNTRY == "{}" & STATUS == "Production"'.format(name)).to_crs({'init': 'epsg:3035'})
+            wind_off_filt = wind_offshore.query('country == "{}" & status == "Production"'.format(name)).to_crs({'init': 'epsg:3035'})
             for w in wind_off_filt.index:
-                wind_farm = wind_off_filt.loc[w,'NAME']
+                wind_farm = wind_off_filt.loc[w,'name']
                 wind_geo = wind_off_filt.loc[w,'geometry']
                 distances =[]
                 nuts_2_ids =[]
@@ -64,7 +67,7 @@ class Wind_Offshore():
                 dic_dis = dict(zip(distances,nuts_2_ids))
 
                 nuts_2_id = dic_dis.get(min_distance)
-                ds['power_plants'].loc[nuts_2_id,'Wind Offshore'] = wind_off_filt.loc[w,'POWER_MW'] + ds['power_plants'].loc[nuts_2_id,'Wind Offshore']
+                ds['power_plants'].loc[nuts_2_id,'Wind Offshore'] = wind_off_filt.loc[w,'power_mw'] + ds['power_plants'].loc[nuts_2_id,'Wind Offshore']
         nuts_2.ds = ds
 
 class Hydro():
@@ -74,7 +77,11 @@ class Hydro():
         year = nuts_2.year
         time_range = nuts_2.ds.time.values
 
-        df_jrc = pd.read_csv('data/resource/jrc_php_dataset/jrc-hydro-power-plant-database.csv')
+        r = urlopen("https://zenodo.org/record/804244/files/Hydro_Inflow.zip")
+        zipfile = ZipFile(BytesIO(r.read()))
+
+        df_jrc = pd.read_csv('https://raw.githubusercontent.com/energy-modelling-toolkit/hydro-power-database/v7/data/jrc-hydro-power-plant-database.csv')
+
 
         tech_list = [tech for tech in df_jrc.type.unique()]
         ds.coords['hydro_tech'] = [tech for tech in df_jrc.type.unique()]
@@ -118,10 +125,10 @@ class Hydro():
             replacement_dic = {'GR':'EL','LU':'CH','GB':'UK'}
             sum_hydro = ds_c['hydro_capacity'].sum().values.item()
             if sum_hydro > 0:
+                hd_id = id
                 if id in replacement_dic.keys():
-                    df_inflow = pd.read_csv('data/resource/Hydro_Inflow/Hydro_Inflow_'+replacement_dic.get(id)+'.csv').query('Year == '+ str(year))
-                else:
-                    df_inflow = pd.read_csv('data/resource/Hydro_Inflow/Hydro_Inflow_'+id+'.csv').query('Year == '+str(year))
+                    hd_id = replacement_dic.get(id)
+                df_inflow = pd.read_csv(zipfile.open('Hydro_Inflow_{}.csv'.format(hd_id))).query('Year == '+ str(year))
 
                 days = pd.date_range(str(year),str(year+1), freq='D')[:-1]
                 df_inflow_norm = pd.Series((df_inflow['Inflow [GWh]']/df_inflow['Inflow [GWh]'].max()).tolist(),index=days)
@@ -155,7 +162,7 @@ class Heat_Pumps():
                 # check hour, temperature_to_load starts with 0 which should be 24
 
             temperature_to_load['temp_room'] = temp_room
-            
+
             for v,k in set(zip(['air'],[cop_max_air])):
                 base = (temperature_to_load.temp_room + 273) / ((temperature_to_load.temp_room + 274) - (
                             temperature_to_load[['temp_room', 'temp_{}'.format(v)]].min(axis=1) + 273))
