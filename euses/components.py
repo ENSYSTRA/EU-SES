@@ -16,8 +16,8 @@ from shapely.ops import transform
 from . import parameters as pr
 from .utilib import download_re_ninja
 from .demand import Power, Heat
-from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Wind_Offshore
-from .resources import Power_Plants, Offshore_Area, Area
+from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Wind_Offshore, Area
+from .resources import Power_Plants
 from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
 from .model import create_location_yaml, create_timeseries_csv, create_model_yaml
 
@@ -71,7 +71,6 @@ class Dataset():
                 temp = tempfile.TemporaryDirectory()
                 resp = urlopen("http://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GPW4_GLOBE_R2015A/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k/V1-0/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.zip")
                 zipfile = ZipFile(BytesIO(resp.read()))
-                file = zipfile.open(zipfile.namelist()[3])
                 raster_path = temp.name+'/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.tif'
                 open(raster_path, 'wb').write(zipfile.read(zipfile.namelist()[3]))
                 population_data = []
@@ -93,8 +92,6 @@ class Dataset():
                 temperature_data.append(weather['temperature'].to_list())
             self.ds['temperature'] =  (('nuts_0','time'),(np.array(temperature_data)))
             self.ds['temperature'].attrs['unit'] = 'Degrees Celsius'
-
-
 
     def add(self, component,  **kwargs):
         comp_class = eval(component)
