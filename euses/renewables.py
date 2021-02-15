@@ -14,7 +14,7 @@ from .utilib import download_re_ninja
 from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
 
 class Wind_Offshore():
-    def __init__(self, nuts_2):
+    def __init__(self, EUSES):
 
         ds = nuts_2.ds
         year = nuts_2.year
@@ -285,7 +285,10 @@ class Area():
                             area_series = nuts_gdp['geometry'].buffer(100).intersection(eez_c_geo.buffer(22000)).area
                             area_series.loc[area_series/area_series.sum()<0.05] = 0
 
-                            area_series = area_series/area_series.sum()* offshore_wind['EZ'+nuts_0].sum()
+                            if nuts_0 == 'IE':
+                                area_series = area_series/area_series.sum()* offshore_wind['EZIR'].sum()
+                            else:
+                                area_series = area_series/area_series.sum()* offshore_wind['EZ'+nuts_0].sum()
 
                             for nuts_id, area in area_series.items():
                                 ds[c].loc[nuts_id] = round(area,2)
