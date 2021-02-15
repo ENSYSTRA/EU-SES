@@ -14,7 +14,7 @@ from .utilib import download_re_ninja
 from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
 
 class Wind_Offshore():
-    def __init__(self, EUSES):
+    def __init__(self, nuts_2):
 
         ds = nuts_2.ds
         year = nuts_2.year
