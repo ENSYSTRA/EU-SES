@@ -178,7 +178,7 @@ techs:
     #
     # Conversion & Conversion Plus
     #
-    cogeneration: # [1] - 14.2 CCGT CHP - Table 53. CCGT advanced CHP.
+    combined_cycle: # [1] - 14.2 CCGT CHP - Table 53. CCGT advanced CHP.
         essentials:
             name: 'Cogeneration'
             color: '#E4AB97'

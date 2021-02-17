@@ -11,9 +11,9 @@ from io import BytesIO
 from . import parameters as pr
 
 class Power():
-    def __init__(self,nuts_2, **kwargs):
-        ds = nuts_2.ds
-        year = nuts_2.year
+    def __init__(self,EUSES, **kwargs):
+        ds = EUSES.ds
+        year = EUSES.year
         time_range = ds.coords['time']
 
         load_excel = pd.read_excel('https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Publications/Statistics/Monthly-hourly-load-values_2006-2015.xlsx', header=3)
@@ -36,9 +36,9 @@ class Power():
             return load_profile.fillna(load_profile.load_in_MW.mean())
 
 
-        for c in nuts_2.countries:
+        for c in EUSES.countries:
             id = pr.get_metadata(c,'renewables_nj_id')
-            ds_c = nuts_2.filter_countries([c]).ds
+            ds_c = EUSES.filter_countries([c]).ds
 
             # ds_c = ds.where(ds['country_code'] == id, drop = True)
             load_profile = entsoe_hourly(id,year)
@@ -51,11 +51,11 @@ class Power():
 
 class Heat():
 
-    def __init__(self,nuts_2, decentralized=False, **kwargs):
+    def __init__(self,EUSES, decentralized=False, **kwargs):
         temp = tempfile.TemporaryDirectory()
 
-        ds = nuts_2.ds
-        year = nuts_2.year
+        ds = EUSES.ds
+        year = EUSES.year
         time_range = ds.coords['time']
 
         r = requests.get('https://gitlab.com/hotmaps/heat/heat_tot_curr_density/-/raw/master/data/heat_tot_curr_density.tif')
@@ -74,7 +74,7 @@ class Heat():
                     ds[sector+'_'+eu] = (('nuts_2',),(np.array([0.0]*len(ds.coords['nuts_2']))))
 
 
-            for c in nuts_2.countries:
+            for c in EUSES.countries:
                 id = pr.get_metadata(c,'nuts_id')
                 hotmaps_id = pr.get_metadata(c,'nuts_id')
                 similar_countries = {'HR':["AL", "MK", "ME"], 'LU':["CH"], 'SE': ["NO"], 'EE': ['EE00']}
@@ -88,7 +88,7 @@ class Heat():
 
                 total_heat_ued = sh_dhw.query('topic == "Total useful heating demand - residential and service sector [TWh/y]"').value.iloc[0]
 
-                ds_c = nuts_2.filter_countries([c]).ds
+                ds_c = EUSES.filter_countries([c]).ds
 
                 for sector, end_use in dict(zip(sectors,[end_uses,end_uses])).items():
                     sh_share = sh_dhw.query('feature == "Total useful heating demand,  per country - '+ sector +' sector [TWh/y]"').value.iloc[0]/total_heat_ued
@@ -214,7 +214,7 @@ class Heat():
             for sector in sectors:
                 ds[sector+'_hot_water_profile'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.nuts_2))))
 
-            for c in nuts_2.countries:
+            for c in EUSES.countries:
                 name = pr.get_metadata(c,'name')
 
                 nuts_0_id = pr.get_metadata(c,'nuts_id')
@@ -270,7 +270,7 @@ class Heat():
             ds['heat_sum'] = ds['heat'].copy()
             ds['heat_centralized'] = ds['heat'].copy()
             ds['heat_decentralized'] = ds['heat'].copy()
-            for c in nuts_2.countries:
+            for c in EUSES.countries:
                 dh_share = pr.get_metadata(c,'dh_share')
                 nuts_0_id = pr.get_metadata(c,'nuts_id')
                 nuts_2_array =  ds['country_code'].where(ds['country_code']==nuts_0_id[:2])['nuts_2'].values
@@ -279,6 +279,6 @@ class Heat():
                     ds['heat_decentralized'].loc[nuts2_id] = ds['heat_sum'].loc[nuts2_id] * (1-dh_share)
 
             ds = ds.drop('heat_sum')
-        nuts_2.ds = ds
+        EUSES.ds = ds
 
         temp.cleanup()

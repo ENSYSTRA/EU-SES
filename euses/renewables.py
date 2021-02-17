@@ -13,72 +13,13 @@ from . import parameters as pr
 from .utilib import download_re_ninja
 from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
 
-class Wind_Offshore():
-    def __init__(self, nuts_2):
-
-        ds = nuts_2.ds
-        year = nuts_2.year
-        time_range = nuts_2.ds.time.values
-
-        wind_offshore = gpd.read_file('https://ows.emodnet-humanactivities.eu/wfs?SERVICE=WFS&VERSION=1.1.0&request=GetFeature&typeName=windfarms&OUTPUTFORMAT=json')
-
-        def poly_np(poly,turbine_point):
-            poly_ext = LinearRing(poly.exterior.coords)
-            point = turbine_point
-            d = poly_ext.project(point)
-            p = poly_ext.interpolate(d)
-            closest_point_coords = list(p.coords)[0]
-            return Point(closest_point_coords).distance(point)
-
-        if 'tech' in ds.coords and 'Wind Offshore' not in ds.coords['tech']:
-
-            df = ds['power_plants'].to_dataframe().T
-            for nuts_2_id in ds['nuts_2'].values:
-                df[nuts_2_id,'Wind Offshore'] = 0
-            ds = ds.drop('power_plants')
-            ds = ds.drop('tech')
-            ds['power_plants'] = df.T.to_xarray()['power_plants']
-
-        if 'tech' not in ds.coords:
-            ds.coords['tech'] = ['Wind Offshore']
-            ds['power_plants'] = (('nuts_2','tech'),(np.array([[0]]*len(ds.nuts_2))))
-
-
-        for name in nuts_2.countries:
-            nuts_0_id = pr.get_metadata(name,'nuts_id')
-            if name == 'Great Britain':
-                name = 'United Kingdom'
-
-            wind_off_filt = wind_offshore.query('country == "{}" & status == "Production"'.format(name)).to_crs({'init': 'epsg:3035'})
-            for w in wind_off_filt.index:
-                wind_farm = wind_off_filt.loc[w,'name']
-                wind_geo = wind_off_filt.loc[w,'geometry']
-                distances =[]
-                nuts_2_ids =[]
-                for nuts in ds.sel(nuts_0=nuts_0_id)['geometry']:
-                    nuts_2_id = nuts.coords['nuts_2'].values.item()
-                    nuts_2_geo = nuts.values.item()
-                    if type(nuts_2_geo) == MultiPolygon:
-                        for n in range(len(nuts_2_geo)):
-                            distances.append(poly_np(nuts_2_geo[n],wind_geo))
-                            nuts_2_ids.append(nuts_2_id)
-                    else:
-                        distances.append(poly_np(nuts_2_geo,wind_geo))
-                        nuts_2_ids.append(nuts_2_id)
-
-                min_distance = min(distances)
-                dic_dis = dict(zip(distances,nuts_2_ids))
-
-                nuts_2_id = dic_dis.get(min_distance)
-                ds['power_plants'].loc[nuts_2_id,'Wind Offshore'] = wind_off_filt.loc[w,'power_mw'] + ds['power_plants'].loc[nuts_2_id,'Wind Offshore']
-        nuts_2.ds = ds
 
 class Hydro():
-    def __init__(self, nuts_2):
+    def __init__(self, EUSES):
 
-        ds = nuts_2.ds
-        year = nuts_2.year
-        time_range = nuts_2.ds.time.values
+        ds = EUSES.ds
+        year = EUSES.year
+        time_range = EUSES.ds.time.values
 
         r = urlopen("https://zenodo.org/record/804244/files/Hydro_Inflow.zip")
         zipfile = ZipFile(BytesIO(r.read()))
@@ -122,8 +63,8 @@ class Hydro():
         ds['hydro_storage'] = (('nuts_2','hydro_storage_tech'),(np.array(data_mwh).T))
 
         ds['hydro_inflow'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
-        for c in nuts_2.countries:
-            ds_c = nuts_2.filter_countries([c]).ds
+        for c in EUSES.countries:
+            ds_c = EUSES.filter_countries([c]).ds
             id = pr.get_metadata(c,'renewables_nj_id')
             replacement_dic = {'GR':'EL','LU':'CH','GB':'UK'}
             sum_hydro = ds_c['hydro_capacity'].sum().values.item()
@@ -145,25 +86,21 @@ class Hydro():
                     ds['hydro_inflow'].loc[nuts_2_id] = df_inflow_norm_h
 
 class Heat_Pumps():
-    def __init__(self, nuts_2, cop_max_air=3.2, temp_room = 21):
-        year =  nuts_2.year
-        ds = nuts_2.ds
+    def __init__(self, EUSES, cop_max_air=3.2, temp_room = 21):
+        year =  EUSES.year
+        ds = EUSES.ds
         time_range = ds.coords['time']
 
         cop_air = []
         ds['cop_air'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
 
-        # for nuts0_id in ds.coords['nuts_0']:
-        for c in nuts_2.countries:
-            ds_c = nuts_2.filter_countries([c]).ds
-            # nuts0_id = c_ds.ds['country_code'].values[0]
+        for c in EUSES.countries:
+            ds_c = EUSES.filter_countries([c]).ds
             temperature_to_load = pd.DataFrame(
                 index=time_range.values,
                 columns=['temp_air', 'cop_air'])
 
             temperature_to_load['temp_air'] = ds_c['temperature'].sum(axis=0)
-                # check hour, temperature_to_load starts with 0 which should be 24
-
             temperature_to_load['temp_room'] = temp_room
 
             for v,k in set(zip(['air'],[cop_max_air])):
@@ -177,10 +114,10 @@ class Heat_Pumps():
                 ds['cop_air'].loc[nuts_2_id] = (temperature_to_load.cop_air*cop_max_air).to_list()
 
 class VRE_Capacity_Factor():
-    def __init__(self, nuts_2, technologies = ['wind','pv','wind_offshore']):
-        ds = nuts_2.ds
+    def __init__(self, EUSES, technologies = ['wind','pv','wind_offshore']):
+        ds = EUSES.ds
         time_range = ds.coords['time']
-        year =  nuts_2.year
+        year =  EUSES.year
 
 
         if 'wind_offshore' in technologies:
@@ -191,11 +128,11 @@ class VRE_Capacity_Factor():
             ds['pv_cf'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
 
         for tech in technologies:
-            for c in nuts_2.countries:
+            for c in EUSES.countries:
                 print(tech,c)
                 re_id = pr.get_metadata(c,'renewables_nj_id')
                 nuts0_id = pr.get_metadata(c,'nuts_id')
-                ds_c = nuts_2.filter_countries([c]).ds
+                ds_c = EUSES.filter_countries([c]).ds
                 if tech != 'wind_offshore':
                     data = download_re_ninja(year, re_id, tech)
                     data = data.filter(items=[c for c in data.columns if c[3:] != 'TOTAL'])
@@ -211,9 +148,9 @@ class VRE_Capacity_Factor():
                         ds['wind_offshore_cf'].loc[nuts0_id] = data['national']
 
 class Area():
-    def __init__(self, nuts_2, scenario='Holtinger2016_med'):
-        year =  nuts_2.year
-        ds = nuts_2.ds
+    def __init__(self, EUSES, scenario='Holtinger2016_med'):
+        year =  EUSES.year
+        ds = EUSES.ds
 
         offhore_no = {'NO01':0,'NO02':0,'NO03':0,'NO04':3965.73,'NO05':134.52,'NO06':139.89,'NO07':1293.52}
         building_no = {'NO01':52.74,'NO02':28.87,'NO03':65.53,'NO04':30.79,'NO05':19.06,'NO06':16.11,'NO07':15.26}
@@ -271,7 +208,7 @@ class Area():
                     temp.cleanup()
 
             if c == 'offshore_wind':
-                for country in nuts_2.countries:
+                for country in EUSES.countries:
                     offshore_mrgid = pr.get_metadata(country,'MRGID')
                     nuts_0 = pr.get_metadata(country,'nuts_id')
                     if type(offshore_mrgid) == int:

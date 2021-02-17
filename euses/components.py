@@ -16,12 +16,12 @@ from shapely.ops import transform
 from . import parameters as pr
 from .utilib import download_re_ninja
 from .demand import Power, Heat
-from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Wind_Offshore, Area
+from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Area
 from .resources import Power_Plants
 from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
 from .model import create_location_yaml, create_timeseries_csv, create_model_yaml
 
-class Dataset():
+class EUSES():
 
     def __init__(self,countries,year,import_ds=False):
         '''
@@ -104,12 +104,13 @@ class Dataset():
         self.ds['geometry'] = (('nuts_2'),(geo_list))
         encoding = {k: {'zlib': True, 'shuffle': True} for k in self.ds.variables}
         self.ds.to_netcdf(dir, encoding=encoding)
+        self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
 
     def import_dataset(dir):
         ds = xr.open_dataset(dir)
         countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
         year = pd.to_datetime(ds.coords['time'].values)[0].year
-        self = Dataset(countries,year,import_ds=True)
+        self = EUSES(countries,year,import_ds=True)
         self.ds = ds
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
         return self
@@ -130,9 +131,9 @@ class Dataset():
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
 
-        zones['pv_pot_e'] = ds['land_area'].values * ds['pv_cf'].values.sum(axis=1)
-        zones['wind_on_pot_e'] = ds['land_area'].values * ds['wind_cf'].values.sum(axis=1)
-        zones['wind_off_pot_e'] = ds['offshore_area'].values * ds['wind_offshore_cf'].values.sum(axis=1)
+        zones['pv_pot_e'] = ds['rooftop_pv'].values * ds['pv_cf'].values.sum(axis=1)
+        zones['wind_on_pot_e'] = ds['onshore_wind'].values * ds['wind_cf'].values.sum(axis=1)
+        zones['wind_off_pot_e'] = ds['offshore_wind'].values * ds['wind_offshore_cf'].values.sum(axis=1)
 
         zones['flh_max']=zones.loc[zones.pv_pot_e<zones.wind_on_pot_e].wind_on_pot_e
         zones.update(pd.Series(zones.loc[zones.pv_pot_e>zones.wind_on_pot_e].pv_pot_e, name='flh_max'))

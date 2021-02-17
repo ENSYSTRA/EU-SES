@@ -1,404 +1,4 @@
 locations:
-  AT:
-    coordinates:
-      lat: 47.59
-      lon: 14.14
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 2245.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 88.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 5202.40407643312
-          storage_cap_equals: 1544800.0
-      hphs:
-        constraints:
-          energy_cap_equals: 3840.3
-          storage_cap_equals: 527400.0
-      hror:
-        constraints:
-          energy_cap_equals: 4680.685531122705
-      battery:
-      hydrogen:
-  HR:
-    coordinates:
-      lat: 45.05
-      lon: 16.41
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 581.8
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 0.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 1105.4044585987263
-          storage_cap_equals: 6632.4267515923575
-      hphs:
-        constraints:
-          energy_cap_equals: 518.7
-          storage_cap_equals: 14800.0
-      hror:
-        constraints:
-          energy_cap_equals: 278.66773029167683
-      battery:
-      hydrogen:
-  RO:
-    coordinates:
-      lat: 45.84
-      lon: 24.98
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 3352.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 386.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 4722.340127388536
-          storage_cap_equals: 28334.040764331214
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 216.0
-      battery:
-      hydrogen:
-  BG:
-    coordinates:
-      lat: 42.76
-      lon: 25.23
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 0.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 156.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 1427.2713375796168
-          storage_cap_equals: 8563.628025477701
-      hphs:
-        constraints:
-          energy_cap_equals: 1239.0
-          storage_cap_equals: 7434.0
-      hror:
-        constraints:
-          energy_cap_equals: 285.44
-      battery:
-      hydrogen:
-  HU:
-    coordinates:
-      lat: 47.17
-      lon: 19.41
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 2955.3
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 0.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 27.6433121019108
-          storage_cap_equals: 165.85987261146482
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 2.97472406713584
-      battery:
-      hydrogen:
-  EL:
-    coordinates:
-      lat: 39.84
-      lon: 22.63
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 2740.0
-      solar:
-        constraints:
-          energy_cap_min: 90.19999999999999
-      wind:
-        constraints:
-          energy_cap_min: 168.45000000000002
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 2516.2
-          storage_cap_equals: 1830000.0
-      hphs:
-        constraints:
-          energy_cap_equals: 699.0
-          storage_cap_equals: 4194.0
-      hror:
-        constraints:
-          energy_cap_equals: 110.535
-      battery:
-      hydrogen:
-  SI:
-    coordinates:
-      lat: 46.12
-      lon: 14.82
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 297.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 0.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 222.79000000000002
-          storage_cap_equals: 1336.7400000000002
-      hphs:
-        constraints:
-          energy_cap_equals: 185.0
-          storage_cap_equals: 1110.0
-      hror:
-        constraints:
-          energy_cap_equals: 834.6849999999998
-      battery:
-      hydrogen:
-  SK:
-    coordinates:
-      lat: 48.71
-      lon: 19.49
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 728.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 0.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 792.0
-          storage_cap_equals: 4752.0
-      hphs:
-        constraints:
-          energy_cap_equals: 1021.28
-          storage_cap_equals: 6127.68
-      hror:
-        constraints:
-          energy_cap_equals: 641.3299999999999
-      battery:
-      hydrogen:
-  CZ:
-    coordinates:
-      lat: 49.74
-      lon: 15.33
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 1320.0
-      solar:
-        constraints:
-          energy_cap_min: 1158.7999999999997
-      wind:
-        constraints:
-          energy_cap_min: 0.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 708.1208449596683
-          storage_cap_equals: 4248.725069758009
-      hphs:
-        constraints:
-          energy_cap_equals: 1172.5095516678389
-          storage_cap_equals: 7035.057310007033
-      hror:
-        constraints:
-          energy_cap_equals: 40.226382271496
-      battery:
-      hydrogen:
-  IT:
-    coordinates:
-      lat: 42.78
-      lon: 12.08
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 37161.85
-      solar:
-        constraints:
-          energy_cap_min: 431.59
-      wind:
-        constraints:
-          energy_cap_min: 105.24
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 4120.16
-          storage_cap_equals: 2600.0
-      hphs:
-        constraints:
-          energy_cap_equals: 7222.95
-          storage_cap_equals: 398595.0
-      hror:
-        constraints:
-          energy_cap_equals: 7561.530000000001
-      battery:
-      hydrogen:
   CH:
     coordinates:
       lat: 46.8
@@ -413,550 +13,25 @@ locations:
       supply_gas:
       supply_biogas:
       heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 40.0
+      combined_cycle:
       solar:
         constraints:
-          energy_cap_min: 565.6630400000001
+          resource_area_max: 150.588
       wind:
         constraints:
-          energy_cap_min: 48.59799999999999
+          resource_area_max: 10.7846
       wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
       hdam:
         constraints:
-          energy_cap_equals: 9322.85
+          energy_cap_equals: 9466.31
           storage_cap_equals: 1803200.0
       hphs:
         constraints:
-          energy_cap_equals: 4113.889999999999
-          storage_cap_equals: 780.0
+          energy_cap_equals: 3897.65
+          storage_cap_equals: 212080.0
       hror:
         constraints:
-          energy_cap_equals: 4532.394499999999
-      battery:
-      hydrogen:
-  PT:
-    coordinates:
-      lat: 39.68
-      lon: -7.96
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 4215.5
-      solar:
-        constraints:
-          energy_cap_min: 270.484
-      wind:
-        constraints:
-          energy_cap_min: 4860.86
-      wind_offshore:
-        constraints:
-          energy_cap_min: 4.5
-          resource_area_max: 1.83955223880597
-      hdam:
-        constraints:
-          energy_cap_equals: 2432.49
-          storage_cap_equals: 1396260.0
-      hphs:
-        constraints:
-          energy_cap_equals: 4157.93
-          storage_cap_equals: 216012.0
-      hror:
-        constraints:
-          energy_cap_equals: 1246.5
-      battery:
-      hydrogen:
-  FR:
-    coordinates:
-      lat: 46.62
-      lon: 2.46
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 4846.083999999998
-      solar:
-        constraints:
-          energy_cap_min: 6953.646472999999
-      wind:
-        constraints:
-          energy_cap_min: 13336.012600000002
-      wind_offshore:
-        constraints:
-          energy_cap_min: 10.0
-          resource_area_max: 268754.43000000005
-      hdam:
-        constraints:
-          energy_cap_equals: 9147.557961783437
-          storage_cap_equals: 2126400.0
-      hphs:
-        constraints:
-          energy_cap_equals: 5014.3
-          storage_cap_equals: 76976.0
-      hror:
-        constraints:
-          energy_cap_equals: 6938.468029331081
-      battery:
-      hydrogen:
-  ES:
-    coordinates:
-      lat: 40.39
-      lon: -3.55
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 23619.644000000004
-      solar:
-        constraints:
-          energy_cap_min: 2032.8129999999999
-      wind:
-        constraints:
-          energy_cap_min: 11178.98
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 7952.509999999998
-          storage_cap_equals: 4114442.0
-      hphs:
-        constraints:
-          energy_cap_equals: 7334.792
-          storage_cap_equals: 4226523.0
-      hror:
-        constraints:
-          energy_cap_equals: 369.0
-      battery:
-      hydrogen:
-  BE:
-    coordinates:
-      lat: 50.58
-      lon: 4.77
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 4603.8
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 151.1
-      wind_offshore:
-        constraints:
-          energy_cap_min: 877.6500000000001
-          resource_area_max: 1101.23
-      hdam:
-        constraints:
-          energy_cap_equals: 12.73566878980889
-          storage_cap_equals: 76.41401273885334
-      hphs:
-        constraints:
-          energy_cap_equals: 2598.5
-          storage_cap_equals: 9478.0
-      hror:
-        constraints:
-          energy_cap_equals: 59.01533974257917
-      battery:
-      hydrogen:
-  IE:
-    coordinates:
-      lat: 53.18
-      lon: -8.15
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 2220.5
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 1287.05
-      wind_offshore:
-        constraints:
-          energy_cap_min: 25.2
-          resource_area_max: 364160.81
-      hdam:
-        constraints:
-          energy_cap_equals: 1.0
-          storage_cap_equals: 6.0
-      hphs:
-        constraints:
-          energy_cap_equals: 342.0
-          storage_cap_equals: 2052.0
-      hror:
-        constraints:
-          energy_cap_equals: 86.0
-      battery:
-      hydrogen:
-  UK:
-    coordinates:
-      lat: 54.15
-      lon: -2.89
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 30079.199999999997
-      solar:
-        constraints:
-          energy_cap_min: 8315.199999999999
-      wind:
-        constraints:
-          energy_cap_min: 12823.1
-      wind_offshore:
-        constraints:
-          energy_cap_min: 986.0
-          resource_area_max: 415583.32000000007
-      hdam:
-        constraints:
-          energy_cap_equals: 459.0
-          storage_cap_equals: 2754.0
-      hphs:
-        constraints:
-          energy_cap_equals: 2833.0
-          storage_cap_equals: 26700.0
-      hror:
-        constraints:
-          energy_cap_equals: 685.2
-      battery:
-      hydrogen:
-  NL:
-    coordinates:
-      lat: 52.27
-      lon: 5.59
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 9312.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 597.0899999999999
-      wind_offshore:
-        constraints:
-          energy_cap_min: 2027.8
-          resource_area_max: 23733.71
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 0.0
-      battery:
-      hydrogen:
-  NO:
-    coordinates:
-      lat: 64.43
-      lon: 14.08
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 431.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 583.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 2.3
-          resource_area_max: 780749.06
-      hdam:
-        constraints:
-          energy_cap_equals: 31348.219999999998
-          storage_cap_equals: 39903443.34000001
-      hphs:
-        constraints:
-          energy_cap_equals: 1344.3
-          storage_cap_equals: 4952921.7
-      hror:
-        constraints:
-          energy_cap_equals: 0.0
-      battery:
-      hydrogen:
-  SE:
-    coordinates:
-      lat: 62.78
-      lon: 16.75
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 2256.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 605.4000000000001
-      wind_offshore:
-        constraints:
-          energy_cap_min: 171.65
-          resource_area_max: 68380.75
-      hdam:
-        constraints:
-          energy_cap_equals: 11454.063516863036
-          storage_cap_equals: 8602.0
-      hphs:
-        constraints:
-          energy_cap_equals: 426.0
-          storage_cap_equals: 25000.0
-      hror:
-        constraints:
-          energy_cap_equals: 1893.8601244908198
-      battery:
-      hydrogen:
-  FI:
-    coordinates:
-      lat: 64.49
-      lon: 26.25
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 3587.24
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 47.8
-      wind_offshore:
-        constraints:
-          energy_cap_min: 89.69999999999999
-          resource_area_max: 28280.77
-      hdam:
-        constraints:
-          energy_cap_equals: 1345.0
-          storage_cap_equals: 8070.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 1308.65
-      battery:
-      hydrogen:
-  LT:
-    coordinates:
-      lat: 55.34
-      lon: 23.9
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 2490.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 0.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 101.0
-          storage_cap_equals: 606.0
-      hphs:
-        constraints:
-          energy_cap_equals: 900.0
-          storage_cap_equals: 5400.0
-      hror:
-        constraints:
-          energy_cap_equals: 0.0
-      battery:
-      hydrogen:
-  LV:
-    coordinates:
-      lat: 56.85
-      lon: 24.93
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 1001.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 0.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 869.0
-          storage_cap_equals: 46330.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 642.1
-      battery:
-      hydrogen:
-  EE:
-    coordinates:
-      lat: 58.67
-      lon: 25.56
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 423.0
-      solar:
-        constraints:
-          energy_cap_min: 0.0
-      wind:
-        constraints:
-          energy_cap_min: 275.3
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 0.0
+          energy_cap_equals: 4160.7345
       battery:
       hydrogen:
   PL:
@@ -973,30 +48,95 @@ locations:
       supply_gas:
       supply_biogas:
       heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 2019.0
+      combined_cycle:
       solar:
         constraints:
-          energy_cap_min: 17.0
+          resource_area_max: 669.8656937489824
       wind:
         constraints:
-          energy_cap_min: 2174.0
+          resource_area_max: 78.0
       wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
       hdam:
         constraints:
-          energy_cap_equals: 320.45541401273863
-          storage_cap_equals: 1922.7324840764318
+          energy_cap_equals: 412.5063694267516
+          storage_cap_equals: 600.0
       hphs:
         constraints:
-          energy_cap_equals: 1780.8
-          storage_cap_equals: 7960.0
+          energy_cap_equals: 1705.0
+          storage_cap_equals: 15690.0
       hror:
         constraints:
           energy_cap_equals: 14.400368779543971
+      battery:
+      hydrogen:
+  NO:
+    coordinates:
+      lat: 64.43
+      lon: 14.08
+    techs:
+      demand_electricity:
+        constraints:
+          resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
+      supply_gas:
+      supply_biogas:
+      heat_pump_air:
+      combined_cycle:
+      solar:
+        constraints:
+          resource_area_max: 111.8964
+      wind:
+        constraints:
+          resource_area_max: 2.045506222222222
+      wind_offshore:
+      hdam:
+        constraints:
+          energy_cap_equals: 31348.219999999998
+          storage_cap_equals: 39903443.34000001
+      hphs:
+        constraints:
+          energy_cap_equals: 1344.3
+          storage_cap_equals: 4952921.7
+      hror:
+        constraints:
+          energy_cap_equals: 0.0
+      battery:
+      hydrogen:
+  NL:
+    coordinates:
+      lat: 52.27
+      lon: 5.59
+    techs:
+      demand_electricity:
+        constraints:
+          resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
+      supply_gas:
+      supply_biogas:
+      heat_pump_air:
+      combined_cycle:
+      solar:
+        constraints:
+          resource_area_max: 285.345811427649
+      wind:
+        constraints:
+          resource_area_max: 1042.0
+      wind_offshore:
+      hdam:
+        constraints:
+          energy_cap_equals: 0.0
+          storage_cap_equals: 0.0
+      hphs:
+        constraints:
+          energy_cap_equals: 0.0
+          storage_cap_equals: 0.0
+      hror:
+        constraints:
+          energy_cap_equals: 0.0
       battery:
       hydrogen:
   DE:
@@ -1013,30 +153,60 @@ locations:
       supply_gas:
       supply_biogas:
       heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 25867.549999999992
+      combined_cycle:
       solar:
         constraints:
-          energy_cap_min: 44859.5553570046
+          resource_area_max: 1403.588589088024
       wind:
         constraints:
-          energy_cap_min: 53105.6793330002
+          resource_area_max: 8953.661367400022
       wind_offshore:
-        constraints:
-          energy_cap_min: 4151.3
-          resource_area_max: 16551.75
       hdam:
         constraints:
           energy_cap_equals: 202.8
           storage_cap_equals: 1216.8000000000002
       hphs:
         constraints:
-          energy_cap_equals: 7428.620000000001
+          energy_cap_equals: 6589.719999999999
           storage_cap_equals: 35400.0
       hror:
         constraints:
-          energy_cap_equals: 3479.022804375153
+          energy_cap_equals: 3302.20685
+      battery:
+      hydrogen:
+  FR:
+    coordinates:
+      lat: 46.62
+      lon: 2.46
+    techs:
+      demand_electricity:
+        constraints:
+          resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
+      supply_gas:
+      supply_biogas:
+      heat_pump_air:
+      combined_cycle:
+      solar:
+        constraints:
+          resource_area_max: 1122.2682894716206
+      wind:
+        constraints:
+          resource_area_max: 4410.0
+      wind_offshore:
+      hdam:
+        constraints:
+          energy_cap_equals: 8944.676433121016
+          storage_cap_equals: 2126400.0
+      hphs:
+        constraints:
+          energy_cap_equals: 5064.0
+          storage_cap_equals: 82683.0
+      hror:
+        constraints:
+          energy_cap_equals: 6316.482562490507
       battery:
       hydrogen:
   DK:
@@ -1053,19 +223,14 @@ locations:
       supply_gas:
       supply_biogas:
       heat_pump_air:
-      cogeneration:
-        constraints:
-          energy_cap_min: 659.0
+      combined_cycle:
       solar:
         constraints:
-          energy_cap_min: 765.9321999999979
+          resource_area_max: 102.18711374108949
       wind:
         constraints:
-          energy_cap_min: 4253.6654999999955
+          resource_area_max: 3056.0
       wind_offshore:
-        constraints:
-          energy_cap_min: 1582.1000000000001
-          resource_area_max: 54020.619999999995
       hdam:
         constraints:
           energy_cap_equals: 0.0
@@ -1079,177 +244,170 @@ locations:
           energy_cap_equals: 0.0
       battery:
       hydrogen:
+  CZ:
+    coordinates:
+      lat: 49.74
+      lon: 15.33
+    techs:
+      demand_electricity:
+        constraints:
+          resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
+      supply_gas:
+      supply_biogas:
+      heat_pump_air:
+      combined_cycle:
+      solar:
+        constraints:
+          resource_area_max: 186.9516101990695
+      wind:
+        constraints:
+          resource_area_max: 65.225
+      wind_offshore:
+      hdam:
+        constraints:
+          energy_cap_equals: 711.4839022845104
+          storage_cap_equals: 4268.903413707062
+      hphs:
+        constraints:
+          energy_cap_equals: 1172.5095516678389
+          storage_cap_equals: 2300.0
+      hror:
+        constraints:
+          energy_cap_equals: 40.226382271496
+      battery:
+      hydrogen:
+  BE:
+    coordinates:
+      lat: 50.64
+      lon: 4.66
+    techs:
+      demand_electricity:
+        constraints:
+          resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
+      supply_gas:
+      supply_biogas:
+      heat_pump_air:
+      combined_cycle:
+      solar:
+        constraints:
+          resource_area_max: 199.7532001799916
+      wind:
+        constraints:
+          resource_area_max: 0.0
+      wind_offshore:
+      hdam:
+        constraints:
+          energy_cap_equals: 12.73566878980889
+          storage_cap_equals: 76.41401273885334
+      hphs:
+        constraints:
+          energy_cap_equals: 1308.0
+          storage_cap_equals: 5710.0
+      hror:
+        constraints:
+          energy_cap_equals: 59.015339742579165
+      battery:
+      hydrogen:
+  AT:
+    coordinates:
+      lat: 47.59
+      lon: 14.14
+    techs:
+      demand_electricity:
+        constraints:
+          resource: file=power.csv
+      demand_heat:
+        constraints:
+          resource: file=heat.csv
+      supply_gas:
+      supply_biogas:
+      heat_pump_air:
+      combined_cycle:
+      solar:
+        constraints:
+          resource_area_max: 149.87042560703748
+      wind:
+        constraints:
+          resource_area_max: 480.0
+      wind_offshore:
+      hdam:
+        constraints:
+          energy_cap_equals: 5239.92
+          storage_cap_equals: 1544800.0
+      hphs:
+        constraints:
+          energy_cap_equals: 3589.3
+          storage_cap_equals: 662090.0
+      hror:
+        constraints:
+          energy_cap_equals: 4584.700868258109
+      battery:
+      hydrogen:
 links:
-  AT,HU:
-    techs:
-      ac_transmission:
-        distance: 0.5
-  AT,SI:
-    techs:
-      ac_transmission:
-        distance: 0.213
-  AT,SK:
-    techs:
-      ac_transmission:
-        distance: 0.52
-  AT,CZ:
-    techs:
-      ac_transmission:
-        distance: 0.318
-  AT,IT:
-    techs:
-      ac_transmission:
-        distance: 0.697
-  AT,CH:
-    techs:
-      ac_transmission:
-        distance: 0.57
-  AT,DE:
-    techs:
-      ac_transmission:
-        distance: 0.595
-  HR,HU:
-    techs:
-      ac_transmission:
-        distance: 0.412
-  HR,SI:
-    techs:
-      ac_transmission:
-        distance: 0.214
-  RO,BG:
-    techs:
-      ac_transmission:
-        distance: 0.428
-  RO,HU:
-    techs:
-      ac_transmission:
-        distance: 0.565
-  BG,EL:
-    techs:
-      ac_transmission:
-        distance: 0.488
-  HU,SI:
-    techs:
-      ac_transmission:
-        distance: 0.462
-  SI,IT:
-    techs:
-      ac_transmission:
-        distance: 0.537
-  SK,CZ:
-    techs:
-      ac_transmission:
-        distance: 0.404
-  SK,PL:
-    techs:
-      ac_transmission:
-        distance: 0.474
-  CZ,PL:
-    techs:
-      ac_transmission:
-        distance: 0.487
-  CZ,DE:
-    techs:
-      ac_transmission:
-        distance: 0.478
-  IT,CH:
-    techs:
-      ac_transmission:
-        distance: 0.675
-  IT,FR:
-    techs:
-      ac_transmission:
-        distance: 1.091
-  CH,FR:
-    techs:
-      ac_transmission:
-        distance: 0.552
   CH,DE:
     techs:
       ac_transmission:
         distance: 0.63
-  PT,ES:
+  CH,FR:
     techs:
       ac_transmission:
-        distance: 0.48
-  FR,ES:
+        distance: 0.552
+  CH,AT:
     techs:
       ac_transmission:
-        distance: 1.057
-  FR,BE:
-    techs:
-      ac_transmission:
-        distance: 0.588
-  FR,DE:
-    techs:
-      ac_transmission:
-        distance: 0.956
-  BE,NL:
-    techs:
-      ac_transmission:
-        distance: 0.245
-  IE,UK:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 500
-        distance: 0.261
-  NL,DE:
-    techs:
-      ac_transmission:
-        distance: 0.445
-  NO,SE:
-    techs:
-      ac_transmission:
-        distance: 0.283
-  NO,FI:
-    techs:
-      ac_transmission:
-        distance: 0.73
-  SE,FI:
-    techs:
-      ac_transmission:
-        distance: 0.634
-  LT,LV:
-    techs:
-      ac_transmission:
-        distance: 0.225
-  LT,PL:
-    techs:
-      ac_transmission:
-        distance: 0.58
-  LV,EE:
-    techs:
-      ac_transmission:
-        distance: 0.257
+        distance: 0.57
   PL,DE:
     techs:
       ac_transmission:
         distance: 0.792
+  PL,CZ:
+    techs:
+      ac_transmission:
+        distance: 0.487
+  NL,DE:
+    techs:
+      ac_transmission:
+        distance: 0.445
+  NL,BE:
+    techs:
+      ac_transmission:
+        distance: 0.239
+  DE,FR:
+    techs:
+      ac_transmission:
+        distance: 0.956
   DE,DK:
     techs:
       dc_transmission:
         constraints:
           energy_cap_equals: 600
         distance: 0.17
-  FI,EE:
+  DE,CZ:
     techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 650
-        distance: 0.17
-  DE,SE:
+      ac_transmission:
+        distance: 0.478
+  DE,BE:
     techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 600
-        distance: 0.25
-  DK,SE:
+      ac_transmission:
+        distance: 0.508
+  DE,AT:
     techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 550
-        distance: 0.176
+      ac_transmission:
+        distance: 0.595
+  FR,BE:
+    techs:
+      ac_transmission:
+        distance: 0.593
+  CZ,AT:
+    techs:
+      ac_transmission:
+        distance: 0.318
   DK,NL:
     techs:
       dc_transmission:
@@ -1268,57 +426,9 @@ links:
         constraints:
           energy_cap_equals: 1400
         distance: 0.623
-  SE,LT:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 700
-        distance: 0.45
   NO,NL:
     techs:
       dc_transmission:
         constraints:
           energy_cap_equals: 700
         distance: 0.58
-  NO,UK:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 1400
-        distance: 0.57
-  DK,UK:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 1400
-        distance: 0.74
-  UK,NL:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 1000
-        distance: 0.25
-  BE,UK:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 1000
-        distance: 0.14
-  UK,FR:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 2000
-        distance: 0.05
-  FR,IE:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 700
-        distance: 0.6
-  IT,EL:
-    techs:
-      dc_transmission:
-        constraints:
-          energy_cap_equals: 500
-        distance: 0.273

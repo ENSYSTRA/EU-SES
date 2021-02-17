@@ -6,8 +6,8 @@ from geopy import distance
 yaml = ruamel.yaml.YAML()
 from . import parameters as pr
 
+vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',76.6],'Wind_Offshore':['offshore_wind',5.36]}
 
-tech_area = {'Solar':76.6 , 'Wind':5 , 'Wind Offshore':5.36}
 dc_links = pd.read_csv('data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
@@ -28,6 +28,7 @@ def create_timeseries_csv(regions_geo, ds_regions):
         export_timeseries(regions_geo, ds_regions,v,k)
 
 def create_location_yaml(regions_geo, ds_regions, sectors):
+    ds_regions["power_plants"] = ds_regions["power_plants"].groupby('tech').sum('fuel')
     yaml = ruamel.yaml.YAML()
 
     if len(regions_geo) > 1 :
@@ -54,14 +55,13 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             for tech in ds_regions.coords[tech_coords].values:
                 installed_capacity = ds_regions[tech_var].loc[rows.nuts_2s,tech].values.item()
                 if tech != 'Hydro':
-                    dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = None #{'constraints':{'energy_cap_max':installed_capacity}}
-                    if tech in ['Wind Offshore','Wind','Solar']:
+                    dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = None
+                    if tech in vre_dic.keys():
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
-                    if tech == 'Wind Offshore':
-                        area_max = ds_regions['offshore_area'].loc[rows.nuts_2s].values.item()
-                        if area_max*tech_area.get(tech) < installed_capacity:
-                            area_max = (installed_capacity / tech_area.get(tech))+1
-                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['resource_area_max'] = area_max
+                        area_max = ds_regions[vre_dic.get(tech)[0]].loc[rows.nuts_2s].values.item()
+                        if area_max*vre_dic.get(tech)[1] < installed_capacity:
+                            area_max = (installed_capacity / vre_dic.get(tech)[1])+1
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'resource_area_max':area_max}}
                     if tech in ['HPHS', 'HDAM']:
                         storage_capacity = ds_regions['hydro_storage'].loc[rows.nuts_2s,tech].values.item()
                         if storage_capacity == 0:
@@ -125,15 +125,15 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     dict_file['group_constraints'] = {}
     if op_mode == 'plan':
-        for i,rows in regions_geo.iterrows():
-            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)] = {}
-            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['techs'] =['wind','solar']
-            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['locs'] = [rows.id]
-            area_max = ds_regions['land_area'].loc[rows.nuts_2s].values.item()
-            wind_solar_area = (ds_regions['power_plants'].loc[rows.nuts_2s,'Solar'].values.item() / tech_area.get('Solar')) +  (ds_regions['power_plants'].loc[rows.nuts_2s,'Wind'].values.item() / tech_area.get('Wind'))
-            if area_max < wind_solar_area:
-                area_max = wind_solar_area + 1
-            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['resource_area_max'] = area_max
+        # for i,rows in regions_geo.iterrows():
+            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)] = {}
+            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['techs'] =['wind','solar']
+            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['locs'] = [rows.id]
+            # area_max = ds_regions['land_area'].loc[rows.nuts_2s].values.item()
+            # wind_solar_area = (ds_regions['power_plants'].loc[rows.nuts_2s,'Solar'].values.item() / tech_area.get('Solar')) +  (ds_regions['power_plants'].loc[rows.nuts_2s,'Wind'].values.item() / tech_area.get('Wind'))
+            # if area_max < wind_solar_area:
+            #     area_max = wind_solar_area + 1
+            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['resource_area_max'] = area_max
 
         # CO2 emissions constraint
         if co2_cap_factor!=None:
