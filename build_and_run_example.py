@@ -35,7 +35,7 @@ filt_ds.create_regions('poli_regions')
 filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.2, national=True)
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
 model.run()
-model.to_netcdf('calliope_model/results/de_eu-calliope-3h.nc')
+model.to_netcdf('calliope_model/results/de_eu-online-calliope-3h.nc')
 
 #--------------------------------------------------------------------------#
 # Germany max-p regions model (GER-max-p)
@@ -51,7 +51,7 @@ filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],
 co2_cap_factor=0.2, national=False)
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
 model.run()
-model.to_netcdf('calliope_model/results/de_max-calliope-3h.nc')
+model.to_netcdf('calliope_model/results/de_max-online-calliope-3h.nc')
 
 #--------------------------------------------------------------------------#
 # Germany administrative regions model (GER-nuts1)
@@ -67,4 +67,4 @@ co2_cap_factor=0.2, national=False)
 # Build and solve calliope model
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
 model.run()
-model.to_netcdf('calliope_model/results/de_nuts1-calliope-3h.nc')
+model.to_netcdf('calliope_model/results/de_nuts1-online-calliope-3h.nc')
