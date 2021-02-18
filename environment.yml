@@ -1,4 +1,4 @@
-name: euses
+name: euses-env
 channels:
   - conda-forge
   - defaults
