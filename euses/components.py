@@ -12,6 +12,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
 from shapely.ops import transform
+import os
 
 from . import parameters as pr
 from .utilib import download_re_ninja
@@ -20,6 +21,8 @@ from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Area
 from .resources import Power_Plants
 from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
 from .model import create_location_yaml, create_timeseries_csv, create_model_yaml
+
+dir_loc = os.path.dirname(__file__)+ "/../data/saved_dataset/"
 
 class EUSES():
 
@@ -97,17 +100,21 @@ class EUSES():
         comp_class = eval(component)
         comp_class(self, **kwargs)
 
-    def save_dataset(self, dir):
-        if os.path.exists(dir):
-            os.remove(dir)
+    def save_dataset(self, dir_name, save_local = 'False'):
+        if save_local == True:
+            dir_loc = ''
+        if os.path.exists(dir_loc + dir_name):
+            os.remove(dir_loc +  dir_name)
         geo_list = [str(geo) for geo in self.ds['geometry'].values]
         self.ds['geometry'] = (('nuts_2'),(geo_list))
         encoding = {k: {'zlib': True, 'shuffle': True} for k in self.ds.variables}
-        self.ds.to_netcdf(dir, encoding=encoding)
+        self.ds.to_netcdf(dir_loc + dir_name, encoding=encoding)
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
 
-    def import_dataset(dir):
-        ds = xr.open_dataset(dir)
+    def import_dataset(dir_name, read_local = 'False'):
+        if read_local == True:
+            dir_loc = ''
+        ds = xr.open_dataset(dir_loc + dir_name)
         countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
         year = pd.to_datetime(ds.coords['time'].values)[0].year
         self = EUSES(countries,year,import_ds=True)
@@ -213,3 +220,27 @@ class EUSES():
         filt_ds.countries = countries
 
         return filt_ds
+
+    def build_dataset(countries, year=2010, save=True, dir_name = 'dataset.nc', save_local=False):
+        # Make list of all countries considered in NUTS 2 dataset
+        if countries == 'EU':
+            countries_metadata = pr.countries_metadata()
+            countries = [country.get('name') for country in countries_metadata]
+
+        # Build NUTS 2 dataset in EUSES dataset for the year
+        euses_ds = EUSES(countries, year)
+        # Add data components
+        data_components_list = ['Power_Plants','Area','Hydro','Heat_Pumps',
+                                    'VRE_Capacity_Factor','Power','Heat']
+        print('Start building data variables')
+        for data_component in data_components_list:
+            euses_ds.add(data_component)
+            print(data_component + ' addition complete')
+
+        if save_local == True:
+            dir_loc = ''
+        # export dataset
+        if save==True:
+            euses_ds.save_dataset(dir_loc + dir)
+
+        return euses_ds

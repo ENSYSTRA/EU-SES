@@ -5,10 +5,13 @@ import ruamel.yaml
 from geopy import distance
 yaml = ruamel.yaml.YAML()
 from . import parameters as pr
+import os
+
+dir_loc = os.path.dirname(__file__)+ "/../"
 
 vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',76.6],'Wind Offshore':['offshore_wind',5.36]}
 
-dc_links = pd.read_csv('data/links/dc_links.csv')
+dc_links = pd.read_csv(dir_loc+'data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = pd.DataFrame(index= ds_regions.time.values)
@@ -16,7 +19,7 @@ def export_timeseries(regions_geo, ds_regions,data_name,sign):
         if len(ds_regions[data_name].loc[rows.nuts_2s].values) != 0:
             df[rows.id] = ds_regions[data_name].loc[rows.nuts_2s].values
     df = df * sign
-    df.to_csv('calliope_model/timeseries_data/{}.csv'.format(data_name))
+    df.to_csv(dir_loc+'calliope_model/timeseries_data/{}.csv'.format(data_name))
 
 def create_timeseries_csv(regions_geo, ds_regions):
     data_list = [{'power':-1}, {'heat':-1}, {'pv_cf':1}, {'wind_cf':1},
@@ -99,7 +102,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                 dict_file['links']['{},{}'.format(fr_index, to_index)] = trans_dic
 
 
-    with open(r'calliope_model/model_config/locations.yaml', 'w') as file:
+    with open(dir_loc+'calliope_model/model_config/locations.yaml', 'w') as file:
         documents = yaml.dump(dict_file, file)
 
 def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
@@ -108,7 +111,7 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
     year = self.year
 
     dict_file = {'import': {}, 'model': {}, 'run': {}}
-    dict_file['import'] = ['model_config/techs_elec.yaml','model_config/locations.yaml', 'scenarios.yaml']
+    dict_file['import'] = [dir_loc+'model_config/techs_elec.yaml',dir_loc+'model_config/locations.yaml', dir_loc+'scenarios.yaml']
 
     dict_file['model']['name'] = 'ESES model'
     dict_file['model']['calliope_version'] = '0.6.5'
@@ -141,7 +144,7 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
             dict_file['group_constraints']['systemwide_co2_cap'] = {'cost_max':{'co2':co2_cap_factor*c02_vol}}
 
     else:
-        dict_file['import'] = ['model_config/techs_elec.yaml','model_config/locations.yaml']
+        dict_file['import'] = [dir_loc+'model_config/techs_elec.yaml',dir_loc+'model_config/locations.yaml']
         dict_file['run']['operation'] = {'horizon': 48, 'window': 24}
 
 
@@ -151,7 +154,7 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
     dict_file['group_constraints']['systemwide_biogas_cap'] = constraint
 
     if 'heat' in sectors:
-        dict_file['import'] = ['model_config/techs_elec_heat.yaml','model_config/locations.yaml', 'scenarios.yaml']
+        dict_file['import'] = [dir_loc+'model_config/techs_elec_heat.yaml',dir_loc+'model_config/locations.yaml', 'scenarios.yaml']
 
-    with open(r'calliope_model/model.yaml', 'w') as file:
+    with open(dir_loc+'calliope_model/model.yaml', 'w') as file:
         documents = yaml.dump(dict_file, file)
