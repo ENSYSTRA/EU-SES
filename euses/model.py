@@ -6,7 +6,7 @@ from geopy import distance
 yaml = ruamel.yaml.YAML()
 from . import parameters as pr
 
-vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',76.6],'Wind_Offshore':['offshore_wind',5.36]}
+vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',76.6],'Wind Offshore':['offshore_wind',5.36]}
 
 dc_links = pd.read_csv('data/links/dc_links.csv')
 
@@ -61,16 +61,16 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                         area_max = ds_regions[vre_dic.get(tech)[0]].loc[rows.nuts_2s].values.item()
                         if area_max*vre_dic.get(tech)[1] < installed_capacity:
                             area_max = (installed_capacity / vre_dic.get(tech)[1])+1
-                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'resource_area_max':area_max}}
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['resource_area_max'] = area_max
                     if tech in ['HPHS', 'HDAM']:
                         storage_capacity = ds_regions['hydro_storage'].loc[rows.nuts_2s,tech].values.item()
                         if storage_capacity == 0:
                             storage_capacity = 6*installed_capacity
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['storage_cap_equals'] = storage_capacity
-                    if tech in ['Waste','Biomass','Cogeneration','Coal','Nuclear','Oil','Other']:
+                    if tech in ['Combined cycle']:
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
-                    if tech in ['HROR','Geothermal']:
+                    if tech in ['HROR']:
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
 
 
