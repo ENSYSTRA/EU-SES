@@ -133,7 +133,7 @@ techs:
     hror: # [1] - 6.4 Hydropower run-of-a-river
         essentials:
             name: 'Hydro'
-            color: '#c6e2ff'
+            color: '#98E0FF'
             parent: supply_power
             carrier_out: power
         constraints:
@@ -156,7 +156,7 @@ techs:
     hdam: # [1] - 6 Hydropower - 6.1 Hydropower dam and reservoir, >100 MW
         essentials:
             name: 'Storage DAM'
-            color: '#738eb6'
+            color: '#7026FF'
             parent: supply_plus
             carrier_out: power
         constraints:
@@ -181,7 +181,7 @@ techs:
     combined_cycle: # [1] - 14.2 CCGT CHP - Table 53. CCGT advanced CHP.
         essentials:
             name: 'Cogeneration'
-            color: '#E4AB97'
+            color: '#635A4D'
             parent: conversion_plus
             primary_carrier_out: power
             carrier_in: gas
