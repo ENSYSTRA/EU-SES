@@ -2,12 +2,6 @@ import euses
 import calliope
 import numpy as np
 
-print(euses.__file__)
-
-
-
-# import euses
-# euses_ds = euses.EUSES.build_dataset(countries =['Austria'])
 
 calliope.set_log_verbosity('CRITICAL', include_solver_output=False)
 eu_ds = euses.EUSES.import_dataset('euses_datasets.nc')
