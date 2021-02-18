@@ -233,6 +233,6 @@ def build_dataset(countries, year=2010, save=True, dir_name = 'dataset.nc'):
         print(data_component + ' addition complete')
     # export dataset
     if save==True:
-        self.save_dataset("data/saved_dataset/" + dir)
+        self.save_dataset(dir_name)
 
     return self
