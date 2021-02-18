@@ -97,3 +97,4 @@ dependencies:
     - wcwidth==0.2.5
     - xarray==0.14.1
     - zipp==3.1.0
+    - datapackage==1.15.1
