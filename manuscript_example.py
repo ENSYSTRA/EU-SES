@@ -1,5 +1,4 @@
 import xarray as xr
-import euses
 import copy
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -7,8 +6,9 @@ import seaborn as sns
 import calliope
 import pandas as pd
 import matplotlib.lines as lines
+import os
 
-
+import euses
 
 # illustrate the spatial classification of regions_geo
 
