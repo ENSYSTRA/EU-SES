@@ -22,8 +22,6 @@ from .resources import Power_Plants
 from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
 from .model import create_location_yaml, create_timeseries_csv, create_model_yaml
 
-dir_loc = os.path.dirname(__file__)+ "/../data/saved_dataset/"
-
 class EUSES():
 
     def __init__(self,countries,year,import_ds=False):
@@ -100,27 +98,15 @@ class EUSES():
         comp_class = eval(component)
         comp_class(self, **kwargs)
 
-    def save_dataset(self, dir_name, save_local = 'False'):
-        if save_local == True:
-            dir_loc = ''
-        if os.path.exists(dir_loc + dir_name):
-            os.remove(dir_loc +  dir_name)
+    def save_dataset(self, dir_name):
+
+        if os.path.exists("data/saved_dataset/" + dir_name):
+            os.remove("data/saved_dataset/" +  dir_name)
         geo_list = [str(geo) for geo in self.ds['geometry'].values]
         self.ds['geometry'] = (('nuts_2'),(geo_list))
         encoding = {k: {'zlib': True, 'shuffle': True} for k in self.ds.variables}
-        self.ds.to_netcdf(dir_loc + dir_name, encoding=encoding)
+        self.ds.to_netcdf("data/saved_dataset/" + dir_name, encoding=encoding)
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
-
-    def import_dataset(dir_name, read_local = 'False'):
-        if read_local == True:
-            dir_loc = ''
-        ds = xr.open_dataset(dir_loc + dir_name)
-        countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
-        year = pd.to_datetime(ds.coords['time'].values)[0].year
-        self = EUSES(countries,year,import_ds=True)
-        self.ds = ds
-        self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
-        return self
 
     def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1):
 
@@ -221,26 +207,32 @@ class EUSES():
 
         return filt_ds
 
-    def build_dataset(countries, year=2010, save=True, dir_name = 'dataset.nc', save_local=False):
-        # Make list of all countries considered in NUTS 2 dataset
-        if countries == 'EU':
-            countries_metadata = pr.countries_metadata()
-            countries = [country.get('name') for country in countries_metadata]
+def import_dataset(dir_name):
+    ds = xr.open_dataset("data/saved_dataset/" + dir_name)
+    countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
+    year = pd.to_datetime(ds.coords['time'].values)[0].year
+    self = EUSES(countries,year,import_ds=True)
+    self.ds = ds
+    self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
+    return self
 
-        # Build NUTS 2 dataset in EUSES dataset for the year
-        euses_ds = EUSES(countries, year)
-        # Add data components
-        data_components_list = ['Power_Plants','Area','Hydro','Heat_Pumps',
-                                    'VRE_Capacity_Factor','Power','Heat']
-        print('Start building data variables')
-        for data_component in data_components_list:
-            euses_ds.add(data_component)
-            print(data_component + ' addition complete')
+def build_dataset(countries, year=2010, save=True, dir_name = 'dataset.nc'):
+    # Make list of all countries considered in NUTS 2 dataset
+    if countries == 'EU':
+        countries_metadata = pr.countries_metadata()
+        countries = [country.get('name') for country in countries_metadata]
 
-        if save_local == True:
-            dir_loc = ''
-        # export dataset
-        if save==True:
-            euses_ds.save_dataset(dir_loc + dir)
+    # Build NUTS 2 dataset in EUSES dataset for the year
+    self = EUSES(countries, year)
+    # Add data components
+    data_components_list = ['Power_Plants','Area','Hydro','Heat_Pumps',
+                                'VRE_Capacity_Factor','Power','Heat']
+    print('Start building data variables')
+    for data_component in data_components_list:
+        self.add(data_component)
+        print(data_component + ' addition complete')
+    # export dataset
+    if save==True:
+        self.save_dataset("data/saved_dataset/" + dir)
 
-        return euses_ds
+    return self

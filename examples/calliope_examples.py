@@ -4,7 +4,7 @@ import numpy as np
 
 
 calliope.set_log_verbosity('CRITICAL', include_solver_output=False)
-eu_ds = euses.EUSES.import_dataset('euses_datasets.nc')
+eu_ds = euses.import_dataset('euses_datasets.nc')
 
 # remove power plants not considered
 fuels_considered = ['Biomass and biogas','Natural gas','Solar','Wind']
