@@ -1,7 +1,9 @@
-import euses
 import calliope
 import numpy as np
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import euses
 
 calliope.set_log_verbosity('CRITICAL', include_solver_output=False)
 eu_ds = euses.import_dataset('euses_datasets.nc')
