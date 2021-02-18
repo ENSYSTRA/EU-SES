@@ -60,6 +60,8 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                     if tech in vre_dic.keys():
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
                         area_max = ds_regions[vre_dic.get(tech)[0]].loc[rows.nuts_2s].values.item()
+                        if tech == 'Solar':
+                            area_max = area_max + ds_regions['utility_pv'].loc[rows.nuts_2s].values.item()
                         if area_max*vre_dic.get(tech)[1] < installed_capacity:
                             area_max = (installed_capacity / vre_dic.get(tech)[1])+1
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['resource_area_max'] = area_max

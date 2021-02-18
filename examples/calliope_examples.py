@@ -44,11 +44,11 @@ model.to_netcdf('calliope_model/results/de_eu-online-calliope-3h.nc')
 filt_ds = eu_ds.filter_countries(['Germany'])
 
 # Build regions dataset uning max-p regions method
-filt_ds.create_regions('poli_regions',area_factor=3.8)
+filt_ds.create_regions('max_p_regions',area_factor=3.8)
 
 # Build and solve calliope model
 filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],
-co2_cap_factor=0.2, national=False)
+co2_cap_factor=0.20, national=False)
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
 model.run()
 model.to_netcdf('calliope_model/results/de_max-online-calliope-3h.nc')
