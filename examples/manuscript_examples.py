@@ -29,8 +29,8 @@ tech_list = np.setdiff1d(tech_list,['Combined cycle'])
 eu_ds.ds['power_plants'].loc[:,['Combined cycle']] = [[g] for g in sum_var.values]
 eu_ds.ds = eu_ds.ds.drop(tech_list,dim='tech')
 
-# only 3% of utility_pv area considered
-eu_ds.ds['utility_pv'] = eu_ds.ds['utility_pv']*0.03
+# only 25% of utility_pv area considered
+eu_ds.ds['utility_pv'] = eu_ds.ds['utility_pv']*0.25
 
 
 #--------------------------------------------------------------------------#
@@ -85,7 +85,7 @@ co2_cap_factor=0.2, national=False)
 # Build and solve calliope model
 ger_nuts1_model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
 ger_nuts1_model.run()
-ger_nuts1_model.to_netcdf('calliope_model/results/de_nuts1-online-calliope-3h.nc')
+ger_nuts1_model.to_netcdf('calliope_model/results/de_nuts1-calliope-3h.nc')
 
 
 # Plot results
