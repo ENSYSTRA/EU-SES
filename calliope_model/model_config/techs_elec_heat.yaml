@@ -75,7 +75,7 @@ techs:
             lifetime: 25
             resource: file=pv_cf.csv
             resource_unit: energy_per_cap
-            resource_area_per_energy_cap: 0.013
+            resource_area_per_energy_cap: 0.0059
         costs:
             monetary:
                 interest_rate: 0.07
@@ -203,7 +203,7 @@ techs:
     heat_pump_air:
         essentials:
             name: 'Air-Sourced Heat Pump'
-            color: '#1eaa9d'
+            color: '#ff4500'
             parent: conversion
             carrier_out: heat
             carrier_in: power

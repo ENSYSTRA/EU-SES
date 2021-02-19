@@ -7,7 +7,7 @@ yaml = ruamel.yaml.YAML()
 from . import parameters as pr
 import os
 
-vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',76.6],'Wind Offshore':['offshore_wind',5.36]}
+vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',170],'Wind Offshore':['offshore_wind',5.36]}
 
 dc_links = pd.read_csv('data/links/dc_links.csv')
 
@@ -88,7 +88,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             length = int(distance.distance((fr.y,fr.x), (to.y,to.x)).km*1.25)
             if g1_geo.intersects(g2_geo) == True and length not in line_lenght:
                 line_lenght.append(length)
-                trans_dic = {'techs':{'ac_transmission': {'distance':length/1e3} }}
+                trans_dic = {'techs':{'ac_transmission': {'distance':length/1e2} }}
                 dict_file['links']['{},{}'.format(rows.id, rows_2.id)] = trans_dic
 
     for i,rows in dc_links.iterrows():
@@ -98,7 +98,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             fr_index = rows_filtr_from.id.values[0]
             to_index = rows_filtr_to.id.values[0]
             if rows_filtr_from.iloc[0].id != rows_filtr_to.iloc[0].id:
-                trans_dic = {'techs':{'dc_transmission': {'constraints':{'energy_cap_equals':rows.capacity},'distance':rows.length/1e3} }}
+                trans_dic = {'techs':{'dc_transmission': {'constraints':{'energy_cap_equals':rows.capacity},'distance':rows.length/1e2} }}
                 dict_file['links']['{},{}'.format(fr_index, to_index)] = trans_dic
 
 

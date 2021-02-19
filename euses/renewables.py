@@ -148,7 +148,7 @@ class VRE_Capacity_Factor():
                         ds['wind_offshore_cf'].loc[nuts0_id] = data['national']
 
 class Area():
-    def __init__(self, EUSES, scenario='Holtinger2016_med'):
+    def __init__(self, EUSES):
         year =  EUSES.year
         ds = EUSES.ds
 
@@ -169,6 +169,7 @@ class Area():
                                 "SURNATOGRHIG", "SURNATOGRLOW"]].sum(axis=1)
 
         rooftop_pv = rooftop_pv.append([building_af_ch,building_af_no])
+        utility_pv = utility_pv.append([(building_af_ch/0.11),(building_af_no/0.11)])
 
         onshore_scenario = 'Reference'
         onshore_wind = wind_jrc['Suitable area'][(wind_jrc.Scenario==onshore_scenario) & (wind_jrc.ONOFF=='Onshore') & (wind_jrc["Subscenario - not cumulative"]=="Setback distance for 3MW turbines")]
@@ -198,13 +199,13 @@ class Area():
                         path = temp.name + '/rastermap_v200605_einfarbig.tif'
                         open(path, 'wb').write(zipfile.read(zipfile.namelist()[5]))
                         area = zonal_stats(ds['geometry'].loc[nuts_2_id].values.item(), path, stats='count')[0].get('count')
-                        ds[c].loc[nuts_2_id] = area*6.25/1e6
+                        ds[c].loc[nuts_2_id] = area*6250/1e6
                     if nuts_0_id['country_code'] == 'NO':
                         r = requests.get('https://gitlab.com/hotmaps/potential/potential_wind/-/raw/master/data/wind_100m.tif?inline=false')
                         path = temp.name+'/wind_100m.tif'
                         open(path, 'wb').write(r.content)
                         area = zonal_stats(ds['geometry'].loc[nuts_2_id].values.item(), path, stats='count')[0].get('count')
-                        ds[c].loc[nuts_2_id] = area/9e6
+                        ds[c].loc[nuts_2_id] = area*900/1e6
                     temp.cleanup()
 
             if c == 'offshore_wind':

@@ -29,6 +29,9 @@ tech_list = np.setdiff1d(tech_list,['Combined cycle'])
 eu_ds.ds['power_plants'].loc[:,['Combined cycle']] = [[g] for g in sum_var.values]
 eu_ds.ds = eu_ds.ds.drop(tech_list,dim='tech')
 
+# only 3% of utility_pv area considered
+eu_ds.ds['utility_pv'] = eu_ds.ds['utility_pv']*0.03
+
 
 #--------------------------------------------------------------------------#
 # EU model (EU-nuts0)
@@ -137,4 +140,4 @@ fig3.lines.extend([l1])
 plt.text(-0.16, 1.7, '(a)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
 plt.text(-0.16, 0.4, '(b)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
 
-fig3.savefig('plots/example_figure.png',bbox_inches='tight',dpi=600)
+fig3.savefig('examples/example_figure.png',bbox_inches='tight',dpi=600)
