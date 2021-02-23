@@ -28,13 +28,12 @@ dependencies:
     - click-plugins==1.1.1
     - cligj==0.5.0
     - cycler==0.10.0
+    - datapackage==1.15.1
     - decorator==4.4.2
     - descartes==1.1.0
     - geographiclib==1.50
-    - https://github.com/ENSYSTRA/geokit/archive/master.zip
     - geopandas==0.8.1
     - geopy==2.0.0
-    - https://github.com/ENSYSTRA/glaes/archive/master.zip
     - idna==2.10
     - importlib-metadata==1.7.0
     - ipykernel==5.3.4
@@ -84,13 +83,12 @@ dependencies:
     - scikit-learn==0.23.2
     - seaborn==0.11.1
     - scipy==1.5.2
-    - shapely==1.6.4
+    - shapely==1.7.0
     - simplejson==3.17.2
     - six==1.15.0
     - smopy==0.0.7
     - snuggs==1.4.7
     - soupsieve==2.0.1
-    - https://github.com/ENSYSTRA/spopt/archive/master.zip
     - threadpoolctl==2.1.0
     - tornado==6.0.4
     - traitlets==5.0.0b1
@@ -98,4 +96,4 @@ dependencies:
     - wcwidth==0.2.5
     - xarray==0.14.1
     - zipp==3.1.0
-    - datapackage==1.15.1
+    - https://github.com/ENSYSTRA/spopt/archive/master.zip

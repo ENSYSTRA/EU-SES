@@ -2,8 +2,6 @@ import pandas as pd
 import xarray as xr
 import numpy as np
 from statistics import mean
-import glaes as gl
-import geokit as gk
 from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
 import geopandas as gpd
 from datapackage import Package

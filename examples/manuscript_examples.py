@@ -40,7 +40,7 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, n
     columns=['id'],geometry=filt_ds.ds_regions['geometry'].values)
 
     filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.2, national=national)
-    model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
+    model = calliope.Model('calliope_model/model.yaml',scenario='time_3H')
     model.run()
     model.to_netcdf('calliope_model/results/'+save_dir)
 
