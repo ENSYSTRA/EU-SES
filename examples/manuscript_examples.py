@@ -68,7 +68,7 @@ de_maxp_nopv_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8
 techs= ['solar','wind', 'wind_offshore','combined_cycle', 'heat_pump_air','battery', 'hdam',
         'hphs', 'hror', 'hydrogen']
 
-colors = ger_max_p_model.inputs['colors'].loc[techs].values
+colors = de_maxp_model.inputs['colors'].loc[techs].values
 
 # load installed capaciy of technologies from model results into pandas dataframe
 df_IC = pd.DataFrame()
