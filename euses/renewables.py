@@ -171,10 +171,10 @@ class Area():
         rooftop_pv = rooftop_pv.append([building_af_ch,building_af_no])
         utility_pv = utility_pv.append([(building_af_ch/0.11),(building_af_no/0.11)])
 
-        onshore_scenario = 'Reference'
-        onshore_wind = wind_jrc['Suitable area'][(wind_jrc.Scenario==onshore_scenario) & (wind_jrc.ONOFF=='Onshore') & (wind_jrc["Subscenario - not cumulative"]=="Setback distance for 3MW turbines")]
+        onshore_scenario = 'EU-Wide low restrictions'
+        onshore_wind = wind_jrc['Suitable area'][(wind_jrc.Scenario==onshore_scenario) & (wind_jrc.ONOFF=='Onshore') & (wind_jrc["Subscenario - not cumulative"]=="400m setback distance")]
 
-        offshore_scenario = 'Reference'
+        offshore_scenario = 'EU-Wide low restrictions'
         offshore_categories = ['Water depth 0-30m','Water depth 30-60m']
         offshore_wind = wind_jrc['Suitable area'][(wind_jrc.Scenario==offshore_scenario) & (wind_jrc['Offshore categories'].isin(offshore_categories))]
 

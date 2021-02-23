@@ -22,8 +22,8 @@ def aggregation(ds, groups):
 
     dsc = ds.copy()
 
-    sums_vars = ['power', 'population', 'heat', 'power_plants', 'offshore_wind', 'rooftop_pv',
-                 'utility_pv','hydro_capacity', 'hydro_storage']
+    sums_vars = ['power', 'population', 'heat', 'power_plants', 'onshore_wind','offshore_wind',
+                  'rooftop_pv','utility_pv','hydro_capacity', 'hydro_storage']
     area_weighted_vars = ['wind_cf', 'pv_cf', 'wind_offshore_cf',
                           'cop_air','hydro_inflow']
 
