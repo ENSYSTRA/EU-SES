@@ -35,7 +35,7 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir):
 
     filt_ds = eu_ds.filter_countries(countries)
     # Build and solve calliope model
-    filt_ds.create_regions(regions_method)
+    filt_ds.create_regions(regions_method, area_factor)
     regions_gpd = gpd.GeoDataFrame(filt_ds.ds_regions['regions'].values,
     columns=['id'],geometry=filt_ds.ds_regions['geometry'].values)
 
