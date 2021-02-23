@@ -12,7 +12,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import euses
 
-def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir):
+def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, national=False):
     calliope.set_log_verbosity('CRITICAL', include_solver_output=False)
     eu_ds = euses.import_dataset('euses_datasets.nc')
     # remove power plants not considered
@@ -39,7 +39,7 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir):
     regions_gpd = gpd.GeoDataFrame(filt_ds.ds_regions['regions'].values,
     columns=['id'],geometry=filt_ds.ds_regions['geometry'].values)
 
-    filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.2, national=True)
+    filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.2, national=national)
     model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'} )
     model.run()
     model.to_netcdf('calliope_model/results/'+save_dir)
@@ -50,9 +50,9 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir):
 # EU model (EU-nuts0)
 countries = ['Germany','Norway','Denmark','Poland','France','Netherlands',
                                  'Belgium','Austria','Switzerland','Czech Rep.']
-eu_nuts0_model, eu_nuts0_gpd = run_scenario(countries, 'poli_regions',None, 1, 'de_eu-calliope-3h.nc')
+eu_nuts0_model, eu_nuts0_gpd = run_scenario(countries, 'poli_regions',None, 1, 'de_eu-calliope-3h.nc', national=True)
 
-#--------------------------------------------------------------------------#
+# --------------------------------------------------------------------------#
 # Germany administrative regions model (GER-nuts1) with and without rooftop_pv
 de_nuts1_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts1', None , 1, 'de_nuts1-pv-calliope-3h.nc')
 de_nuts1_nopv_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts1', None , 0, 'de_nuts1-nopv-calliope-3h.nc')
@@ -61,8 +61,6 @@ de_nuts1_nopv_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts
 # Germany max-p regions model (GER-max-p) with and without rooftop_pv
 de_maxp_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 1, 'de_maxp-pv-calliope-3h.nc')
 de_maxp_nopv_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 0, 'de_maxp-nopv-calliope-3h.nc')
-
-
 # Plot results
 
 techs= ['solar','wind', 'wind_offshore','combined_cycle', 'heat_pump_air','battery', 'hdam',
