@@ -1,6 +1,6 @@
 # EU-SES - EUropean Sustainable Energy System for Python
 
-EU-SES is an energy system modelling tool that maximises the use of web-hosted pre-processed data sources. EU-SES also focuses on providing an automated method of building energy system model while maintaining the flexibility of selecting the spatial resolution of the model.
+EU-SES is an energy system modelling tool that maximises the use of web-hosted pre-processed data sources. EU-SES offers an automated data-processing approach to build energy system models while maintaining the flexibility of selecting the spatial resolution of the model.
 
 The EU-SES concentrates on the 27 EU countries plus UK, Norway and Switzerland. The modelling tool builds a dataset of the NUTS 2 areas based on a scenario selection. The scenario specifies the countries of interest and the scenarios available in data sources. The spatial data of the NUTS 2 areas is aggregated into a regions dataset according a selected method of defining regions. The regions dataset and the [calliope modelling framework](https://calliope.readthedocs.io/en/stable/index.html) can then be used to build the energy system model. So far the EU-SES modelling tool can build and solve optimisation models that include the power sector and the residential and tertiary heating sector.
 

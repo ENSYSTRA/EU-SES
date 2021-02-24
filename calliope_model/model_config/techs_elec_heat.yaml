@@ -160,7 +160,6 @@ techs:
             parent: supply_plus
             carrier_out: power
         constraints:
-            # energy_cap_per_storage_cap_equals: 0.008
             resource: file=hydro_inflow.csv
             resource_unit: energy_per_cap
             energy_eff: 1
@@ -190,7 +189,7 @@ techs:
         constraints:
             export_carrier: power
             energy_eff: 0.61
-            carrier_ratios.carrier_out_2.heat: 0.77 # Todo Check
+            carrier_ratios.carrier_out_2.heat: 0.77
             lifetime: 30
         costs:
             monetary:
@@ -230,7 +229,7 @@ techs:
             storage_cap_max: inf
             energy_cap_per_storage_cap_equals: 0.17
             energy_eff: 0.95  # round trip efficiency
-            storage_loss: 0  # No loss over time assumed
+            storage_loss: 0
             lifetime: 10
         costs:
             monetary:
@@ -251,7 +250,7 @@ techs:
             storage_cap_max: inf
             energy_cap_per_storage_cap_equals: 0.007
             energy_eff: 0.41
-            storage_loss: 0  # No loss over time assumed
+            storage_loss: 0
             lifetime: 30
         costs:
             monetary:
@@ -271,10 +270,8 @@ techs:
             parent: storage
             carrier: power
         constraints:
-            # energy_cap_per_storage_cap_min: 0.17
             storage_initial: 1
             energy_eff: 0.85 #  round trip efficiency
-            # storage_loss: 0.01  # No loss over time assumed
             lifetime: 60
         costs:
             monetary:
@@ -313,12 +310,8 @@ techs:
             carrier: power
         constraints:
             energy_cap_equals: 2000
-            energy_eff_per_distance: 0.995 # in per 1000 km
+            energy_eff_per_distance: 0.995 # in per 100 km
             lifetime: 25
-        costs:
-            monetary:
-                interest_rate: 0.07
-                energy_cap_per_distance: 0.6
 
     dc_transmission:
         essentials:
@@ -328,9 +321,5 @@ techs:
             carrier: power
         constraints:
             # energy_cap_max: 2000
-            energy_eff_per_distance: 0.998 # in per 1000 km
+            energy_eff_per_distance: 0.998 # in per 100 km
             lifetime: 25
-        costs:
-            monetary:
-                interest_rate: 0.07
-                # energy_cap_per_distance: 0.01
