@@ -112,4 +112,4 @@ fig3.lines.extend([l1])
 plt.text(-0.16, 1.7, '(a)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
 plt.text(-0.16, 0.4, '(b)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
 
-fig3.savefig('examples/example_figure.png',bbox_inches='tight',dpi=600)
+fig3.savefig('examples/example_figure.pdf',bbox_inches='tight')
