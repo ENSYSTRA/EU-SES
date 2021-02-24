@@ -92,4 +92,4 @@ This work was done by ESR 5 of the [ENSYSTRA](https://ensystra.eu/) project and 
 
 
 # License
-The code is MIT licensed 
+The code is licensed under Creative Commons Attribution Share Alike 4.0 International.
