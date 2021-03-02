@@ -169,7 +169,7 @@ class Area():
                                 "SURNATOGRHIG", "SURNATOGRLOW"]].sum(axis=1)
 
         rooftop_pv = rooftop_pv.append([building_af_ch,building_af_no])
-        utility_pv = utility_pv.append([(building_af_ch/0.11),(building_af_no/0.11)])
+        utility_pv = utility_pv.append([(building_af_ch*144),(building_af_no*176)])
 
         onshore_scenario = 'EU-Wide low restrictions'
         onshore_wind = wind_jrc['Suitable area'][(wind_jrc.Scenario==onshore_scenario) & (wind_jrc.ONOFF=='Onshore') & (wind_jrc["Subscenario - not cumulative"]=="400m setback distance")]
