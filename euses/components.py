@@ -124,7 +124,7 @@ class EUSES():
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
 
-        zones['pv_pot_e'] = ds['rooftop_pv'].values * ds['pv_cf'].values.sum(axis=1)
+        zones['pv_pot_e'] = (ds['rooftop_pv']+ds['utility_pv']).values * ds['pv_cf'].values.sum(axis=1)
         zones['wind_on_pot_e'] = ds['onshore_wind'].values * ds['wind_cf'].values.sum(axis=1)
         zones['wind_off_pot_e'] = ds['offshore_wind'].values * ds['wind_offshore_cf'].values.sum(axis=1)
 
