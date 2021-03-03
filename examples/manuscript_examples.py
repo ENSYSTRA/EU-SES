@@ -160,7 +160,7 @@ for i in range(4):
         if i ==3:
             axs[i,j].set_xlabel("Technologies", fontsize=12)
         if j ==0:
-            axs[i,j].set_ylabel('Percentage difference in installed capacity of \n GER NUTS1 without PV in reference to \n GER NUTS1 model with rooftop PV [%]')
+            axs[i,j].set_ylabel('Percentage difference in installed capacity of \n GER NUTS1 without rooftop PV in reference to \n GER NUTS1 model with rooftop PV [%]')
         legend = axs[i,j].get_legend()
         legend.remove()
         regions.remove(regions[0])
@@ -187,7 +187,7 @@ for e,(region, rows) in enumerate(region_pf.iterrows()):
     axs[e].set_xticklabels([])
     axs[e].set_xticks([])
     axs[e].set_xlabel("Technologies", fontsize=12)
-    axs[0].set_ylabel('Percentage difference in installed capacity of \n GER NUTS1 without PV in reference to \n GER NUTS1 model with rooftop PV [%]')
+    axs[0].set_ylabel('Percentage difference in installed capacity of \n GER NUTS1 without rooftop PV in reference to \n GER NUTS1 model with rooftop PV [%]')
 plt.legend(labels = names, bbox_to_anchor=(1,-0.1), ncol=4)
 plt.tight_layout()
 fig5.savefig('examples/capacity_difference-selected_states.pdf',bbox_inches='tight')
