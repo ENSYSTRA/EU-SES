@@ -20,9 +20,9 @@ run:
 group_constraints:
   systemwide_co2_cap:
     cost_max:
-      co2: 67773800000.0
+      co2: 67690200000.0
   systemwide_biogas_cap:
     techs:
     - supply_biogas
     carrier_prod_max:
-      gas: 19807761.755390298
+      gas: 18737429.014324218
