@@ -55,6 +55,8 @@ de_nuts1_nopv_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts
 # Germany max-p regions model (GER-max-p) with and without rooftop_pv
 de_maxp_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 1, 'de_maxp-pv-calliope-3h')
 de_maxp_nopv_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 0, 'de_maxp-nopv-calliope-3h')
+
+# Reload results for ploting
 eu_nuts0_model = calliope.read_netcdf('calliope_model/results/de_eu-calliope-3h.nc')
 de_nuts1_model = calliope.read_netcdf('calliope_model/results/de_nuts1-pv-calliope-3h.nc')
 de_maxp_model = calliope.read_netcdf('calliope_model/results/de_maxp-pv-calliope-3h.nc')

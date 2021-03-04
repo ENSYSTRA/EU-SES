@@ -34,10 +34,10 @@ class EUSES():
         self.countries = countries
         self.year = year
 
-        nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
-
         if import_ds == False:
 
+            nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
+            
             time = pd.date_range(str(year), str(year+1), freq='1H')[:-1]
             self.ds.coords['time'] = time
             self.ds.coords['nuts_0'] = [pr.get_metadata(c,'nuts_id') for c in self.countries]
