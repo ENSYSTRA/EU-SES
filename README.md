@@ -57,8 +57,9 @@ example.create_regions('poli_regions')
 
 # Build a power and heat optimisation calliope model with a limitation on CO2 emission.  
 # The specifications of the technologies within the model are in the calliope_model folder.
+# The default solver used is cbc, in this example the pyomo pre installed solver glpk is used.
 example.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.2, national=True)
-model = calliope.Model('calliope_model/model.yaml',scenario='time_3H')
+model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'glpk'})
 model.run()
 
 # The model optimisation results can then be analysed using calliope analysising tools described in https://calliope.readthedocs.io/en/stable/user/analysing.html
