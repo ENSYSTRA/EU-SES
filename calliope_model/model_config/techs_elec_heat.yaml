@@ -310,7 +310,6 @@ techs:
             carrier: power
         constraints:
             energy_cap_min: 2000
-            energy_eff: 0.95
             lifetime: 40
         costs:
             monetary:
@@ -324,5 +323,4 @@ techs:
             parent: transmission
             carrier: power
         constraints:
-            energy_eff_per_distance: 0.98
             lifetime: 40
