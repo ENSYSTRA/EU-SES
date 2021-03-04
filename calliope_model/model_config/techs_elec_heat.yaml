@@ -310,7 +310,9 @@ techs:
             carrier: power
         constraints:
             energy_cap_min: 2000
+            energy_cap_max: 8000
             lifetime: 40
+            energy_eff: 1
         costs:
             monetary:
                 energy_cap_per_distance: 40000 # value in per 100km , 400 €/MWkm https://doi.org/10.1016/j.energy.2017.06.004
@@ -324,3 +326,4 @@ techs:
             carrier: power
         constraints:
             lifetime: 40
+            energy_eff: 1
