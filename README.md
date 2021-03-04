@@ -1,4 +1,5 @@
 # EU-SES - EUropean Sustainable Energy System for Python
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4575214.svg)](https://doi.org/10.5281/zenodo.4575214)
 
 EU-SES is an energy system modelling tool that maximises the use of web-hosted pre-processed data sources. EU-SES offers an automated data-processing approach to build energy system models while maintaining the flexibility of selecting the spatial resolution of the model.
 
