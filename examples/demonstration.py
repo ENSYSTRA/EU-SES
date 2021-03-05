@@ -35,7 +35,7 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, n
     regions_gpd = gpd.GeoDataFrame(filt_ds.ds_regions['regions'].values,
     columns=['id'],geometry=filt_ds.ds_regions['geometry'].values)
     filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.2, national=national)
-    model = calliope.Model('calliope_model/model.yaml',scenario='time_3H')
+    model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'})
     model.run()
     model.to_netcdf('calliope_model/results/'+save_dir+'.nc')
     return model, regions_gpd
@@ -56,11 +56,21 @@ de_nuts1_nopv_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts
 de_maxp_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 1, 'de_maxp-pv-calliope-3h')
 de_maxp_nopv_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 0, 'de_maxp-nopv-calliope-3h')
 
-# Reload results for ploting
-eu_nuts0_model = calliope.read_netcdf('calliope_model/results/de_eu-calliope-3h.nc')
-de_nuts1_model = calliope.read_netcdf('calliope_model/results/de_nuts1-pv-calliope-3h.nc')
-de_maxp_model = calliope.read_netcdf('calliope_model/results/de_maxp-pv-calliope-3h.nc')
+
 # Plot results
+# Calculate curtailment by model and technology
+curtailment = pd.DataFrame(index=['GER NUTS0', 'GER NUTS1', 'GER MAX-P'])
+results_dic={'GER NUTS0':eu_nuts0_model, 'GER NUTS1':de_nuts1_model, 'GER MAX-P':de_maxp_model}
+
+for name, m in results_dic.items():
+    for tech in ['wind','solar','wind_offshore']:
+        filter = {'techs':tech}
+        if name == 'GER NUTS0':
+            filter = {'techs':tech,'locs':'DE'}
+        flh = m.get_formatted_array('carrier_prod').loc[dict(filter,**{'carriers':'power'})]/m.get_formatted_array('energy_cap').loc[filter]
+        flh_resource = m.get_formatted_array('resource').loc[filter]
+        curtailment.loc[name,tech] = (1-flh.sum()/flh_resource.sum()).values*100
+
 
 techs= ['solar','wind', 'wind_offshore','combined_cycle', 'heat_pump_air','battery', 'hdam',
         'hphs', 'hror', 'hydrogen']
@@ -83,39 +93,58 @@ for model, name in fig_dic.items():
 df_IC=df_IC/1e6 # convert to TW from GW
 
 # build figure with plots of instaled capacity and the respective regions
-fig3 = plt.figure(figsize=(8,7),frameon=False)
-gs = fig3.add_gridspec(2, 3)
+fig3 = plt.figure(figsize=(8,10),frameon=False)
+gs = fig3.add_gridspec(3, 3)
 
-f3_ax1 = fig3.add_subplot(gs[1, :])
+# fig (a)
+cmap = sns.color_palette("Spectral", as_cmap=True)
+ax_a1 = fig3.add_subplot(gs[0, 0])
+eu_nuts0_gpd.plot(ax=ax_a1,column='id',cmap=cmap, edgecolor='grey')
+ax_a1.set_title(label='GER NUTS0')
+ax_a2 = fig3.add_subplot(gs[0, 1])
+de_nuts1_gpd.plot(ax=ax_a2,column='id',cmap=cmap,edgecolor='grey')
+ax_a2.set_title(label='GER NUTS1')
+ax_a3 = fig3.add_subplot(gs[0, 2])
+de_maxp_gpd.plot(ax=ax_a3,column='id',cmap=cmap,edgecolor='grey')
+ax_a3.set_title(label='GER MAX-P')
+
+[axs.set_axis_off() for axs in [ax_a1,ax_a2, ax_a3]]
+
+# fig (b)
+ax_b3 = fig3.add_subplot(gs[1, :])
 techs_name= ['Solar','Onshore wind', 'Offshore wind','Cogeneration',
- 'Air-sourced heat pump','Battery', 'Reservoir based hydropower',
+ 'Air-sourced heat pump','Battery', 'Reservoir-based hydropower',
  'Pumped-storage', 'Run-of-river hydropower', 'Hydrogen','AC Transmission',
  'DC Transmission']
-df_IC.transpose().plot.bar(ax=f3_ax1,stacked=True, color=colors)
-f3_ax1.legend(techs_name, loc='lower left', bbox_to_anchor=(0, -0.6),ncol=3)
-f3_ax1.set_ylabel('Installed Capacity (TW)')
-plt.xticks(ticks=[0,1,2],labels=['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
 
-cmap = sns.color_palette("Spectral", as_cmap=True)
+df_IC.transpose().plot.bar(ax=ax_b3,stacked=True, color=colors)
+ax_b3.legend(techs_name, loc='lower left', bbox_to_anchor=(1, -0.1),ncol=1)
+ax_b3.set_ylabel('Installed Capacity (TW)')
 
-f3_ax2 = fig3.add_subplot(gs[0, 0])
-eu_nuts0_gpd.plot(ax=f3_ax2,column='id',cmap=cmap, edgecolor='grey')
-f3_ax2.set_title(label='GER NUTS0')
-f3_ax3 = fig3.add_subplot(gs[0, 1])
-de_nuts1_gpd.plot(ax=f3_ax3,column='id',cmap=cmap,edgecolor='grey')
-f3_ax3.set_title(label='GER NUTS1')
-f3_ax4 = fig3.add_subplot(gs[0, 2])
-de_maxp_gpd.plot(ax=f3_ax4,column='id',cmap=cmap,edgecolor='grey')
-f3_ax4.set_title(label='GER MAX-P')
+ax_b3.set_xticklabels(['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
+ax_b3.tick_params(length=0)
 
-[axs.set_axis_off() for axs in [f3_ax2,f3_ax3, f3_ax4]]
+for side in ['top','right']:
+    ax_b3.spines[side].set_visible(False)
 
-l1 = lines.Line2D([0, 0.9], [0.51 ,0.51], transform=fig3.transFigure,
-                  figure=fig3, c= '#BDC3C7')
-fig3.lines.extend([l1])
+# fig (c)
+ax_c = fig3.add_subplot(gs[2, :])
+colors_vre = de_maxp_model.inputs['colors'].loc[curtailment.columns].values
+curtailment.plot.bar(ax=ax_c,color=colors_vre)
+
+ax_c.legend(curtailment.columns, loc='lower left', bbox_to_anchor=(1, 0),ncol=1)
+ax_c.set_ylabel('Percentage curtailment')
+
+ax_c.set_xticklabels(['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
+ax_c.tick_params(length=0)
+ax_c.legend(['Onshore wind','Solar','Offshore wind'], loc='lower left', bbox_to_anchor=(1, 0.1),ncol=1)
+
+for side in ['top','right']:
+    ax_c.spines[side].set_visible(False)
 
 plt.text(-0.16, 1.7, '(a)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
 plt.text(-0.16, 0.4, '(b)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
+plt.text(-0.16, -0.8, '(c)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
 
 fig3.savefig('examples/installed_capacity_plot.pdf',bbox_inches='tight')
 
@@ -149,12 +178,12 @@ state_names = ['Baden-Württemberg','Bayern','Niedersachsen','Nordrhein-Westfale
 'Brandenburg','Bremen','Hamburg','Hessen','Mecklenburg-Vorpommern','Rheinland-Pfalz',
 'Saarland','Sachsen','Sachsen-Anhalt','Schleswig-Holstein','Thüringen']
 pf_difference['state_name'] = state_names
+pf_difference = pf_difference.loc[pf_difference.sum(axis=1)!=0]
 
+fig4, axs = plt.subplots(4,3, figsize=(15,14))
 regions = pf_difference.index.to_list()
-
-fig4, axs = plt.subplots(4,4, figsize=(15,20))
 for i in range(4):
-    for j in range(4):
+    for j in range(3):
         region_pf = pf_difference.drop(['state_name','ac_transmission'],axis=1).filter(items=[regions[0]],axis=0)
         state_name = pf_difference.loc[regions[0],'state_name']
         techs = region_pf.columns.to_list()
@@ -162,10 +191,8 @@ for i in range(4):
         region_pf.plot.bar(title=state_name, ax=axs[i,j],color=colors)
         axs[i,j].set_xticklabels([])
         axs[i,j].set_xticks([])
-        if i ==3:
-            axs[i,j].set_xlabel("Technologies", fontsize=12)
         if j ==0:
-            axs[i,j].set_ylabel('Percentage change in installed capacity [%]')
+            axs[i,j].set_ylabel('Percentage change')
         legend = axs[i,j].get_legend()
         legend.remove()
         regions.remove(regions[0])
@@ -175,7 +202,7 @@ plt.legend(labels = names, bbox_to_anchor=(0.8,-0.2), ncol=7)
 fig4.savefig('examples/percentage_change-all_states.pdf',bbox_inches='tight')
 
 pf_difference = pf_difference.replace([np.inf, -np.inf], np.nan).fillna(0)
-regions_pf = pf_difference.loc[pf_difference.state_name.isin(['Berlin','Mecklenburg-Vorpommern'])]
+regions_pf = pf_difference.loc[pf_difference.state_name.isin(['Berlin','Brandenburg'])]
 regions_pf.loc['Germany',:-1] = (pf_nopv.sum()-pf_pv.sum())/pf_pv.sum()*100
 regions_pf.loc['Germany','state_name'] = 'Germany'
 region_pf = regions_pf.drop(['ac_transmission'],axis=1)
@@ -183,16 +210,25 @@ techs = region_pf.drop(['state_name'],axis=1).columns.to_list()
 colors = model.inputs['colors'].loc[techs].values
 names =  model.inputs['names'].loc[techs].values
 
-fig5, axs = plt.subplots(1,3, figsize=(10,4))
+
+fig5 = plt.figure(figsize=(8,6))
+
+grid = plt.GridSpec(2, 4, wspace=0.5, hspace=0.2)
+ax_0 = plt.subplot(grid[0, 0:2]) # Berlin, top left
+ax_1 = plt.subplot(grid[0, 2:]) # Brandenburg, top right
+ax_2 = plt.subplot(grid[1, 1:3]) # Germany, lower plot
 
 for e,(region, rows) in enumerate(region_pf.iterrows()):
-    region_pf.filter(items=[region],axis=0).plot.bar(title=rows.state_name, ax=axs[e],color=colors)
-    axs[e].get_legend().remove()
-    axs[e].set_ylim(-80,10)
-    axs[e].set_xticklabels([])
-    axs[e].set_xticks([])
-    axs[e].set_xlabel("Technologies", fontsize=12)
-    axs[0].set_ylabel('Percentage change in installed capacity [%]')
-plt.legend(labels = names, bbox_to_anchor=(1,-0.1), ncol=4)
-plt.tight_layout()
+    axs = eval('ax_'+str(e))
+    region_pf.filter(items=[region],axis=0).plot.bar(title=rows.state_name, ax=axs,color=colors, width=1.6)
+    axs.get_legend().remove()
+    axs.set_xticklabels([])
+    ax_1.set_ylim(-45,130)
+    ax_2.set_ylim(-0.05,0.15)
+    axs.set_xticks([])
+    axs.set_ylabel('Percentage change')
+    for side in ['top','right','bottom']:
+        axs.spines[side].set_visible(False)
+plt.legend(labels = names, bbox_to_anchor=(1.5,-0.1), ncol=4)
+
 fig5.savefig('examples/percentage_change-selected_states.pdf',bbox_inches='tight')

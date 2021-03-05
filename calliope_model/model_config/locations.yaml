@@ -19,7 +19,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 12177.528221102379
-          resource_area_max: 13787.497654759916
+          resource_area_max: 13559.0
       wind:
         constraints:
           energy_cap_min: 1356.4531129999987
@@ -61,7 +61,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 5065.570452000508
-          resource_area_max: 6612.461407648352
+          resource_area_max: 6378.5
       wind:
         constraints:
           energy_cap_min: 2902.3732169999976
@@ -103,7 +103,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 6803.6948120007055
-          resource_area_max: 7779.270148263519
+          resource_area_max: 7648.0
       wind:
         constraints:
           energy_cap_min: 3070.5655449999967
@@ -145,7 +145,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 3814.7578390001736
-          resource_area_max: 9533.950683738269
+          resource_area_max: 9412.0
       wind:
         constraints:
           energy_cap_min: 2806.588300000001
@@ -187,7 +187,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 4267.90134800042
-          resource_area_max: 8117.7829968017
+          resource_area_max: 7989.5
       wind:
         constraints:
           energy_cap_min: 7777.297500000006
@@ -229,7 +229,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 3776.1192310001325
-          resource_area_max: 9320.656734850148
+          resource_area_max: 9221.5
       wind:
         constraints:
           energy_cap_min: 6547.886700000033
@@ -271,7 +271,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 5565.198727192381
-          resource_area_max: 6683.820822783682
+          resource_area_max: 6422.0
       wind:
         constraints:
           energy_cap_min: 5950.771941999991
@@ -313,7 +313,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 4856.014673000095
-          resource_area_max: 6986.496117737889
+          resource_area_max: 6867.5
       wind:
         constraints:
           energy_cap_min: 5448.908530000011
@@ -355,7 +355,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 3941.8458020002186
-          resource_area_max: 10710.152022504548
+          resource_area_max: 10630.5
       wind:
         constraints:
           energy_cap_min: 8902.461990000065
