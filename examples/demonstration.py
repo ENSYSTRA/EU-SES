@@ -1,10 +1,7 @@
-import xarray as xr
-import copy
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
-import matplotlib.lines as lines
 import calliope
 import numpy as np
 import os, sys
@@ -38,6 +35,7 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, n
     model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'gurobi'})
     model.run()
     model.to_netcdf('calliope_model/results/'+save_dir+'.nc')
+
     return model, regions_gpd
 
 #--------------------------------------------------------------------------#
@@ -56,6 +54,26 @@ de_nuts1_nopv_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts
 de_maxp_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 1, 'de_maxp-pv-calliope-3h')
 de_maxp_nopv_model, de_maxp_gpd = run_scenario(['Germany'], 'max_p_regions', 3.8 , 0, 'de_maxp-nopv-calliope-3h')
 
+eu_nuts0_model = calliope.read_netcdf('calliope_model/results/de_eu-calliope-3h.nc')
+de_nuts1_model = calliope.read_netcdf('calliope_model/results/de_nuts1-pv-calliope-3h.nc')
+de_maxp_model = calliope.read_netcdf('calliope_model/results/de_maxp-pv-calliope-3h.nc')
+
+#--------------------------------------------------------------------------------------------
+
+
+area_usage = pd.DataFrame(index=['GER NUTS0', 'GER NUTS1', 'GER MAX-P'])
+results_dic={'GER NUTS0':eu_nuts0_model, 'GER NUTS1':de_nuts1_model, 'GER MAX-P':de_maxp_model}
+
+for name, m in results_dic.items():
+    for tech in ['wind','solar','wind_offshore']:
+        filter = {'techs':tech}
+        if name == 'GER NUTS0':
+            filter = {'techs':tech,'locs':'DE'}
+        area_max = m.get_formatted_array('resource_area_max').loc[filter].sum()
+        area_used = m.get_formatted_array('resource_area').loc[filter].sum()
+        area_usage.loc[name,tech] = area_used/area_max*100
+
+#--------------------------------------------------------------------------------------------
 
 # Plot results
 # Calculate curtailment by model and technology
@@ -92,61 +110,81 @@ for model, name in fig_dic.items():
         df_IC.loc[transmission,name] = installed_capacity.loc[installed_capacity.coords['techs'].str.contains(transmission)].sum()
 df_IC=df_IC/1e6 # convert to TW from GW
 
-# build figure with plots of instaled capacity and the respective regions
-fig3 = plt.figure(figsize=(8,10),frameon=False)
-gs = fig3.add_gridspec(3, 3)
+def plot_graphs(w,l):
+    fig3 = plt.figure(figsize=(w,l),frameon=False)
+    gs = fig3.add_gridspec(4, 3)
 
-# fig (a)
-cmap = sns.color_palette("Spectral", as_cmap=True)
-ax_a1 = fig3.add_subplot(gs[0, 0])
-eu_nuts0_gpd.plot(ax=ax_a1,column='id',cmap=cmap, edgecolor='grey')
-ax_a1.set_title(label='GER NUTS0')
-ax_a2 = fig3.add_subplot(gs[0, 1])
-de_nuts1_gpd.plot(ax=ax_a2,column='id',cmap=cmap,edgecolor='grey')
-ax_a2.set_title(label='GER NUTS1')
-ax_a3 = fig3.add_subplot(gs[0, 2])
-de_maxp_gpd.plot(ax=ax_a3,column='id',cmap=cmap,edgecolor='grey')
-ax_a3.set_title(label='GER MAX-P')
+    # fig (a)
+    cmap = sns.color_palette("Spectral", as_cmap=True)
+    ax_a1 = fig3.add_subplot(gs[0, 0])
+    eu_nuts0_gpd.plot(ax=ax_a1,column='id',cmap=cmap, edgecolor='grey')
+    ax_a1.set_title(label='GER NUTS0')
+    ax_a2 = fig3.add_subplot(gs[0, 1])
+    de_nuts1_gpd.plot(ax=ax_a2,column='id',cmap=cmap,edgecolor='grey')
+    ax_a2.set_title(label='GER NUTS1')
+    ax_a3 = fig3.add_subplot(gs[0, 2])
+    de_maxp_gpd.plot(ax=ax_a3,column='id',cmap=cmap,edgecolor='grey')
+    ax_a3.set_title(label='GER MAX-P')
 
-[axs.set_axis_off() for axs in [ax_a1,ax_a2, ax_a3]]
+    [axs.set_axis_off() for axs in [ax_a1,ax_a2, ax_a3]]
 
-# fig (b)
-ax_b3 = fig3.add_subplot(gs[1, :])
-techs_name= ['Solar','Onshore wind', 'Offshore wind','Cogeneration',
- 'Air-sourced heat pump','Battery', 'Reservoir-based hydropower',
- 'Pumped-storage', 'Run-of-river hydropower', 'Hydrogen','AC Transmission',
- 'DC Transmission']
+    # fig (b)
+    ax_b = fig3.add_subplot(gs[1, :])
+    techs_name= ['Solar','Onshore wind', 'Offshore wind','Cogeneration',
+     'Air-sourced heat pump','Battery', 'Reservoir-based hydropower',
+     'Pumped-storage', 'Run-of-river hydropower', 'Hydrogen','AC Transmission',
+     'DC Transmission']
 
-df_IC.transpose().plot.bar(ax=ax_b3,stacked=True, color=colors)
-ax_b3.legend(techs_name, loc='lower left', bbox_to_anchor=(1, -0.1),ncol=1)
-ax_b3.set_ylabel('Installed Capacity (TW)')
+    df_IC.transpose().plot.bar(ax=ax_b,stacked=True, color=colors)
+    ax_b.legend(techs_name, loc='lower left', bbox_to_anchor=(1, -0.1),ncol=1)
+    ax_b.set_ylabel('Installed \nCapacity (TW)')
 
-ax_b3.set_xticklabels(['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
-ax_b3.tick_params(length=0)
+    ax_b.set_xticklabels(['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
+    ax_b.tick_params(length=0)
 
-for side in ['top','right']:
-    ax_b3.spines[side].set_visible(False)
+    for side in ['top','right']:
+        ax_b.spines[side].set_visible(False)
 
-# fig (c)
-ax_c = fig3.add_subplot(gs[2, :])
-colors_vre = de_maxp_model.inputs['colors'].loc[curtailment.columns].values
-curtailment.plot.bar(ax=ax_c,color=colors_vre)
+    # fig (c)
+    ax_c = fig3.add_subplot(gs[2, :])
+    colors_vre = de_maxp_model.inputs['colors'].loc[curtailment.columns].values
+    curtailment.plot.bar(ax=ax_c,color=colors_vre)
 
-ax_c.legend(curtailment.columns, loc='lower left', bbox_to_anchor=(1, 0),ncol=1)
-ax_c.set_ylabel('Percentage curtailment')
+    ax_c.legend(curtailment.columns, loc='lower left', bbox_to_anchor=(1, 0),ncol=1)
+    ax_c.set_ylabel('Percentage \ncurtailment')
 
-ax_c.set_xticklabels(['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
-ax_c.tick_params(length=0)
-ax_c.legend(['Onshore wind','Solar','Offshore wind'], loc='lower left', bbox_to_anchor=(1, 0.1),ncol=1)
+    ax_c.set_xticklabels(['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
+    ax_c.tick_params(length=0)
+    ax_c.legend(['Onshore wind','Solar','Offshore wind'], loc='lower left', bbox_to_anchor=(1, 0.1),ncol=1)
 
-for side in ['top','right']:
-    ax_c.spines[side].set_visible(False)
+    for side in ['top','right']:
+        ax_c.spines[side].set_visible(False)
 
-plt.text(-0.16, 1.7, '(a)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
-plt.text(-0.16, 0.4, '(b)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
-plt.text(-0.16, -0.8, '(c)',fontsize=13, transform=f3_ax1.transAxes, fontweight='semibold')
+    # fig (d)
 
-fig3.savefig('examples/installed_capacity_plot.pdf',bbox_inches='tight')
+    ax_d = fig3.add_subplot(gs[3, :])
+    colors_vre = de_maxp_model.inputs['colors'].loc[curtailment.columns].values
+    area_usage.plot.bar(ax=ax_d,color=colors_vre)
+
+    ax_d.legend(curtailment.columns, loc='lower left', bbox_to_anchor=(1, 0),ncol=1)
+    ax_d.set_ylabel('Percentage \nof available area used')
+
+    ax_d.set_xticklabels(['GER NUTS0', 'GER NUTS1', 'GER MAX-P'], rotation=0)
+    ax_d.tick_params(length=0)
+    ax_d.legend(['Onshore wind','Solar','Offshore wind'], loc='lower left', bbox_to_anchor=(1, 0.1),ncol=1)
+
+    for side in ['top','right']:
+        ax_d.spines[side].set_visible(False)
+
+    # ---
+
+    plt.text(-0.16, 2, '(a)',fontsize=13, transform=ax_b.transAxes, fontweight='semibold')
+    plt.text(-0.16, 0.8, '(b)',fontsize=13, transform=ax_b.transAxes, fontweight='semibold')
+    plt.text(-0.16, 0.8, '(c)',fontsize=13, transform=ax_c.transAxes, fontweight='semibold')
+    plt.text(-0.16, 0.8, '(d)',fontsize=13, transform=ax_d.transAxes, fontweight='semibold')
+
+    fig3.savefig('examples/installed_capacity_plot.pdf',bbox_inches='tight')
+plot_graphs(8,13)
 
 
 # Plot difference in installed capacity with and without pv in nuts 1 model
