@@ -16,7 +16,7 @@ import os
 
 from . import parameters as pr
 from .utilib import download_re_ninja
-from .demand import Power, Heat
+from .demand import Power, Heat, Iron_and_Steel
 from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Area
 from .resources import Power_Plants
 from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
@@ -37,7 +37,7 @@ class EUSES():
         if import_ds == False:
 
             nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
-            
+
             time = pd.date_range(str(year), str(year+1), freq='1H')[:-1]
             self.ds.coords['time'] = time
             self.ds.coords['nuts_0'] = [pr.get_metadata(c,'nuts_id') for c in self.countries]
@@ -183,7 +183,7 @@ class EUSES():
 
         regions_geo = regions_geo.to_crs({'init': 'epsg:4326'})
 
-        create_timeseries_csv(regions_geo, ds_regions)
+        create_timeseries_csv(regions_geo, ds_regions, sectors)
         create_location_yaml(regions_geo, ds_regions,sectors)
         create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor)
 

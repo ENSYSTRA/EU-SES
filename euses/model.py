@@ -19,11 +19,14 @@ def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = df * sign
     df.to_csv('calliope_model/timeseries_data/{}.csv'.format(data_name))
 
-def create_timeseries_csv(regions_geo, ds_regions):
+def create_timeseries_csv(regions_geo, ds_regions, sectors):
     data_list = [{'power':-1}, {'heat':-1}, {'pv_cf':1}, {'wind_cf':1},
                     {'wind_offshore_cf':1}, {'hydro_inflow':1},
                     {'cop_air':1}]
-
+    if 'iron and steel' in sectors:
+        data_list.append({'hydrogen':-1})
+        ds_regions['power'] = ds_regions['power'] + ds_regions['industries_demand'].loc[{'e_form':'power','sector':'Iron and steel'}]
+        ds_regions['hydrogen'] = ds_regions['industries_demand'].loc[{'e_form':'hydrogen','sector':'Iron and steel'}]
     for series in data_list:
         v, k = series.popitem()
         export_timeseries(regions_geo, ds_regions,v,k)
@@ -51,6 +54,11 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             for add_tech in ['supply_gas','supply_biogas', 'heat_pump_air']:
                 dict_file['locations'][rows.id]['techs'][add_tech] = None
 
+        if 'iron and steel' in sectors:
+            dict_file['locations'][rows.id]['techs']['demand_hydrogen'] = {'constraints':{'resource':'file=hydrogen.csv'}}
+            for add_tech in ['electrolyser','fuel_cell', 'h2_storage']:
+                dict_file['locations'][rows.id]['techs'][add_tech] = None
+
         for tech_dic in [{'tech':'power_plants'}, {'hydro_tech':'hydro_capacity'}]:
             tech_coords, tech_var = tech_dic.popitem()
             for tech in ds_regions.coords[tech_coords].values:
@@ -76,8 +84,11 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                     if tech in ['HROR']:
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
 
+        storages = ['battery', 'hydrogen']
+        if 'iron and steel' in sectors:
+            storages.remove('hydrogen')
 
-        for techs in ['battery', 'hydrogen']:
+        for techs in storages:
             dict_file['locations'][rows.id]['techs'][techs] = None
 
         for j, rows_2 in regions_geo.iterrows():
@@ -112,6 +123,7 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     dict_file = {'import': {}, 'model': {}, 'run': {}}
     dict_file['import'] = ['model_config/techs_elec.yaml','model_config/locations.yaml', 'scenarios.yaml']
+
 
     dict_file['model']['name'] = 'ESES model'
     dict_file['model']['calliope_version'] = '0.6.5'
@@ -155,6 +167,9 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     if 'heat' in sectors:
         dict_file['import'] = ['model_config/techs_elec_heat.yaml','model_config/locations.yaml', 'scenarios.yaml']
+
+    if 'iron and steel' in sectors:
+        dict_file['import'] = ['model_config/techs_elec_heat_h2.yaml','model_config/locations.yaml', 'scenarios.yaml']
 
     with open(r'calliope_model/model.yaml', 'w') as file:
         documents = yaml.dump(dict_file, file)

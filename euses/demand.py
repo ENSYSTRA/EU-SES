@@ -7,6 +7,9 @@ import requests
 import tempfile
 import io
 from io import BytesIO
+from shapely.geometry import MultiPolygon, Polygon, LinearRing, Point
+from shapely import wkt
+import xarray as xr
 
 from . import parameters as pr
 
@@ -282,3 +285,55 @@ class Heat():
         EUSES.ds = ds
 
         temp.cleanup()
+
+class Iron_and_Steel():
+
+    def __init__(self,EUSES, h2_per_t = 60, h2_kWh_per_kg = 33.33, power_eaf = 0.65, power_add = 0.32, dic_correction = {'DE':45e6}, **kwargs):
+
+        ds = EUSES.ds
+
+        hotmaps_industry_directory = 'https://gitlab.com/hotmaps/industrial_sites/industrial_sites_Industrial_Database/-/raw/master/data/Industrial_Database.csv'
+        r = requests.get(hotmaps_industry_directory)
+
+        industries = pd.read_csv(io.StringIO(r.content.decode('utf-8')),sep=';')
+        df = industries.loc[industries.Subsector == 'Iron and steel']
+        df = df.loc[df.geom.str.contains('4326').dropna().index]
+        df['geometry'] = [geom[1] for geom in df.geom.str.split(';')]
+        df['geometry'] = df['geometry'].apply(wkt.loads)
+        crs = {'init': 'epsg:4326'}
+        isp_gpd = gpd.GeoDataFrame(df, crs=crs, geometry='geometry')
+        isp_gpd = isp_gpd.to_crs({'init': 'epsg:3035'})
+        isp_gpd['sector'] =  isp_gpd['Subsector']
+        isp_gpd.loc[isp_gpd['CompanyName'].dropna().loc[isp_gpd['CompanyName'].str.contains('Saarstahl AG').dropna()].index]
+
+        df = pd.DataFrame()
+        for nuts_2_geo in ds['geometry']:
+            nuts_2_id = nuts_2_geo.coords['nuts_2'].values.item()
+            df1 = pd.DataFrame(isp_gpd.loc[isp_gpd.within(nuts_2_geo.item())].groupby(['sector']).sum().Production.rename(nuts_2_id)).T
+            df = df.append(df1)
+
+        sector = np.unique(df.T.index.get_level_values('sector').values)
+        e_form = ['hydrogen','power']
+        array = np.array([df.T[n2].to_xarray().values for n2 in df.index])
+
+        array_power = array * [[[1]*8760]] * (power_eaf+power_add) / 8760
+        array_h2 = array *  [[[1]*8760]] * h2_per_t * h2_kWh_per_kg * 1e-3 / 8760
+        xda_capacity =  xr.DataArray(array, coords=[df.index, sector ], dims=["nuts_2","sector"])
+        xda_demand  = xr.DataArray([np.concatenate((array_h2,array_power))], coords=[sector,e_form,df.index, ds.coords["time"].values], dims=["sector","e_form","nuts_2","time"])
+        for i in ['industries','sector']:
+            if i in ds.data_vars or i in ds.coords:
+                ds = ds.drop(i)
+
+        ds.coords['sector'] = sector
+        ds['industries'] = xda_capacity
+        ds['industries'].attrs['unit'] = 'tonne'
+
+        ds.coords['e_form'] = ['hydrogen','power']
+        ds['industries_demand'] = xda_demand
+        ds['industries_demand'].attrs['unit'] = 'MWh'
+
+        for nuts_0, cumulative_capacity in dic_correction.items():
+            nuts_2_c = ds['country_code'].loc[ds['country_code'].str.contains(nuts_0)].coords['nuts_2'].values
+            correction_factor = cumulative_capacity / ds['industries'].loc[nuts_2_c].sum()
+            ds['industries'].loc[nuts_2_c] = ds['industries'].loc[nuts_2_c] * correction_factor
+            ds['industries_demand'].loc[{'nuts_2':nuts_2_c}] = ds['industries'].loc[nuts_2_c] * correction_factor

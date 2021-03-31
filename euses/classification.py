@@ -23,7 +23,7 @@ def aggregation(ds, groups):
     dsc = ds.copy()
 
     sums_vars = ['power', 'population', 'heat', 'power_plants', 'onshore_wind','offshore_wind',
-                  'rooftop_pv','utility_pv','hydro_capacity', 'hydro_storage']
+                  'rooftop_pv','utility_pv','hydro_capacity', 'hydro_storage','industries','industries_demand']
     area_weighted_vars = ['wind_cf', 'pv_cf', 'wind_offshore_cf',
                           'cop_air','hydro_inflow']
 
@@ -41,12 +41,12 @@ def aggregation(ds, groups):
                         ds_is[var].loc[n] = dsc[var].loc[n] * dsc['offshore_wind'].loc[n] / offshore_area_sum
                     else:
                         ds_is[var].loc[n] = dsc[var].loc[n] * dsc['geometry'].loc[n].values.item().area / group_area
-                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+                dsc[var].loc[{'nuts_2':nuts[0]}] = ds_is[var].sum(dim="nuts_2")
 
             for var in sums_vars:
-                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+                dsc[var].loc[{'nuts_2':nuts[0]}] = ds_is[var].sum(dim="nuts_2")
 
-            dsc['geometry'].loc[nuts[0]] = np.array(str(unary_union(ds_is['geometry'].loc[nuts].values)))
+            dsc['geometry'].loc[{'nuts_2':nuts[0]}] = np.array(str(unary_union(ds_is['geometry'].loc[nuts].values)))
 
             new_coords = np.where(new_coords==nuts[0], sep.join(nuts), new_coords)
             dsc = dsc.assign_coords(nuts_2=new_coords)

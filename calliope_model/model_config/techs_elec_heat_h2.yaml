@@ -1,0 +1,371 @@
+
+##
+# TECHNOLOGY DEFINITIONS
+# The values for the year 2030 were used
+# except for instances where another reference is provided
+#
+#                       Monetary Costs
+# # _callioipe name _____unit________________________Description______________
+#   om_annual     : €/MW per year : Fixed Operation and Maintenance Costs
+#   energy_cap    : €/MW          : CAPEX ref
+#   om_prod       : €/MWh_elec    : Variable Operation and Maintenance Cost (Without fuel cost)
+#   om_cost       : €/MWh_ther    : Fuel cost
+#
+#                        CO2 Costs
+#   om_prod       : kgCO2(eq)/MWh  : Direct GHG emissions
+#
+# References:
+# [1]	C. Moles, B. Sigfusson, A. Spisto, M. Vallei, E. Weidner, J. Giuntoli, A. Jäger-Waldau, R. Lacal Arántegui, S. Lazarou, D. Magagna, J. Carlsson, M. del M. Perez Fortes, G. de Marco, M. Jakubcionis, European Commission, Joint Research Centre, Institute for Energy and Transport, SERTIS, Energy Technology Reference Indicator (ETRI) projections for 2010-2050., 2014.
+# [2]	Mathiesen, B. V, L. H., Hansen, K, Ridjan, I., Djørup, S. R., Nielsen, S., Sorknæs, P., Thellufsen, J. Z., Grundahl, L., Lund, R. S., Drysdale, D., Connolly, D., Østergaard, P. A., IDA’s Energy Vision 2050: ASmart Energy System strategy for 100% renewable Denmark, Department of Development and Planning,Aalborg University, 2015.
+# [3]	A. Schröder, F. Kunz, J. Meiss, R. Mendelevitch, Current and Prospective Costs of Electricity Generation until 2050, (n.d.) 105.
+# [4]	Danish Energy Agency and Energinet, Technology Data for heating installations, (n.d.). https://ens.dk/sites/ens.dk/files/Analyser/technology_data_catalogue_for_individual_heating_installations.pdf (accessed June 29, 2020).
+# [5]	Darío R. Gómez, John D. Watterson, Branca B. Americano, Chia Ha, Gregg Marland, Emmanuel Matsika, Lemmy Nenge Namayanga, Balgis Osman-Elasha, John D. Kalenga Saka, Karen Treanton, Roberta Quadrelli, 2006 IPCC Guidelines for National Greenhouse Gas Inventories - Chapter 2 Stationary Combustion, 2006. https://www.ipcc-nggip.iges.or.jp/public/2006gl/pdf/2_Volume2/V2_2_Ch2_Stationary_Combustion.pdf (accessed September 8, 2020).
+# [6]	V. Jülch, Comparison of electricity storage options using levelized cost of storage (LCOS) method, Appl. Energy. 183 (2016) 1594–1606. https://doi.org/10.0716/j.apenergy.2016.08.165
+##
+
+tech_groups:
+    supply_power:
+        essentials:
+            parent: supply
+            carrier: power
+
+techs:
+    supply_gas:
+        essentials:
+            name: 'Natural gas'
+            color: '#C98AAD'
+            parent: supply
+            carrier: gas
+        constraints:
+            resource: inf
+            lifetime: 25
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_prod: 29.89 # [2] : 8.3 €2015/GJ * 3.6 GJ/MWh - Natural Gas
+            co2:
+                om_prod: 230
+
+    supply_biogas:
+        essentials:
+            name: 'Biogas'
+            color: '#C98AAD'
+            parent: supply
+            carrier: gas
+        constraints:
+            resource: inf
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_prod: 21.6 # [2] : 6 €2015/GJ * 3.6 GJ/MWh - Biomass
+            co2:
+                om_prod: 0
+
+
+##-Renewables-##
+
+    solar: # [1] - 5.2 Commercial solar PV >2MW without tracking - Table 7.
+        essentials:
+            name: 'Solar'
+            color: '#ffcc00'
+            parent: supply_power
+            carrier_out: power
+        constraints:
+            energy_eff: 1
+            lifetime: 25
+            resource: file=pv_cf.csv
+            resource_unit: energy_per_cap
+            resource_area_per_energy_cap: 0.0059
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_annual: 10880
+                energy_cap: 640000
+                om_prod: 0
+            co2:
+                om_prod: 0
+
+
+    wind: # [1] - 4.1 Onshore wind - capacity greater than 2 MW - Table 4.
+        essentials:
+            name: 'Onshore Wind'
+            color: '#1aa39c'
+            parent: supply_power
+            carrier_out: power
+        constraints:
+            energy_eff: 1
+            lifetime: 25
+            resource: file=wind_cf.csv
+            resource_unit: energy_per_cap
+            resource_area_per_energy_cap: 0.2
+        costs:
+            monetary:
+                interest_rate: 0.07
+                energy_cap: 1300000
+                om_prod: 0
+                om_annual: 28600
+            co2:
+                om_prod: 0
+
+    wind_offshore: # 4.2 Offshore wind - Table 5.
+        essentials:
+            name: 'Offshore Wind'
+            color: '#4ca3dd'
+            parent: supply_power
+            carrier_out: power
+        constraints:
+            energy_eff: 1
+            lifetime: 30
+            resource: file=wind_offshore_cf.csv
+            resource_unit: energy_per_cap
+            resource_area_per_energy_cap: 0.19  # wind farm density with 5.36 MW/km_2 and 56% use of comercially available sea area https://windeurope.org/wp-content/uploads/files/about-wind/reports/Unleashing-Europes-offshore-wind-potential.pdf
+        costs:
+            monetary:
+                interest_rate: 0.07
+                energy_cap: 2580000
+                om_prod: 0
+                om_annual: 77400
+            co2:
+                om_prod: 0
+
+
+
+    hror: # [1] - 6.4 Hydropower run-of-a-river
+        essentials:
+            name: 'Hydro'
+            color: '#98E0FF'
+            parent: supply_power
+            carrier_out: power
+        constraints:
+            energy_eff: 1
+            lifetime: 60
+            resource: file=hydro_inflow.csv
+            resource_unit: energy_per_cap
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_prod: 5
+                om_annual: 84300
+            co2:
+                om_prod: 0
+
+
+    #
+    # Supply Plus
+    #
+    hdam: # [1] - 6 Hydropower - 6.1 Hydropower dam and reservoir, >100 MW
+        essentials:
+            name: 'Storage DAM'
+            color: '#7026FF'
+            parent: supply_plus
+            carrier_out: power
+        constraints:
+            resource: file=hydro_inflow.csv
+            resource_unit: energy_per_cap
+            energy_eff: 1
+            storage_initial: 1
+            lifetime: 60
+            resource_cap_equals_energy_cap: true
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_annual: 22000
+                om_prod: 3
+            co2:
+                om_prod: 0
+
+    #
+    # Conversion & Conversion Plus
+    #
+    combined_cycle: # [1] - 14.2 CCGT CHP - Table 53. CCGT advanced CHP.
+        essentials:
+            name: 'Cogeneration'
+            color: '#635A4D'
+            parent: conversion_plus
+            primary_carrier_out: power
+            carrier_in: gas
+            carrier_out: power
+            carrier_out_2: heat
+        constraints:
+            export_carrier: power
+            energy_eff: 0.61
+            carrier_ratios.carrier_out_2.heat: 0.77
+            lifetime: 30
+        costs:
+            monetary:
+                interest_rate: 0.07
+                energy_cap: 990000
+                om_prod: 4
+                om_annual: 38610
+
+
+    heat_pump_air:
+        essentials:
+            name: 'Air-Sourced Heat Pump'
+            color: '#ff4500'
+            parent: conversion
+            carrier_out: heat
+            carrier_in: power
+        constraints:
+            energy_eff: file=cop_air.csv
+            lifetime: 20
+        costs:
+            monetary:
+                interest_rate: 0.07
+                energy_cap: 1780000
+                om_annual: 17800
+
+
+    #
+    # Storage
+    #
+    battery: # [6]
+        essentials:
+            name: 'Battery'
+            color: '#b8cdca'
+            parent: storage
+            carrier: power
+        constraints:
+            storage_cap_max: inf
+            energy_cap_per_storage_cap_equals: 0.17
+            energy_eff: 0.95  # round trip efficiency
+            storage_loss: 0
+            lifetime: 10
+        costs:
+            monetary:
+                interest_rate: 0.07
+                storage_cap: 420000
+                energy_cap: 65000
+                om_prod: 0
+                om_annual: 1400
+
+    electrolyser:
+        essentials:
+            name: 'Electrolyser'
+            color: '#65325F'
+            parent: conversion
+            carrier_out: hydrogen
+            carrier_in: power
+        constraints:
+            energy_eff: 0.7
+            lifetime: 30
+        costs:
+            monetary:
+                interest_rate: 0.07
+                energy_cap: 195000 # 230 usd/kw
+                # om_annual:
+
+    fuel_cell: # https://ens.dk/sites/ens.dk/files/Statistik/technology_data_catalogue_for_el_and_dh_-_0009.pdf pg 202
+        essentials:
+            name: 'Fuel Cell'
+            color: '#DED4DD'
+            parent: conversion_plus
+            primary_carrier_out: power
+            carrier_in: hydrogen
+            carrier_out: power
+            carrier_out_2: heat
+        constraints:
+            export_carrier: power
+            energy_eff: 0.5
+            carrier_ratios.carrier_out_2.heat: 0.4
+            lifetime: 10
+        costs:
+            monetary:
+                interest_rate: 0.07
+                energy_cap: 1100000
+                om_annual: 55000
+
+    h2_storage:
+        essentials:
+            name: 'H2 Storage'
+            color: '#AB9EE9'
+            parent: storage
+            carrier: hydrogen
+        constraints:
+            storage_initial: 1
+            energy_eff: 1
+            lifetime: 30
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_annual: 450 # €/MWh per year
+
+
+    hphs: # [1] - 16.8 Pumped Hydro Storage - Table 67. New PHS including both reservoirs. Uni
+        essentials:
+            name: 'PH Storage'
+            color: '#738eb6'
+            parent: storage
+            carrier: power
+        constraints:
+            storage_initial: 1
+            energy_eff: 0.85 #  round trip efficiency
+            lifetime: 60
+        costs:
+            monetary:
+                interest_rate: 0.07
+                om_annual: 45000 # €/MW per year
+                om_prod: 0
+            co2:
+                om_prod: 0
+
+
+    ##
+    # Demand
+    ##
+    demand_electricity:
+        essentials:
+            name: 'Power demand'
+            color: '#072486'
+            parent: demand
+            carrier: power
+
+    demand_electricity_ISP:
+        essentials:
+            name: 'Power demand ISP'
+            color: '#666085'
+            parent: demand
+            carrier: power
+
+    demand_heat:
+        essentials:
+            name: 'Heat demand'
+            color: '#072486'
+            parent: demand
+            carrier: heat
+
+    demand_hydrogen:
+        essentials:
+            name: 'H2 demand'
+            color: '#D25FC4'
+            parent: demand
+            carrier: hydrogen
+    #
+    # Transmission
+    ##
+
+    ac_transmission:
+        essentials:
+            name: 'AC power Transmission'
+            color: '#6783E3'
+            parent: transmission
+            carrier: power
+        constraints:
+            energy_cap_min: 2000
+            energy_cap_max: 8000
+            lifetime: 40
+            energy_eff: 1
+        costs:
+            monetary:
+                energy_cap_per_distance: 40000 # value in per 100km , 400 €/MWkm https://doi.org/10.1016/j.energy.2017.06.004
+                interest_rate: 0.07
+
+    dc_transmission:
+        essentials:
+            name: 'Interconnectors'
+            color: '#6783E3'
+            parent: transmission
+            carrier: power
+        constraints:
+            lifetime: 40
+            energy_eff: 1
