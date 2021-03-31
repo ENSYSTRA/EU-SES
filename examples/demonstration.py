@@ -9,7 +9,7 @@ import os, sys
 import euses
 
 eu_ds = euses.import_dataset('euses_datasets.nc')
-eu_ds.add('Iron_and_Steel')
+eu_ds.add('Iron_and_Steel', h2_per_t = 60, h2_kWh_per_kg = 33.33, power_eaf = 0.65, power_add = 0.32, dic_correction = {'DE':45e6})
 
 ds = eu_ds.ds
 
@@ -28,13 +28,35 @@ eu_ds.ds = eu_ds.ds.drop(tech_list,dim='tech')
 eu_ds.ds['rooftop_pv'] = eu_ds.ds['rooftop_pv']*1
 eu_ds.ds['utility_pv'] = eu_ds.ds['utility_pv']*0.50
 
-filt_ds.create_regions('poli_regions')
+filt_ds.ds['industries_demand']
+filt_ds = eu_ds.filter_countries(['Germany'])
 filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat','iron and steel'],co2_cap_factor=0.2, national=True)
+filt_ds.create_regions('poli_regions')
 model = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'cbc'})
 model.run()
+model.get_formatted_array('resource').loc[{'techs':'demand_hydrogen'}]
+
+# create model without demand from iron and steel
+filt_ds_v2 = eu_ds.filter_countries(['Germany'])
+filt_ds_v2.ds['industries_demand'] = filt_ds_v2.ds['industries_demand'] * 0
+filt_ds_v2.create_regions('poli_regions')
+filt_ds_v2.create_calliope_model(op_mode='plan',sectors=['power','heat','iron and steel'],co2_cap_factor=0.2, national=True)
+model_v2 = calliope.Model('calliope_model/model.yaml',scenario='time_3H',override_dict={'run.solver': 'cbc'})
+model_v2.run()
 
 # plot results
-
-model.get_formatted_array('energy_cap').to_pandas().plot.bar(figsize=(12,12))
+techs_selecion = ['battery', 'combined_cycle', 'demand_hydrogen',
+                    'electrolyser', 'fuel_cell', 'h2_storage',
+                    'heat_pump_air', 'solar', 'wind', 'wind_offshore']
+model.results['energy_cap'].coords['techs']
+model.get_formatted_array('energy_cap').loc[{'techs':techs_selecion}].to_pandas().plot.bar(figsize=(8,5))
 model.plot.timeseries(array=['storage'])
 model.plot.timeseries(array=['power','heat','hydrogen'])
+
+
+model_v2.plot.timeseries(array=['hydrogen'])
+
+((model.get_formatted_array('energy_cap').loc[{'techs':techs_selecion}]-model_v2.get_formatted_array('energy_cap').loc[{'techs':techs_selecion}])/model_v2.get_formatted_array('energy_cap').loc[{'techs':techs_selecion}]).to_pandas().plot.bar(figsize=(8,5))
+
+
+((model.results['total_levelised_cost']-model_v2.results['total_levelised_cost'])/model_v2.results['total_levelised_cost']).to_pandas().plot.bar()

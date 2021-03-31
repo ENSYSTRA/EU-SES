@@ -25,7 +25,7 @@ locations:
       solar:
         constraints:
           energy_cap_min: 50268.63110529703
-          resource_area_max: 157660.58858908803
+          resource_area_max: 79532.08858908803
       wind:
         constraints:
           energy_cap_min: 44763.306837000106

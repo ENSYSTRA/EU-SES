@@ -336,4 +336,4 @@ class Iron_and_Steel():
             nuts_2_c = ds['country_code'].loc[ds['country_code'].str.contains(nuts_0)].coords['nuts_2'].values
             correction_factor = cumulative_capacity / ds['industries'].loc[nuts_2_c].sum()
             ds['industries'].loc[nuts_2_c] = ds['industries'].loc[nuts_2_c] * correction_factor
-            ds['industries_demand'].loc[{'nuts_2':nuts_2_c}] = ds['industries'].loc[nuts_2_c] * correction_factor
+            ds['industries_demand'].loc[{'nuts_2':nuts_2_c}] = ds['industries_demand'].loc[{'nuts_2':nuts_2_c}] * correction_factor
