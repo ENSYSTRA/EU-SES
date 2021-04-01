@@ -28,7 +28,6 @@ eu_ds.ds = eu_ds.ds.drop(tech_list,dim='tech')
 eu_ds.ds['rooftop_pv'] = eu_ds.ds['rooftop_pv']*1
 eu_ds.ds['utility_pv'] = eu_ds.ds['utility_pv']*0.50
 
-filt_ds.ds['industries_demand']
 filt_ds = eu_ds.filter_countries(['Germany'])
 filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat','iron and steel'],co2_cap_factor=0.2, national=True)
 filt_ds.create_regions('poli_regions')
