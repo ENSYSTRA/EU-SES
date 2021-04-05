@@ -1,5 +1,5 @@
 import:
-- model_config/techs_elec_heat_h2.yaml
+- model_config/techs_elec_heat.yaml
 - model_config/locations.yaml
 - scenarios.yaml
 model:
@@ -17,12 +17,19 @@ run:
   mode: plan
   objective_options.cost_class:
     monetary: 1
-group_constraints:
-  systemwide_co2_cap:
-    cost_max:
-      co2: 67690200000.0
-  systemwide_biogas_cap:
-    techs:
-    - supply_biogas
-    carrier_prod_max:
-      gas: 18737429.014324218
+# group_constraints:
+#   region_0_land_area_cap:
+#     techs:
+#     - wind
+#     - solar
+#     locs:
+#     - region_0
+#     resource_area_max: 37356.3161
+#   systemwide_co2_cap:
+#     cost_max:
+#       co2: 16922550000.0
+#   systemwide_biogas_cap:
+#     techs:
+#     - supply_biogas
+#     carrier_prod_max:
+#       gas: 18737428.95622879
