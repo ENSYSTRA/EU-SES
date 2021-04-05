@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 import geopandas as gpd
 import numpy as np
@@ -6,23 +5,18 @@ import xarray as xr
 from rasterstats import zonal_stats
 from shapely import wkt
 import copy
-import requests
-import tempfile
-from io import BytesIO
-from zipfile import ZipFile
-from urllib.request import urlopen
+
 from shapely.ops import transform
-import os
 
 from . import parameters as pr
 from .utilib import download_re_ninja
-from .demand import Power, Heat, Iron_and_Steel
-from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Area
-from .resources import Power_Plants
+from .demand import Power, Heat
+from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Wind_Offshore
+from .resources import Power_Plants, Offshore_Area, Area
 from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
 from .model import create_location_yaml, create_timeseries_csv, create_model_yaml
 
-class EUSES():
+class Dataset():
 
     def __init__(self,countries,year,import_ds=False):
         '''
@@ -30,13 +24,15 @@ class EUSES():
         year : reference year
         '''
 
+        raster_path = 'data/spatial/population/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.tif'
+        nuts_geom_eu = gpd.read_file('data/spatial/NUTS/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
+
+
         self.ds = xr.Dataset()
         self.countries = countries
         self.year = year
 
         if import_ds == False:
-
-            nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
 
             time = pd.date_range(str(year), str(year+1), freq='1H')[:-1]
             self.ds.coords['time'] = time
@@ -68,22 +64,15 @@ class EUSES():
             self.ds['geometry'].attrs['crs'] = 'epsg:3035'
 
             # add population data
-            if ['population'] not in list(self.ds.keys()):
-                temp = tempfile.TemporaryDirectory()
-                resp = urlopen("http://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/GHSL/GHS_POP_GPW4_GLOBE_R2015A/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k/V1-0/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.zip")
-                zipfile = ZipFile(BytesIO(resp.read()))
-                raster_path = temp.name+'/GHS_POP_GPW42015_GLOBE_R2015A_54009_1k_v1_0.tif'
-                open(raster_path, 'wb').write(zipfile.read(zipfile.namelist()[3]))
-                population_data = []
-                for l in  self.ds.coords['nuts_2']:
-                    geo = self.ds.sel(nuts_2=l)['geometry_54009'].values.item()
-                    population = zonal_stats(geo, raster_path, stats='sum')[0].get('sum')
-                    population_data.append(population)
+            population_data = []
+            for l in  self.ds.coords['nuts_2']:
+                geo = self.ds.sel(nuts_2=l)['geometry_54009'].values.item()
+                population = zonal_stats(geo, raster_path, stats='sum')[0].get('sum')
+                population_data.append(population)
 
-                self.ds['population'] = (('nuts_2'),(np.array(population_data)))
-                self.ds['population'].attrs['unit'] = 'People'
-                self.ds = self.ds.drop('geometry_54009')
-                temp.cleanup()
+            self.ds['population'] = (('nuts_2'),(np.array(population_data)))
+            self.ds['population'].attrs['unit'] = 'People'
+            self.ds = self.ds.drop('geometry_54009')
 
             # add temperature data
             temperature_data = []
@@ -98,15 +87,20 @@ class EUSES():
         comp_class = eval(component)
         comp_class(self, **kwargs)
 
-    def save_dataset(self, dir_name):
-
-        if os.path.exists("data/saved_dataset/" + dir_name):
-            os.remove("data/saved_dataset/" +  dir_name)
+    def save_dataset(self, dir):
         geo_list = [str(geo) for geo in self.ds['geometry'].values]
         self.ds['geometry'] = (('nuts_2'),(geo_list))
         encoding = {k: {'zlib': True, 'shuffle': True} for k in self.ds.variables}
-        self.ds.to_netcdf("data/saved_dataset/" + dir_name, encoding=encoding)
+        self.ds.to_netcdf(dir, encoding=encoding)
+
+    def import_dataset(dir):
+        ds = xr.open_dataset(dir)
+        countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
+        year = pd.to_datetime(ds.coords['time'].values)[0].year
+        self = Dataset(countries,year,import_ds=True)
+        self.ds = ds
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
+        return self
 
     def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1):
 
@@ -124,9 +118,9 @@ class EUSES():
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
 
-        zones['pv_pot_e'] = (ds['rooftop_pv']+ds['utility_pv']).values * ds['pv_cf'].values.sum(axis=1)
-        zones['wind_on_pot_e'] = ds['onshore_wind'].values * ds['wind_cf'].values.sum(axis=1)
-        zones['wind_off_pot_e'] = ds['offshore_wind'].values * ds['wind_offshore_cf'].values.sum(axis=1)
+        zones['pv_pot_e'] = ds['land_area'].values * ds['pv_cf'].values.sum(axis=1)
+        zones['wind_on_pot_e'] = ds['land_area'].values * ds['wind_cf'].values.sum(axis=1)
+        zones['wind_off_pot_e'] = ds['offshore_area'].values * ds['wind_offshore_cf'].values.sum(axis=1)
 
         zones['flh_max']=zones.loc[zones.pv_pot_e<zones.wind_on_pot_e].wind_on_pot_e
         zones.update(pd.Series(zones.loc[zones.pv_pot_e>zones.wind_on_pot_e].pv_pot_e, name='flh_max'))
@@ -139,7 +133,7 @@ class EUSES():
         zones['minimum_threshold'] = zones.geometry.area
 
         method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','storage'],
-                        'poli_regions':2,'poli_regions_nuts1':3}
+                        'poli_regions':2,'poli_regions_nuts3':3}
 
         if method in ['rdm_regions','max_p_regions']:
             np.random.seed(initial_seed)
@@ -151,7 +145,7 @@ class EUSES():
                 nuts_array = zones['nuts'].unique()
                 class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
 
-        if method in ['poli_regions','poli_regions_nuts1']:
+        if method in ['poli_regions','poli_regions_nuts3']:
             zones['nuts'] = zones['id'].str[:method_dir.get(method)]
             nuts_array = zones['nuts'].unique()
             class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
@@ -183,7 +177,7 @@ class EUSES():
 
         regions_geo = regions_geo.to_crs({'init': 'epsg:4326'})
 
-        create_timeseries_csv(regions_geo, ds_regions, sectors)
+        create_timeseries_csv(regions_geo, ds_regions)
         create_location_yaml(regions_geo, ds_regions,sectors)
         create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor)
 
@@ -206,33 +200,3 @@ class EUSES():
         filt_ds.countries = countries
 
         return filt_ds
-
-def import_dataset(dir_name):
-    ds = xr.open_dataset("data/saved_dataset/" + dir_name)
-    countries = [pr.get_metadata(id,'name') for id in ds.coords['nuts_0'].values]
-    year = pd.to_datetime(ds.coords['time'].values)[0].year
-    self = EUSES(countries,year,import_ds=True)
-    self.ds = ds
-    self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
-    return self
-
-def build_dataset(countries, year=2010, save=True, dir_name = 'dataset.nc'):
-    # Make list of all countries considered in NUTS 2 dataset
-    if countries == 'EU':
-        countries_metadata = pr.countries_metadata()
-        countries = [country.get('name') for country in countries_metadata]
-
-    # Build NUTS 2 dataset in EUSES dataset for the year
-    self = EUSES(countries, year)
-    # Add data components
-    data_components_list = ['Power_Plants','Area','Hydro','Heat_Pumps',
-                                'VRE_Capacity_Factor','Power','Heat']
-    print('Start building data variables')
-    for data_component in data_components_list:
-        self.add(data_component)
-        print(data_component + ' addition complete')
-    # export dataset
-    if save==True:
-        self.save_dataset(dir_name)
-
-    return self

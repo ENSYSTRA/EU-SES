@@ -5,10 +5,9 @@ import ruamel.yaml
 from geopy import distance
 yaml = ruamel.yaml.YAML()
 from . import parameters as pr
-import os
 
-vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',170],'Wind Offshore':['offshore_wind',5.36]}
 
+tech_area = {'Solar':76.6 , 'Wind':5 , 'Wind Offshore':5.36}
 dc_links = pd.read_csv('data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
@@ -19,20 +18,16 @@ def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = df * sign
     df.to_csv('calliope_model/timeseries_data/{}.csv'.format(data_name))
 
-def create_timeseries_csv(regions_geo, ds_regions, sectors):
+def create_timeseries_csv(regions_geo, ds_regions):
     data_list = [{'power':-1}, {'heat':-1}, {'pv_cf':1}, {'wind_cf':1},
                     {'wind_offshore_cf':1}, {'hydro_inflow':1},
                     {'cop_air':1}]
-    if 'iron and steel' in sectors:
-        data_list.append({'hydrogen':-1})
-        ds_regions['power'] = ds_regions['power'] + ds_regions['industries_demand'].loc[{'e_form':'power','sector':'Iron and steel'}]
-        ds_regions['hydrogen'] = ds_regions['industries_demand'].loc[{'e_form':'hydrogen','sector':'Iron and steel'}]
+
     for series in data_list:
         v, k = series.popitem()
         export_timeseries(regions_geo, ds_regions,v,k)
 
 def create_location_yaml(regions_geo, ds_regions, sectors):
-    ds_regions["power_plants"] = ds_regions["power_plants"].groupby('tech').sum('fuel')
     yaml = ruamel.yaml.YAML()
 
     if len(regions_geo) > 1 :
@@ -54,24 +49,18 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             for add_tech in ['supply_gas','supply_biogas', 'heat_pump_air']:
                 dict_file['locations'][rows.id]['techs'][add_tech] = None
 
-        if 'iron and steel' in sectors:
-            dict_file['locations'][rows.id]['techs']['demand_hydrogen'] = {'constraints':{'resource':'file=hydrogen.csv'}}
-            for add_tech in ['electrolyser','fuel_cell', 'h2_storage']:
-                dict_file['locations'][rows.id]['techs'][add_tech] = None
-
         for tech_dic in [{'tech':'power_plants'}, {'hydro_tech':'hydro_capacity'}]:
             tech_coords, tech_var = tech_dic.popitem()
             for tech in ds_regions.coords[tech_coords].values:
                 installed_capacity = ds_regions[tech_var].loc[rows.nuts_2s,tech].values.item()
                 if tech != 'Hydro':
-                    dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = None
-                    if tech in vre_dic.keys():
+                    dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = None #{'constraints':{'energy_cap_max':installed_capacity}}
+                    if tech in ['Wind Offshore','Wind','Solar']:
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
-                        area_max = ds_regions[vre_dic.get(tech)[0]].loc[rows.nuts_2s].values.item()
-                        if tech == 'Solar':
-                            area_max = area_max + ds_regions['utility_pv'].loc[rows.nuts_2s].values.item()
-                        if area_max*vre_dic.get(tech)[1] < installed_capacity:
-                            area_max = (installed_capacity / vre_dic.get(tech)[1])+1
+                    if tech == 'Wind Offshore':
+                        area_max = ds_regions['offshore_area'].loc[rows.nuts_2s].values.item()
+                        if area_max*tech_area.get(tech) < installed_capacity:
+                            area_max = (installed_capacity / tech_area.get(tech))+1
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['resource_area_max'] = area_max
                     if tech in ['HPHS', 'HDAM']:
                         storage_capacity = ds_regions['hydro_storage'].loc[rows.nuts_2s,tech].values.item()
@@ -79,16 +68,11 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                             storage_capacity = 6*installed_capacity
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['storage_cap_equals'] = storage_capacity
-                    if tech in ['Combined cycle']:
-                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
-                    if tech in ['HROR']:
+                    if tech in ['Waste','HROR','Geothermal','Biomass']:
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
 
-        storages = ['battery', 'hydrogen']
-        if 'iron and steel' in sectors:
-            storages.remove('hydrogen')
 
-        for techs in storages:
+        for techs in ['battery', 'hydrogen']:
             dict_file['locations'][rows.id]['techs'][techs] = None
 
         for j, rows_2 in regions_geo.iterrows():
@@ -99,7 +83,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             length = int(distance.distance((fr.y,fr.x), (to.y,to.x)).km*1.25)
             if g1_geo.intersects(g2_geo) == True and length not in line_lenght:
                 line_lenght.append(length)
-                trans_dic = {'techs':{'ac_transmission': {'distance':length/1e2} }}
+                trans_dic = {'techs':{'ac_transmission': {'distance':length/1e3} }}
                 dict_file['links']['{},{}'.format(rows.id, rows_2.id)] = trans_dic
 
     for i,rows in dc_links.iterrows():
@@ -109,7 +93,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             fr_index = rows_filtr_from.id.values[0]
             to_index = rows_filtr_to.id.values[0]
             if rows_filtr_from.iloc[0].id != rows_filtr_to.iloc[0].id:
-                trans_dic = {'techs':{'dc_transmission': {'constraints':{'energy_cap_equals':rows.capacity},'distance':rows.length/1e2} }}
+                trans_dic = {'techs':{'dc_transmission': {'constraints':{'energy_cap_equals':rows.capacity},'distance':rows.length/10} }}
                 dict_file['links']['{},{}'.format(fr_index, to_index)] = trans_dic
 
 
@@ -123,7 +107,6 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     dict_file = {'import': {}, 'model': {}, 'run': {}}
     dict_file['import'] = ['model_config/techs_elec.yaml','model_config/locations.yaml', 'scenarios.yaml']
-
 
     dict_file['model']['name'] = 'ESES model'
     dict_file['model']['calliope_version'] = '0.6.5'
@@ -140,15 +123,15 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     dict_file['group_constraints'] = {}
     if op_mode == 'plan':
-        # for i,rows in regions_geo.iterrows():
-            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)] = {}
-            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['techs'] =['wind','solar']
-            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['locs'] = [rows.id]
-            # area_max = ds_regions['land_area'].loc[rows.nuts_2s].values.item()
-            # wind_solar_area = (ds_regions['power_plants'].loc[rows.nuts_2s,'Solar'].values.item() / tech_area.get('Solar')) +  (ds_regions['power_plants'].loc[rows.nuts_2s,'Wind'].values.item() / tech_area.get('Wind'))
-            # if area_max < wind_solar_area:
-            #     area_max = wind_solar_area + 1
-            # dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['resource_area_max'] = area_max
+        for i,rows in regions_geo.iterrows():
+            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)] = {}
+            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['techs'] =['wind','solar']
+            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['locs'] = [rows.id]
+            area_max = ds_regions['land_area'].loc[rows.nuts_2s].values.item()
+            wind_solar_area = (ds_regions['power_plants'].loc[rows.nuts_2s,'Solar'].values.item() / tech_area.get('Solar')) +  (ds_regions['power_plants'].loc[rows.nuts_2s,'Wind'].values.item() / tech_area.get('Wind'))
+            if area_max < wind_solar_area:
+                area_max = wind_solar_area + 1
+            dict_file['group_constraints']['{}_land_area_cap'.format(rows.id)]['resource_area_max'] = area_max
 
         # CO2 emissions constraint
         if co2_cap_factor!=None:
@@ -167,9 +150,6 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     if 'heat' in sectors:
         dict_file['import'] = ['model_config/techs_elec_heat.yaml','model_config/locations.yaml', 'scenarios.yaml']
-
-    if 'iron and steel' in sectors:
-        dict_file['import'] = ['model_config/techs_elec_heat_h2.yaml','model_config/locations.yaml', 'scenarios.yaml']
 
     with open(r'calliope_model/model.yaml', 'w') as file:
         documents = yaml.dump(dict_file, file)

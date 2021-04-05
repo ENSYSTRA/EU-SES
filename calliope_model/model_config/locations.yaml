@@ -1,5 +1,5 @@
 locations:
-  DE:
+  region_0:
     coordinates:
       lat: 51.11
       lon: 10.39
@@ -13,36 +13,28 @@ locations:
       supply_gas:
       supply_biogas:
       heat_pump_air:
-      demand_hydrogen:
-        constraints:
-          resource: file=hydrogen.csv
-      electrolyser:
-      fuel_cell:
-      h2_storage:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 29410.374900000003
+      heat_pump_ground:
+      cogeneration:
       solar:
         constraints:
-          energy_cap_min: 50268.63110529703
-          resource_area_max: 79532.08858908803
+          energy_cap_min: 44859.5553570046
       wind:
         constraints:
-          energy_cap_min: 44763.306837000106
-          resource_area_max: 100145.0
+          energy_cap_min: 53105.6793330002
       wind_offshore:
         constraints:
-          energy_cap_min: 1072.8
-          resource_area_max: 16042.010000000002
+          energy_cap_min: 4151.3
+          resource_area_max: 16551.75
       hdam:
         constraints:
           energy_cap_equals: 202.8
           storage_cap_equals: 1216.8000000000002
       hphs:
         constraints:
-          energy_cap_equals: 6589.719999999999
+          energy_cap_equals: 7428.620000000001
           storage_cap_equals: 35400.0
       hror:
         constraints:
-          energy_cap_equals: 3302.20685
+          energy_cap_equals: 3479.022804375153
       battery:
+      hydrogen:
