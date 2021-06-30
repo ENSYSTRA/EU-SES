@@ -165,8 +165,7 @@ class Area():
         wind_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_WIND_ONSHORE_OFFSHORE.XLSX',sheet_name='Raw data',index_col=1,header=5)
 
         rooftop_pv = solar_jrc[["SURARTRESROO","SURARTINDROO","SURARTRESFAC","SURARTINDFAC"]].sum(axis=1)
-        utility_pv = solar_jrc[["SURNATAGRHIG", "SURNATAGRLOW",
-                                "SURNATOGRHIG", "SURNATOGRLOW"]].sum(axis=1)
+        utility_pv = solar_jrc[["SURNATAGRLOW","SURNATOGRLOW"]].sum(axis=1)
 
         rooftop_pv = rooftop_pv.append([building_af_ch,building_af_no])
         utility_pv = utility_pv.append([(building_af_ch*144),(building_af_no*176)])
