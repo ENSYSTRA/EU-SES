@@ -18,30 +18,47 @@ def wind_offshore_to_nuts2(ds):
         ds['wind_offshore_cf'].loc[nuts2_id] = dsc['wind_offshore_cf'].loc[nuts0_id]
 
 
-def aggregation(ds, groups):
+def aggregation(ds, groups, var_weigthing):
+
+    if var_weigthing == 'preset':
+        var_weigthing = {'wind_cf':'area','pv_cf':'area','wind_offshore_cf':'offshore_wind',
+                        'cop_air':'area','hydro_inflow':'area'}
 
     dsc = ds.copy()
 
+    dsc['area'] = dsc['geometry']
+    dsc['area'].values = [a.area for a in dsc['geometry'].values]
+
     sums_vars = ['power', 'population', 'heat', 'power_plants', 'onshore_wind','offshore_wind',
                   'rooftop_pv','utility_pv','hydro_capacity', 'hydro_storage']
-    area_weighted_vars = ['wind_cf', 'pv_cf', 'wind_offshore_cf',
-                          'cop_air','hydro_inflow']
+    # area_weighted_vars = ['wind_cf', 'pv_cf', 'wind_offshore_cf',
+    #                       'cop_air','hydro_inflow']
 
     sep=','
     new_coords = dsc.coords['nuts_2'].values
     for nuts in groups:
         if nuts[0] in dsc.coords['nuts_2']:
             ds_is =  dsc.sel(nuts_2=nuts)
-            group_area = sum([i.area for i in ds_is['geometry'].values])
-            offshore_area_sum = ds_is['offshore_wind'].sum()
+            # group_area = sum([i.area for i in ds_is['geometry'].values])
+            # offshore_area_sum = ds_is['offshore_wind'].sum()
 
-            for var in area_weighted_vars:
+            for var, weight_var in  var_weigthing.items():
+                sum_weighted_var = ds_is[weight_var].sum()
                 for n in nuts:
-                    if var == 'wind_offshore_cf':
-                        ds_is[var].loc[n] = dsc[var].loc[n] * dsc['offshore_wind'].loc[n] / offshore_area_sum
+                    if sum_weighted_var == 0:
+                        ds_is[var].loc[n] = dsc[var].loc[n]
                     else:
-                        ds_is[var].loc[n] = dsc[var].loc[n] * dsc['geometry'].loc[n].values.item().area / group_area
+                        ds_is[var].loc[n] = dsc[var].loc[n] * dsc[weight_var].loc[n].sum() / sum_weighted_var
+
                 dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+
+            # for var in area_weighted_vars:
+            #     for n in nuts:
+            #         if var == 'wind_offshore_cf':
+            #             ds_is[var].loc[n] = dsc[var].loc[n] * dsc['offshore_wind'].loc[n] / offshore_area_sum
+            #         else:
+            #             ds_is[var].loc[n] = dsc[var].loc[n] * dsc['geometry'].loc[n].values.item().area / group_area
+            #     dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
 
             for var in sums_vars:
                 dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)

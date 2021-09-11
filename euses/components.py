@@ -37,7 +37,7 @@ class EUSES():
         if import_ds == False:
 
             nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
-            
+
             time = pd.date_range(str(year), str(year+1), freq='1H')[:-1]
             self.ds.coords['time'] = time
             self.ds.coords['nuts_0'] = [pr.get_metadata(c,'nuts_id') for c in self.countries]
@@ -108,7 +108,7 @@ class EUSES():
         self.ds.to_netcdf("data/saved_dataset/" + dir_name, encoding=encoding)
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
 
-    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1):
+    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1,var_weigthing='preset'):
 
         ds = self.ds.copy(deep=True)
 
@@ -116,10 +116,10 @@ class EUSES():
 
         island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
 
-        ds = aggregation(ds, island_groups)
+        ds = aggregation(ds, island_groups,var_weigthing)
 
         if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
-            ds = aggregation(ds, [['BE34','LU00']])
+            ds = aggregation(ds, [['BE34','LU00']],var_weigthing)
 
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
@@ -159,7 +159,7 @@ class EUSES():
 
         class_regions = [zones.loc[c].id.to_list() for c in class_regions_int]
 
-        ds = aggregation(ds,class_regions)
+        ds = aggregation(ds,class_regions,var_weigthing)
         ds.coords['regions'] = ('nuts_2', ds.coords['nuts_2'].values)
         ds = ds.swap_dims({'nuts_2': 'regions'})
         ds = ds.drop('nuts_2')

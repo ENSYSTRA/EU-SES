@@ -197,8 +197,10 @@ class Area():
                         zipfile = ZipFile(BytesIO(resp.read()))
                         path = temp.name + '/rastermap_v200605_einfarbig.tif'
                         open(path, 'wb').write(zipfile.read(zipfile.namelist()[5]))
-                        area = zonal_stats(ds['geometry'].loc[nuts_2_id].values.item(), path, stats='count')[0].get('count')
-                        ds[c].loc[nuts_2_id] = area*6250/1e6
+                        gpd_shape = gpd.GeoDataFrame(geometry=[ds['geometry'].loc[nuts_2_id].values.item()],crs = {'init': 'epsg:3035'})
+                        geo_shape = gpd_shape.to_crs({'init': 'epsg:21781'}).loc[0]
+                        area = zonal_stats(geo_shape, path, stats='count')[0].get('count')
+                        ds[c].loc[nuts_2_id] = area*6.5
                     if nuts_0_id['country_code'] == 'NO':
                         r = requests.get('https://gitlab.com/hotmaps/potential/potential_wind/-/raw/master/data/wind_100m.tif?inline=false')
                         path = temp.name+'/wind_100m.tif'
