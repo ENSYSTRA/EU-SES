@@ -50,15 +50,27 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, n
 # EU model (EU-nuts0)
 countries = ['Germany','Norway','Denmark','Poland','France','Netherlands',
                                  'Belgium','Austria','Switzerland','Czech Rep.']
+var_weigthing_solar = {'wind_cf':'area','pv_cf':'area_pv','wind_offshore_cf':'offshore_wind',
+'cop_air':'area','hydro_inflow':'area'}
+var_weigthing_onshore_wind = {'wind_cf':'onshore_wind','pv_cf':'area','wind_offshore_cf':'offshore_wind',
+'cop_air':'area','hydro_inflow':'area'}
 
 scn_ref_eu_model, scn_ref_eu_gpd = run_scenario(countries, 'poli_regions',None, 1, 'scn_ref_eu', national=True)
 
-var_weigthing_solar = {'wind_cf':'area','pv_cf':'area_pv','wind_offshore_cf':'offshore_wind',
-                        'cop_air':'area','hydro_inflow':'area'}
 scn_solar_eu_model, scn_solar_eu_gpd = run_scenario(countries, 'poli_regions',None, 1,
                                                 'scn_solar_eu', national=True,var_weigthing=var_weigthing_solar)
 
-var_weigthing_onshore_wind = {'wind_cf':'onshore_wind','pv_cf':'area','wind_offshore_cf':'offshore_wind',
-                        'cop_air':'area','hydro_inflow':'area'}
 scn_onshore_wind_eu_model, scn_onshore_wind_eu_gpd = run_scenario(countries, 'poli_regions',None, 1,
                                                 'scn_onshore_wind_eu', national=True,var_weigthing=var_weigthing_onshore_wind)
+
+# --------------------------------------------------------------------------#
+# Germany administrative regions model (GER-nuts1) with and without rooftop_pv
+countries = ['Germany']
+de_nuts1_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts1', None , 1, 'de_nuts1-pv-calliope-3h')
+de_nuts1_nopv_model, de_nuts1_gpd = run_scenario(['Germany'], 'poli_regions_nuts1', None , 0, 'de_nuts1-nopv-calliope-3h')
+
+scn_ref_de_model, scn_ref_de_gpd = run_scenario(countries, 'poli_regions_nuts1',None, 1, 'scn_ref_de', national=True)
+
+scn_solar_de_model, scn_solar_de_gpd = run_scenario(countries, 'poli_regions_nuts1',None, 1, 'scn_solar_de', national=True,var_weigthing=var_weigthing_solar)
+
+scn_onshore_wind_de_model, scn_onshore_wind_eu_gpd = run_scenario(countries, 'poli_regions_nuts1',None, 1,'scn_onshore_wind_de', national=True,var_weigthing=var_weigthing_onshore_wind)
