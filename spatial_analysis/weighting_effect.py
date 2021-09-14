@@ -11,29 +11,6 @@ import numpy as np
 import os, sys
 # sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-
-eu_ds = euses.import_dataset('euses_datasets.nc')
-eu_ds_alt = euses.import_dataset('euses_datasets.nc')
-
-countries = ['Germany','Norway','Denmark','Poland','France','Netherlands',
-                                 'Belgium','Austria','Switzerland','Czech Rep.']
-
-filt_ds = eu_ds.filter_countries(countries)
-
-eu_ds.create_regions('poli_regions', var_weigthing='preset')
-
-
-eu_ds_alt.ds['rooftop_pv_cf'] = eu_ds.ds['pv_cf']
-eu_ds_alt.ds['utility_pv_cf'] = eu_ds.ds['pv_cf']
-
-var_weigthing_alt = {'wind_cf':'onshore_wind','rooftop_pv_cf':'rooftop_pv',
-                        'utility_pv_cf':'utility_pv',
-                        'wind_offshore_cf':'offshore_wind',
-                        'cop_air':'population','hydro_inflow':'hydro_capacity'}
-
-eu_ds_alt.create_regions('poli_regions', var_weigthing=var_weigthing_alt)
-
-
 def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, national=False, var_weigthing='preset'):
     calliope.set_log_verbosity('CRITICAL', include_solver_output=False)
     eu_ds = euses.import_dataset('euses_datasets.nc')
@@ -56,9 +33,10 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, n
     if var_weigthing == 'preset':
         filt_ds.create_regions(regions_method, area_factor)
     else:
-        filt_ds.create_regions(regions_method, area_factor, var_weigthing = var_weigthing_alt)
+        filt_ds.ds['area_pv'] = filt_ds.ds['rooftop_pv'] + filt_ds.ds['utility_pv']
+        filt_ds.create_regions(regions_method, area_factor, var_weigthing = var_weigthing)
     # Build and solve calliope model
-    filt_ds.create_regions(regions_method, area_factor)
+    # filt_ds.create_regions(regions_method, area_factor)
     regions_gpd = gpd.GeoDataFrame(filt_ds.ds_regions['regions'].values,
     columns=['id'],geometry=filt_ds.ds_regions['geometry'].values)
     filt_ds.create_calliope_model(op_mode='plan',sectors=['power','heat'],co2_cap_factor=0.2, national=national)
@@ -72,6 +50,15 @@ def run_scenario(countries, regions_method, area_factor, rooftop_pv, save_dir, n
 # EU model (EU-nuts0)
 countries = ['Germany','Norway','Denmark','Poland','France','Netherlands',
                                  'Belgium','Austria','Switzerland','Czech Rep.']
-eu_nuts0_model_alt, eu_nuts0_gpd_alt = run_scenario(countries, 'poli_regions',None, 1,
-                                                'de_eu-alt-3h', national=True,var_weigthing=var_weigthing_alt)
-eu_nuts0_model, eu_nuts0_gpd = run_scenario(countries, 'poli_regions',None, 1, 'de_eu-3h', national=True)
+
+scn_ref_eu_model, scn_ref_eu_gpd = run_scenario(countries, 'poli_regions',None, 1, 'scn_ref_eu', national=True)
+
+var_weigthing_solar = {'wind_cf':'area','pv_cf':'area_pv','wind_offshore_cf':'offshore_wind',
+                        'cop_air':'area','hydro_inflow':'area'}
+scn_solar_eu_model, scn_solar_eu_gpd = run_scenario(countries, 'poli_regions',None, 1,
+                                                'scn_solar_eu', national=True,var_weigthing=var_weigthing_solar)
+
+var_weigthing_onshore_wind = {'wind_cf':'onshore_wind','pv_cf':'area','wind_offshore_cf':'offshore_wind',
+                        'cop_air':'area','hydro_inflow':'area'}
+scn_onshore_wind_eu_model, scn_onshore_wind_eu_gpd = run_scenario(countries, 'poli_regions',None, 1,
+                                                'scn_onshore_wind_eu', national=True,var_weigthing=var_weigthing_onshore_wind)
