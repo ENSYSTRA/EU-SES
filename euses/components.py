@@ -24,7 +24,7 @@ from .model import create_location_yaml, create_timeseries_csv, create_model_yam
 
 class EUSES():
 
-    def __init__(self,countries,year,import_ds=False):
+    def __init__(self,countries,year,import_ds=False,temperature_weighting='population'):
         '''
         countries : List of countries by name
         year : reference year
@@ -89,7 +89,7 @@ class EUSES():
             temperature_data = []
             for c in self.countries:
                 re_id = pr.get_metadata(c,'renewables_nj_id')
-                weather = download_re_ninja(year,re_id,'weather')
+                weather = download_re_ninja(year,re_id,'weather',temperature_weighting)
                 temperature_data.append(weather['temperature'].to_list())
             self.ds['temperature'] =  (('nuts_0','time'),(np.array(temperature_data)))
             self.ds['temperature'].attrs['unit'] = 'Degrees Celsius'
@@ -118,8 +118,9 @@ class EUSES():
 
         ds = aggregation(ds, island_groups,var_weigthing)
 
-        if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
-            ds = aggregation(ds, [['BE34','LU00']],var_weigthing)
+        if method != 'poli_regions':
+            if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
+                ds = aggregation(ds, [['BE34','LU00']],var_weigthing)
 
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
@@ -204,6 +205,9 @@ class EUSES():
         filt_ds.ds = filt_ds.ds.drop(nuts_0s_invers,dim='nuts_0')
         filt_ds.ds = filt_ds.ds.drop(nuts_2s_invers,dim='nuts_2')
         filt_ds.countries = countries
+        if type(filt_ds.ds['country_code'][0].values) == np.ndarray:
+            country_codes = [c.item() for c in filt_ds.ds['country_code']]
+            filt_ds.ds['country_code'].values = country_codes
 
         return filt_ds
 

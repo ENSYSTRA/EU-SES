@@ -11,7 +11,7 @@ from io import BytesIO
 from . import parameters as pr
 
 class Power():
-    def __init__(self,EUSES, **kwargs):
+    def __init__(self,EUSES,disaggregation_var='population', **kwargs):
         ds = EUSES.ds
         year = EUSES.year
         time_range = ds.coords['time']
@@ -43,10 +43,10 @@ class Power():
             # ds_c = ds.where(ds['country_code'] == id, drop = True)
             load_profile = entsoe_hourly(id,year)
 
-            population_sum = ds_c['population'].sum().item()
+            sum_var = ds_c[disaggregation_var].sum().item()
 
             for nuts_2_id in ds_c.coords['nuts_2']:
-                power_profile = [round(ds_c['population'].loc[nuts_2_id].values.item()/population_sum * int(x),3) for x in load_profile.load_in_MW]
+                power_profile = [round(ds_c[disaggregation_var].loc[nuts_2_id].values.item()/sum_var * int(x),3) for x in load_profile.load_in_MW]
                 ds['power'].loc[nuts_2_id] = power_profile
 
 class Heat():
