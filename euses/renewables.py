@@ -86,7 +86,7 @@ class Hydro():
                     ds['hydro_inflow'].loc[nuts_2_id] = df_inflow_norm_h
 
 class Heat_Pumps():
-    def __init__(self, EUSES, temp_sink = 50):
+    def __init__(self, EUSES, temp_sink = 50,correction_factor=0.85):
         year =  EUSES.year
         ds = EUSES.ds
         time_range = ds.coords['time']
@@ -106,7 +106,7 @@ class Heat_Pumps():
             df_cop.loc[df_cop['cop_air']<1] = 1
 
             for nuts_2_id in ds_c.coords['nuts_2'].values:
-                ds['cop_air'].loc[nuts_2_id] = df_cop['cop_air']
+                ds['cop_air'].loc[nuts_2_id] = df_cop['cop_air']*correction_factor
 
 class VRE_Capacity_Factor():
     def __init__(self, EUSES, technologies = ['wind','pv','wind_offshore']):
