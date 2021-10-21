@@ -258,10 +258,10 @@ class Heat():
 
         sectors = ['residential','service']
         end_uses = ['space_heating','hot_water']
-        # for sector, end_use in dict(zip(sectors,[end_uses,end_uses])).items():
-        #     for eu in end_use:
-        #         ds = ds.drop(sector+'_'+eu)
-        #         ds = ds.drop(sector+'_'+eu+'_profile')
+        for sector, end_use in dict(zip(sectors,[end_uses,end_uses])).items():
+            for eu in end_use:
+                ds = ds.drop(sector+'_'+eu)
+                ds = ds.drop(sector+'_'+eu+'_profile')
 
         ds['heat'] = heat_attr_sum
         ds['heat'].attrs['unit'] = 'MW'
