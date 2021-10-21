@@ -2,15 +2,17 @@ import requests
 import pandas as pd
 import io
 
-def download_re_ninja(year,country_id, data_type):
+def download_re_ninja(year,country_id, data_type,temperature_weighting):
     ''' data_type: "weather", "pv", "wind", "wind_offshore"
     '''
     url_base = 'https://www.renewables.ninja/country_downloads/'
 
-    url_dic = {'weather' : '{}/ninja_weather_country_{}_merra-2_land_area_weighted.csv',
+    url_dic = {'weather' : '{}/ninja_weather_country_{}_merra-2_population_weighted.csv',
                'pv' : '{}/ninja_pv_country_{}_merra-2_nuts-2_corrected.csv',
                'wind' : '{}/ninja_wind_country_{}_current_merra-2_nuts-2_corrected.csv',
                'wind_offshore' : '{}/ninja_wind_country_{}_long-termfuture-merra-2_corrected.csv' }
+    if temperature_weighting == 'land_area':
+        url_dic['weather'] = '{}/ninja_weather_country_{}_merra-2_land_area_weighted.csv'
 
     if country_id in ['MK','LU','LV','LT']:
         url_dic['wind'] = '{}/ninja_wind_country_{}_current-merra-2_corrected.csv'
