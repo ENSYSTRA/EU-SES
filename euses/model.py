@@ -15,7 +15,7 @@ def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = pd.DataFrame(index= ds_regions.time.values)
     for i,rows in regions_geo.iterrows():
         if len(ds_regions[data_name].loc[rows.nuts_2s].values) != 0:
-            df[rows.id.item()] = ds_regions[data_name].loc[rows.nuts_2s].values
+            df[rows.id] = ds_regions[data_name].loc[rows.nuts_2s].values
     df = df * sign
     df.to_csv('calliope_model/timeseries_data/{}.csv'.format(data_name))
 
@@ -39,46 +39,46 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
 
     line_lenght = [0]
     for i, rows in regions_geo.iterrows():
-        dict_file['locations'][rows.id.item()]= {}
+        dict_file['locations'][rows.id]= {}
         coords = rows.geometry.centroid
-        dict_file['locations'][rows.id.item()]['coordinates'] = {'lat':round(coords.y,2),'lon':round(coords.x,2)}
-        dict_file['locations'][rows.id.item()]['techs'] = {}
-        dict_file['locations'][rows.id.item()]['techs']['demand_electricity'] = {'constraints':{'resource':'file=power.csv'}}
+        dict_file['locations'][rows.id]['coordinates'] = {'lat':round(coords.y,2),'lon':round(coords.x,2)}
+        dict_file['locations'][rows.id]['techs'] = {}
+        dict_file['locations'][rows.id]['techs']['demand_electricity'] = {'constraints':{'resource':'file=power.csv'}}
 
 
         if 'heat' in sectors:
-            dict_file['locations'][rows.id.item()]['techs']['demand_heat'] = {'constraints':{'resource':'file=heat.csv'}}
+            dict_file['locations'][rows.id]['techs']['demand_heat'] = {'constraints':{'resource':'file=heat.csv'}}
             for add_tech in ['supply_gas','supply_biogas', 'heat_pump_air']:
-                dict_file['locations'][rows.id.item()]['techs'][add_tech] = None
+                dict_file['locations'][rows.id]['techs'][add_tech] = None
 
         for tech_dic in [{'tech':'power_plants'}, {'hydro_tech':'hydro_capacity'}]:
             tech_coords, tech_var = tech_dic.popitem()
             for tech in ds_regions.coords[tech_coords].values:
                 installed_capacity = ds_regions[tech_var].loc[rows.nuts_2s,tech].values.item()
                 if tech != 'Hydro':
-                    dict_file['locations'][rows.id.item()]['techs'][tech.lower().replace(' ','_')] = None
+                    dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = None
                     if tech in vre_dic.keys():
-                        dict_file['locations'][rows.id.item()]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
                         area_max = ds_regions[vre_dic.get(tech)[0]].loc[rows.nuts_2s].values.item()
                         if tech == 'Solar':
                             area_max = area_max + ds_regions['utility_pv'].loc[rows.nuts_2s].values.item()
                         if area_max*vre_dic.get(tech)[1] < installed_capacity:
                             area_max = (installed_capacity / vre_dic.get(tech)[1])+1
-                        dict_file['locations'][rows.id.item()]['techs'][tech.lower().replace(' ','_')]['constraints']['resource_area_max'] = area_max
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['resource_area_max'] = area_max
                     if tech in ['HPHS', 'HDAM']:
                         storage_capacity = ds_regions['hydro_storage'].loc[rows.nuts_2s,tech].values.item()
                         if storage_capacity == 0:
                             storage_capacity = 6*installed_capacity
-                        dict_file['locations'][rows.id.item()]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
-                        dict_file['locations'][rows.id.item()]['techs'][tech.lower().replace(' ','_')]['constraints']['storage_cap_equals'] = storage_capacity
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')]['constraints']['storage_cap_equals'] = storage_capacity
                     if tech in ['Combined cycle']:
-                        dict_file['locations'][rows.id.item()]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_min':installed_capacity}}
                     if tech in ['HROR']:
-                        dict_file['locations'][rows.id.item()]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
+                        dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
 
 
         for techs in ['battery', 'hydrogen']:
-            dict_file['locations'][rows.id.item()]['techs'][techs] = None
+            dict_file['locations'][rows.id]['techs'][techs] = None
 
         for j, rows_2 in regions_geo.iterrows():
             g1_geo = rows.geometry.buffer(0.0001)
@@ -89,7 +89,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             if g1_geo.intersects(g2_geo) == True and length not in line_lenght:
                 line_lenght.append(length)
                 trans_dic = {'techs':{'ac_transmission': {'distance':length/1e2} }}
-                dict_file['links']['{},{}'.format(rows.id.item(), rows_2.id.item())] = trans_dic
+                dict_file['links']['{},{}'.format(rows.id, rows_2.id)] = trans_dic
 
     for i,rows in dc_links.iterrows():
         rows_filtr_from = regions_geo[regions_geo.nuts_2s.astype(str).str.contains(rows['from'],regex=True)]
