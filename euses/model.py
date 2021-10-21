@@ -121,7 +121,7 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     dict_file['run']['solver'] = 'cbc'
     dict_file['run']['ensure_feasibility'] = 'false'
-    dict_file['run']['bigM'] = 1e9
+    dict_file['run']['bigM'] = 1e10
     dict_file['run']['zero_threshold'] = 1e-15
     dict_file['run']['mode'] = op_mode
     dict_file['run']['objective_options.cost_class'] = {'monetary': 1}
