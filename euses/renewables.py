@@ -86,7 +86,7 @@ class Hydro():
                     ds['hydro_inflow'].loc[nuts_2_id] = df_inflow_norm_h
 
 class Heat_Pumps():
-    def __init__(self, EUSES, cop_max_air=3.2, temp_room = 21):
+    def __init__(self, EUSES, temp_sink = 50):
         year =  EUSES.year
         ds = EUSES.ds
         time_range = ds.coords['time']
@@ -96,22 +96,17 @@ class Heat_Pumps():
 
         for c in EUSES.countries:
             ds_c = EUSES.filter_countries([c]).ds
-            temperature_to_load = pd.DataFrame(
+            df_cop = pd.DataFrame(
                 index=time_range.values,
                 columns=['temp_air', 'cop_air'])
-
-            temperature_to_load['temp_air'] = ds_c['temperature'].sum(axis=0)
-            temperature_to_load['temp_room'] = temp_room
-
-            for v,k in set(zip(['air'],[cop_max_air])):
-                base = (temperature_to_load.temp_room + 273) / ((temperature_to_load.temp_room + 274) - (
-                            temperature_to_load[['temp_room', 'temp_{}'.format(v)]].min(axis=1) + 273))
-                temperature_to_load['cop_{}'.format(v)] = (base/base.mean())
-                temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] > 1,'cop_{}'.format(v)]  = 1
-                temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] < 1/cop_max_air,'cop_{}'.format(v)] = 1/k
+            df_cop['temp_air'] = ds_c['temperature'].sum(axis=0)
+            df_cop['temp_sink'] = temp_sink
+            temp_diff = df_cop.temp_sink-df_cop.temp_air
+            df_cop['cop_air'] = 6.08 - 0.09*temp_diff + 5e-4*(temp_diff**2)
+            df_cop.loc[df_cop['cop_air']<1] = 1
 
             for nuts_2_id in ds_c.coords['nuts_2'].values:
-                ds['cop_air'].loc[nuts_2_id] = (temperature_to_load.cop_air*cop_max_air).to_list()
+                ds['cop_air'].loc[nuts_2_id] = df_cop['cop_air']
 
 class VRE_Capacity_Factor():
     def __init__(self, EUSES, technologies = ['wind','pv','wind_offshore']):
