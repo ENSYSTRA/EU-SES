@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 import io
 
-def download_re_ninja(year,country_id, data_type,temperature_weighting):
+def download_re_ninja(year,country_id, data_type,temperature_weighting=None):
     ''' data_type: "weather", "pv", "wind", "wind_offshore"
     '''
     url_base = 'https://www.renewables.ninja/country_downloads/'

@@ -16,7 +16,7 @@ class Power():
         year = EUSES.year
         time_range = ds.coords['time']
 
-        load_excel = pd.read_excel('https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Publications/Statistics/Monthly-hourly-load-values_2006-2015.xlsx', header=3)
+        load_excel = pd.read_excel('https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Publications/Statistics/Monthly-hourly-load-values_2006-2015.xlsx', header=3, engine='openpyxl')
 
         ds['power'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
         ds['power'].attrs['unit'] = 'MW'
