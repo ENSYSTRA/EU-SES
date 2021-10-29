@@ -46,22 +46,14 @@ def aggregation(ds, groups, var_weigthing):
                 sum_weighted_var = ds_is[weight_var].sum()
                 for n in nuts:
                     if sum_weighted_var == 0:
-                        ds_is[var].loc[n] = dsc[var].loc[n]
+                        ds_is[var].loc[{'nuts_2':n}] = dsc[var].loc[{'nuts_2':n}]
                     else:
-                        ds_is[var].loc[n] = dsc[var].loc[n] * dsc[weight_var].loc[n].sum() / sum_weighted_var
+                        ds_is[var].loc[{'nuts_2':n}] = dsc[var].loc[{'nuts_2':n}] * dsc[weight_var].loc[{'nuts_2':n}].sum() / sum_weighted_var
 
-                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
-
-            # for var in area_weighted_vars:
-            #     for n in nuts:
-            #         if var == 'wind_offshore_cf':
-            #             ds_is[var].loc[n] = dsc[var].loc[n] * dsc['offshore_wind'].loc[n] / offshore_area_sum
-            #         else:
-            #             ds_is[var].loc[n] = dsc[var].loc[n] * dsc['geometry'].loc[n].values.item().area / group_area
-            #     dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+                dsc[var].loc[{'nuts_2':nuts[0]}] = ds_is[var].sum(dim='nuts_2')
 
             for var in sums_vars:
-                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+                dsc[var].loc[{'nuts_2':nuts[0]}] = ds_is[var].sum(dim='nuts_2')
 
             dsc['geometry'].loc[nuts[0]] = np.array(str(unary_union(ds_is['geometry'].loc[nuts].values)))
 

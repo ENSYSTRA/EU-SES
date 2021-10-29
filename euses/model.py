@@ -14,8 +14,8 @@ dc_links = pd.read_csv('data/links/dc_links.csv')
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = pd.DataFrame(index= ds_regions.time.values)
     for i,rows in regions_geo.iterrows():
-        if len(ds_regions[data_name].loc[rows.nuts_2s].values) != 0:
-            df[rows.id] = ds_regions[data_name].loc[rows.nuts_2s].values
+        if len(ds_regions[data_name].loc[{'regions':rows.nuts_2s}].values) != 0:
+            df[rows.id] = ds_regions[data_name].loc[{'regions':rows.nuts_2s}].values
     df = df * sign
     df.to_csv('calliope_model/timeseries_data/{}.csv'.format(data_name))
 

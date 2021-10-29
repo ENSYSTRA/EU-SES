@@ -128,7 +128,7 @@ class EUSES():
 
         ds = aggregation(ds, island_groups,var_weigthing)
 
-        if method != 'poli_regions':
+        if method not in ['nuts0','nuts1','nuts2']:
             if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
                 ds = aggregation(ds, [['BE34','LU00']],var_weigthing)
 
@@ -150,7 +150,7 @@ class EUSES():
         zones['minimum_threshold'] = zones.geometry.area
 
         method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','storage'],
-                        'poli_regions':2,'poli_regions_nuts1':3}
+                        'nuts0':2,'nuts1':3,'nuts2':4}
 
         if method in ['rdm_regions','max_p_regions']:
             np.random.seed(initial_seed)
@@ -162,7 +162,7 @@ class EUSES():
                 nuts_array = zones['nuts'].unique()
                 class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
 
-        if method in ['poli_regions','poli_regions_nuts1']:
+        if method in ['nuts0','nuts1','nuts2']:
             zones['nuts'] = zones['id'].str[:method_dir.get(method)]
             nuts_array = zones['nuts'].unique()
             class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
