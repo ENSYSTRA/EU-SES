@@ -132,7 +132,7 @@ class Heat():
                         if nuts0_id in country:
                             nuts0_id = replacement
 
-                    temperature_to_load = ds['temperature'].loc[nuts0_id].to_dataframe()
+                    temperature_to_load = ds['temperature'].loc[:,nuts2_id].to_dataframe()
                     temperature_to_load['hour'] = temperature_to_load.index.hour
 
                     generic_profile.hour = generic_profile.hour.replace(24,0)

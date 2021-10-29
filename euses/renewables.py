@@ -87,26 +87,14 @@ class Hydro():
 
 class Heat_Pumps():
     def __init__(self, EUSES, temp_sink = 50,correction_factor=0.85):
-        year =  EUSES.year
         ds = EUSES.ds
-        time_range = ds.coords['time']
 
-        cop_air = []
-        ds['cop_air'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
+        ds['temp_diff'] = temp_sink - ds['temperature']
+        ds['cop_air'] = 6.08 - 0.09*ds['temp_diff'] + 5e-4*(ds['temp_diff']**2)
+        ds['cop_air'] = ds.cop_air.where(ds.cop_air>1,1)
+        ds['cop_air'] = ds['cop_air']*correction_factor
 
-        for c in EUSES.countries:
-            ds_c = EUSES.filter_countries([c]).ds
-            df_cop = pd.DataFrame(
-                index=time_range.values,
-                columns=['temp_air', 'cop_air'])
-            df_cop['temp_air'] = ds_c['temperature'].sum(axis=0)
-            df_cop['temp_sink'] = temp_sink
-            temp_diff = df_cop.temp_sink-df_cop.temp_air
-            df_cop['cop_air'] = 6.08 - 0.09*temp_diff + 5e-4*(temp_diff**2)
-            df_cop.loc[df_cop['cop_air']<1] = 1
-
-            for nuts_2_id in ds_c.coords['nuts_2'].values:
-                ds['cop_air'].loc[nuts_2_id] = df_cop['cop_air']*correction_factor
+        ds = ds.drop('temp_diff')
 
 class VRE_Capacity_Factor():
     def __init__(self, EUSES, technologies = ['wind','pv','wind_offshore']):
@@ -155,9 +143,9 @@ class Area():
         building_af_no = pd.Series(building_no)*0.49
 
 
-        solar_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_SOLAR_PV_CSP.XLSX',sheet_name='Raw Data Available Areas',index_col=1,header=2)
+        solar_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_SOLAR_PV_CSP.XLSX',sheet_name='Raw Data Available Areas',index_col=1,header=2, engine='openpyxl')
 
-        wind_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_WIND_ONSHORE_OFFSHORE.XLSX',sheet_name='Raw data',index_col=1,header=5)
+        wind_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_WIND_ONSHORE_OFFSHORE.XLSX',sheet_name='Raw data',index_col=1,header=5,engine='openpyxl')
 
         rooftop_pv = solar_jrc[["SURARTRESROO","SURARTINDROO","SURARTRESFAC","SURARTINDFAC"]].sum(axis=1)
         utility_pv = solar_jrc[["SURNATAGRLOW","SURNATOGRLOW"]].sum(axis=1)

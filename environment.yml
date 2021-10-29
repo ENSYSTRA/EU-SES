@@ -16,6 +16,7 @@ dependencies:
     - rasterstats==0.15.0
     - geopy==2.0.0
     - matplotlib==3.4.1
+    - h5netcdf==0.11.0
     - ipython
     - xlrd
     - jupyter

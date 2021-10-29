@@ -12,7 +12,6 @@ from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
 from shapely.ops import transform
-import os
 
 from . import parameters as pr
 from .utilib import download_re_ninja
@@ -86,13 +85,24 @@ class EUSES():
                 temp.cleanup()
 
             # add temperature data
-            temperature_data = []
-            for c in self.countries:
-                re_id = pr.get_metadata(c,'renewables_nj_id')
-                weather = download_re_ninja(year,re_id,'weather',temperature_weighting)
-                temperature_data.append(weather['temperature'].to_list())
-            self.ds['temperature'] =  (('nuts_0','time'),(np.array(temperature_data)))
-            self.ds['temperature'].attrs['unit'] = 'Degrees Celsius'
+            r = urlopen("https://zenodo.org/record/4584576/files/era-nuts-t2m-nuts2-hourly.nc")
+            ds_t2m = xr.open_dataset(BytesIO(r.read())).load()
+            diff = list(set(self.ds.nuts_2.values).difference(set(ds_t2m['t2m'].region.values)))
+
+            nuts2_13_16 = pd.read_excel("https://ec.europa.eu/eurostat/documents/345175/629341/NUTS2013-NUTS2016.xlsx",engine='openpyxl',sheet_name='Correspondence NUTS-2',index_col=0,header=0)
+            corr = nuts2_13_16.loc[list(set(diff).intersection(set(nuts2_13_16.index))),'Code 2016'].dropna()
+
+            self.ds['temperature'] = (('time','nuts_2'),(np.empty((len(self.ds.time),len(self.ds.nuts_2)))))
+            common_nuts2 = list(set(self.ds.nuts_2.values).intersection(set(ds_t2m['t2m'].region.values)))
+            self.ds['temperature'].loc[:,common_nuts2] = ds_t2m['t2m'].loc[self.ds.time,common_nuts2]
+            self.ds['temperature'].loc[:,corr.index] = ds_t2m['t2m'].loc[self.ds.time,corr.values].values
+
+            realocated = {'HU10':['HU11','HU12'],'LT00':['LT01','LT02'],'PL12':['PL91','PL91'],'UKM3':['UKM9','UKM8'],
+            'IE02':['IE05','IE06'],'IE01':['IE04']}
+            for code_2013, code_2016 in realocated.items():
+                if code_2013 in self.ds.nuts_2.values:
+                    self.ds['temperature'].loc[:,code_2013] = ds_t2m['t2m'].loc[self.ds.time,code_2016].mean(axis=1).values
+
 
     def add(self, component,  **kwargs):
         comp_class = eval(component)
