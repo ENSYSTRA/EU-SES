@@ -24,7 +24,7 @@ class Hydro():
         r = urlopen("https://zenodo.org/record/804244/files/Hydro_Inflow.zip")
         zipfile = ZipFile(BytesIO(r.read()))
 
-        df_jrc = pd.read_csv('https://raw.githubusercontent.com/energy-modelling-toolkit/hydro-power-database/v7/data/jrc-hydro-power-plant-database.csv')
+        df_jrc = pd.read_csv('https://raw.githubusercontent.com/energy-modelling-toolkit/hydro-power-database/v10/data/jrc-hydro-power-plant-database.csv')
 
 
         tech_list = [tech for tech in df_jrc.type.unique()]
