@@ -21,10 +21,12 @@ def wind_offshore_to_nuts2(ds):
 def aggregation(ds, groups, var_weigthing):
 
     if var_weigthing == 'preset':
-        var_weigthing = {'wind_cf':'onshore_wind','pv_cf':'area_pv','wind_offshore_cf':'offshore_wind', 'cop_air':'population','hydro_inflow':'area'}
+        var_weigthing = {'wind_cf':'onshore_wind','pv_cf':'area_pv','wind_offshore_cf':'offshore_wind', 'cop_air':'population','hydro_inflow':'hydro_capacity_all'}
 
     dsc = ds.copy()
 
+    dsc['hydro_capacity_all'] = dsc['hydro_capacity'].sum(dim='hydro_tech')
+    dsc['area_pv'] = dsc['rooftop_pv'] + dsc['utility_pv']
     dsc['area'] = dsc['geometry']
     dsc['area'].values = [a.area for a in dsc['geometry'].values]
 
