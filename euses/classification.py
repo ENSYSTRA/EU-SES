@@ -21,8 +21,7 @@ def wind_offshore_to_nuts2(ds):
 def aggregation(ds, groups, var_weigthing):
 
     if var_weigthing == 'preset':
-        var_weigthing = {'wind_cf':'area','pv_cf':'area','wind_offshore_cf':'offshore_wind',
-                        'cop_air':'area','hydro_inflow':'area'}
+        var_weigthing = {'wind_cf':'onshore_wind','pv_cf':'area_pv','wind_offshore_cf':'offshore_wind', 'cop_air':'population','hydro_inflow':'area'}
 
     dsc = ds.copy()
 
