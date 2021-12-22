@@ -6,11 +6,23 @@ from shapely import wkt
 import numpy as np
 import spopt, libpysal
 
-def wind_offshore_to_nuts2(ds):
+def disaggregation(ds, disaggr_var = {'power':'population'}):
     time_range = ds.time.values
     dsc = ds.copy()
+    cc_nuts0_id = dict(zip(np.unique(dsc['country_code'].values),dsc.coords['nuts_0'].values))
+    cc_nuts0_id['EL'] = 'GR'
+    cc_nuts0_id['EE'] = 'EE00'
 
     ds['wind_offshore_cf'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
+    ds['power'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
+
+    ds_sum_var = dsc[disaggr_var['power']].groupby(dsc['country_code']).sum()
+    for nuts2_id in dsc.coords['nuts_2']:
+        cc_id = dsc['country_code'].loc[nuts2_id].values.item()
+        sum_var = ds_sum_var.loc[cc_id].item()
+        weighting_factor = dsc[disaggr_var['power']].loc[nuts2_id].values.item()/sum_var
+        power_profile = dsc['power'].loc[cc_nuts0_id[cc_id]] * weighting_factor
+        ds['power'].loc[nuts2_id] = power_profile
 
     ds_c = ds.where(ds['offshore_wind'] > 0, drop = True)
     for nuts2_id in ds_c.coords['nuts_2'].values:
@@ -18,11 +30,13 @@ def wind_offshore_to_nuts2(ds):
         ds['wind_offshore_cf'].loc[nuts2_id] = dsc['wind_offshore_cf'].loc[nuts0_id]
 
 
-def aggregation(ds, groups, var_weigthing):
+def aggregation(ds, groups, aggr_var = 'set1'):
 
-    if var_weigthing == 'preset':
-        var_weigthing = {'wind_cf':'onshore_wind','pv_cf':'area_pv','wind_offshore_cf':'offshore_wind', 'cop_air':'population','hydro_inflow':'hydro_capacity_all'}
+    if aggr_var == 'set1':
+        aggr_var = {'wind_cf':'onshore_wind','pv_cf':'area_pv','cop_air':'population'}
 
+    aggr_var['wind_offshore_cf']='offshore_wind'
+    aggr_var['hydro_inflow']='hydro_capacity_all'
     dsc = ds.copy()
 
     dsc['hydro_capacity_all'] = dsc['hydro_capacity'].sum(dim='hydro_tech')
@@ -43,7 +57,7 @@ def aggregation(ds, groups, var_weigthing):
             # group_area = sum([i.area for i in ds_is['geometry'].values])
             # offshore_area_sum = ds_is['offshore_wind'].sum()
 
-            for var, weight_var in  var_weigthing.items():
+            for var, weight_var in  aggr_var.items():
                 sum_weighted_var = ds_is[weight_var].sum()
                 for n in nuts:
                     if sum_weighted_var == 0:

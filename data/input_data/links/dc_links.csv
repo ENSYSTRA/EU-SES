@@ -1,0 +1,31 @@
+﻿id,name,from,to,capacity,voltage,length,projected_date,status
+1,Estlink,FI1B,EE00,350,150,105,,Installed
+2,Estlink 2,FI1B,EE00,650,450,170,,Installed
+3,Kriegers Flak,DE80,DK02,400,220,200,2019,Construction
+4,Baltic,DE80,SE22,600,450,250,,Installed
+5,Kontek,DE80,DK02,600,400,170,,Installed
+6,Konti-Skan (1&2),DK05,SE23,550,250,176,,Installed
+7,COBRAcable,DK03,NL11,700,400,325,2019,Construction
+8,Skagerrak,DK05,NO04,1700,350,227,,Installed
+9,Nordlink,DEF0,NO04,1400,525,623,2020,Construction
+10,Swedlit,SE21,LT00,700,300,450,,Installed
+11,NorNed,NO04,NL11,700,450,580,,Installed
+12,Nord Sea Link,NO04,UKC2,1400,515,720,2021,Construction
+13,Nord connect,NO04,UKM5,1400,515,570,2024,Construction
+14,Viking Link,DK03,UKF3,1400,500,740,2023,Construction
+15,BritNed,UKJ4,NL32,1000,450,250,,Installed
+16,Nemo Link,BE25,UKJ4,1000,400,140,,Installed
+17,GridLink,UKJ4,FR30,1400,500,160,,Installed
+18,ElecLink,UKJ4,FR30,1000,320,51,2019,Construction
+19,Aquind,UKJ4,FR30,2000,320,200,2022,Construction
+20,IFA2,UKJ3,FR25,1000,320,200,2028,Construction
+21,FAB Link,UKK4,FR25,1400,320,220,2022,Construction
+22,IFA 1,UKJ4,FR30,2000,270,50,,Installed
+23,Celtic Link,FR52,IE02,700,320,600,2026,Construction
+24,Green Link,IE02,UKL1,500,320,172,2023,Construction
+25,East-West Link,IE02,UKD6,500,320,261,,Installed
+26,Moyle,UKN0,UKM3,500,250,63,,Installed
+27,Western Link,UKM3,UKD6,2200,400,422,,Installed
+28,Italy-Greece,ITF4,EL54,500,400,273,,Installed
+29,SACOI,ITG2,ITI1,300,200,385,,Installed
+30,SAPEI,ITG2,ITI4,1000,500,440,,Installed

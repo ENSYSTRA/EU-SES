@@ -18,7 +18,7 @@ from .utilib import download_re_ninja
 from .demand import Power, Heat
 from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Area
 from .resources import Power_Plants
-from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
+from .classification import disaggregation, aggregation, round_coord, max_p_regions
 from .model import create_location_yaml, create_timeseries_csv, create_model_yaml
 
 class EUSES():
@@ -66,6 +66,10 @@ class EUSES():
             self.ds['geometry_54009'] = (('nuts_2'),(nuts_2['geometry'].to_crs({'proj': 'moll'}).to_xarray()))
             self.ds['geometry'].attrs['crs'] = 'epsg:3035'
 
+            eu_gdp = pd.read_csv('data/input_data/nuts2_gdp.csv',header=2,index_col=0)
+            self.ds['gdp'] = eu_gdp.loc[ds_nuts2.values,'2015']
+            self.ds['gdp'] = self.ds['gdp'].fillna(0)
+
             # add population data
             if ['population'] not in list(self.ds.keys()):
                 temp = tempfile.TemporaryDirectory()
@@ -92,16 +96,16 @@ class EUSES():
             nuts2_13_16 = pd.read_excel("https://ec.europa.eu/eurostat/documents/345175/629341/NUTS2013-NUTS2016.xlsx",engine='openpyxl',sheet_name='Correspondence NUTS-2',index_col=0,header=0)
             corr = nuts2_13_16.loc[list(set(diff).intersection(set(nuts2_13_16.index))),'Code 2016'].dropna()
 
-            self.ds['temperature'] = (('time','nuts_2'),(np.empty((len(self.ds.time),len(self.ds.nuts_2)))))
+            self.ds['temperature'] = (('nuts_2','time'),(np.empty((len(self.ds.nuts_2),len(self.ds.time)))))
             common_nuts2 = list(set(self.ds.nuts_2.values).intersection(set(ds_t2m['t2m'].region.values)))
-            self.ds['temperature'].loc[:,common_nuts2] = ds_t2m['t2m'].loc[self.ds.time,common_nuts2]
-            self.ds['temperature'].loc[:,corr.index] = ds_t2m['t2m'].loc[self.ds.time,corr.values].values
+            self.ds['temperature'].loc[common_nuts2,:] = ds_t2m['t2m'].loc[self.ds.time,common_nuts2].transpose().values
+            self.ds['temperature'].loc[corr.index,:] = ds_t2m['t2m'].loc[self.ds.time,corr.values].transpose().values
 
             realocated = {'HU10':['HU11','HU12'],'LT00':['LT01','LT02'],'PL12':['PL91','PL91'],'UKM3':['UKM9','UKM8'],
             'IE02':['IE05','IE06'],'IE01':['IE04']}
             for code_2013, code_2016 in realocated.items():
                 if code_2013 in self.ds.nuts_2.values:
-                    self.ds['temperature'].loc[:,code_2013] = ds_t2m['t2m'].loc[self.ds.time,code_2016].mean(axis=1).values
+                    self.ds['temperature'].loc[code_2013,:] = ds_t2m['t2m'].loc[self.ds.time,code_2016].mean(axis=1).transpose().values
 
 
     def add(self, component,  **kwargs):
@@ -118,19 +122,18 @@ class EUSES():
         self.ds.to_netcdf("data/saved_dataset/" + dir_name, encoding=encoding)
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
 
-    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1,var_weigthing='preset'):
+    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1,disaggr_var='preset', aggr_var ='preset'):
+
+        disaggregation(self.ds,disaggr_var) # add wind-offshore capacity factor to nuts_2 areas
 
         ds = self.ds.copy(deep=True)
-
-        wind_offshore_to_nuts2(ds) # add wind-offshore capacity factor to nuts_2 areas
-
         island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
 
-        ds = aggregation(ds, island_groups,var_weigthing)
+        ds = aggregation(ds, island_groups,aggr_var)
 
         if method not in ['nuts0','nuts1','nuts2']:
             if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
-                ds = aggregation(ds, [['BE34','LU00']],var_weigthing)
+                ds = aggregation(ds, [['BE34','LU00']],aggr_var)
 
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
@@ -170,10 +173,13 @@ class EUSES():
 
         class_regions = [zones.loc[c].id.to_list() for c in class_regions_int]
 
-        ds = aggregation(ds,class_regions,var_weigthing)
+        ds = aggregation(ds,class_regions,aggr_var)
         ds.coords['regions'] = ('nuts_2', ds.coords['nuts_2'].values)
         ds = ds.swap_dims({'nuts_2': 'regions'})
         ds = ds.drop('nuts_2')
+        if type(ds['country_code'][0].values) == np.ndarray:
+            country_codes = [c.item() for c in ds['country_code']]
+            ds['country_code'].values = country_codes
 
         self.ds_regions = ds
 

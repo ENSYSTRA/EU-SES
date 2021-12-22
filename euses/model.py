@@ -9,7 +9,7 @@ import os
 
 vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',170],'Wind Offshore':['offshore_wind',5.36]}
 
-dc_links = pd.read_csv('data/links/dc_links.csv')
+dc_links = pd.read_csv('data/input_data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = pd.DataFrame(index= ds_regions.time.values)
