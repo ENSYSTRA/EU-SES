@@ -7,6 +7,8 @@ dependencies:
   - calliope=0.6.7
   - gdal=2.4.1
   - mapclassify=2.4.0
+  - coincbc
+  - seaborn
   - pip:
     - spopt==0.1.0
     - datapackage==1.15.1

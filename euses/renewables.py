@@ -112,7 +112,6 @@ class VRE_Capacity_Factor():
 
         for tech in technologies:
             for c in EUSES.countries:
-                print(tech,c)
                 re_id = pr.get_metadata(c,'renewables_nj_id')
                 nuts0_id = pr.get_metadata(c,'nuts_id')
                 ds_c = EUSES.filter_countries([c]).ds

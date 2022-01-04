@@ -6,7 +6,9 @@ from shapely import wkt
 import numpy as np
 import spopt, libpysal
 
-def disaggregation(ds, disaggr_var = {'power':'population'}):
+def disaggregation(ds, disaggr_var = 'preset'):
+    if disaggr_var == 'preset':
+        disaggr_var = {'power':'population'}
     time_range = ds.time.values
     dsc = ds.copy()
     cc_nuts0_id = dict(zip(np.unique(dsc['country_code'].values),dsc.coords['nuts_0'].values))
@@ -30,9 +32,9 @@ def disaggregation(ds, disaggr_var = {'power':'population'}):
         ds['wind_offshore_cf'].loc[nuts2_id] = dsc['wind_offshore_cf'].loc[nuts0_id]
 
 
-def aggregation(ds, groups, aggr_var = 'set1'):
+def aggregation(ds, groups, aggr_var = 'preset'):
 
-    if aggr_var == 'set1':
+    if aggr_var == 'preset':
         aggr_var = {'wind_cf':'onshore_wind','pv_cf':'area_pv','cop_air':'population'}
 
     aggr_var['wind_offshore_cf']='offshore_wind'

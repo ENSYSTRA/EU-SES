@@ -34,6 +34,7 @@ class EUSES():
         self.year = year
 
         if import_ds == False:
+            print('Building Areas dataset')
 
             nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
 
@@ -66,8 +67,9 @@ class EUSES():
             self.ds['geometry_54009'] = (('nuts_2'),(nuts_2['geometry'].to_crs({'proj': 'moll'}).to_xarray()))
             self.ds['geometry'].attrs['crs'] = 'epsg:3035'
 
+            print('  - {} added'.format('NUTS 2 ID and geometry'))
             eu_gdp = pd.read_csv('data/input_data/nuts2_gdp.csv',header=2,index_col=0)
-            self.ds['gdp'] = eu_gdp.loc[ds_nuts2.values,'2015']
+            self.ds['gdp'] = eu_gdp.loc[self.ds.coords['nuts_2'].values,'2015']
             self.ds['gdp'] = self.ds['gdp'].fillna(0)
 
             # add population data
@@ -87,6 +89,7 @@ class EUSES():
                 self.ds['population'].attrs['unit'] = 'People'
                 self.ds = self.ds.drop('geometry_54009')
                 temp.cleanup()
+            print('  - {} variables added'.format('Population and gdp'))
 
             # add temperature data
             r = urlopen("https://zenodo.org/record/4584576/files/era-nuts-t2m-nuts2-hourly.nc")
@@ -106,7 +109,7 @@ class EUSES():
             for code_2013, code_2016 in realocated.items():
                 if code_2013 in self.ds.nuts_2.values:
                     self.ds['temperature'].loc[code_2013,:] = ds_t2m['t2m'].loc[self.ds.time,code_2016].mean(axis=1).transpose().values
-
+            print('  - {} variables added'.format('Temperature'))
 
     def add(self, component,  **kwargs):
         comp_class = eval(component)
@@ -124,9 +127,9 @@ class EUSES():
 
     def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1,disaggr_var='preset', aggr_var ='preset'):
 
-        disaggregation(self.ds,disaggr_var) # add wind-offshore capacity factor to nuts_2 areas
-
         ds = self.ds.copy(deep=True)
+        disaggregation(ds,disaggr_var) # add wind-offshore capacity factor to nuts_2 areas
+
         island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
 
         ds = aggregation(ds, island_groups,aggr_var)
@@ -243,14 +246,21 @@ def build_dataset(countries, year=2010, save=True, dir_name = 'dataset.nc'):
         countries = [country.get('name') for country in countries_metadata]
 
     # Build NUTS 2 dataset in EUSES dataset for the year
+
     self = EUSES(countries, year)
     # Add data components
-    data_components_list = ['Power_Plants','Area','Hydro','Heat_Pumps',
-                                'VRE_Capacity_Factor','Power','Heat']
-    print('Start building data variables')
-    for data_component in data_components_list:
+    data_components_list = {'Power_Plants':'Power plants',
+                            'Area':'Onshore wind, offshore wind, and solar PV area',
+                            'Hydro':'Hydropower capacity and availability',
+                            'Heat_Pumps': 'Air-sourced HP capacity factor',
+                            'VRE_Capacity_Factor':'Onshore wind, offshore wind, and solar PV capacity factor',
+                            'Power': 'Electricity demand',
+                            'Heat': 'Hot water and space heating demand'}
+    for data_component, decription in data_components_list.items():
         self.add(data_component)
-        print(data_component + ' addition complete')
+        print('  - {} variables added'.format(decription))
+
+    print('Areas dataset complete')
     # export dataset
     if save==True:
         self.save_dataset(dir_name)

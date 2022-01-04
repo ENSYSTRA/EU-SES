@@ -77,7 +77,8 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
 
 
-        for techs in ['battery', 'hydrogen']:
+        # for techs in ['battery', 'hydrogen']:
+        for techs in ['hydrogen']:
             dict_file['locations'][rows.id]['techs'][techs] = None
 
         for j, rows_2 in regions_geo.iterrows():
@@ -88,6 +89,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             length = int(distance.distance((fr.y,fr.x), (to.y,to.x)).km*1.25)
             if g1_geo.intersects(g2_geo) == True and length not in line_lenght:
                 line_lenght.append(length)
+                # trans_dic = {'techs':{'ac_transmission': {'constraints':{'energy_cap_equals':rows.capacity},'distance':rows.length/1e2} }}
                 trans_dic = {'techs':{'ac_transmission': {'distance':length/1e2} }}
                 dict_file['links']['{},{}'.format(rows.id, rows_2.id)] = trans_dic
 
