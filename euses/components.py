@@ -12,19 +12,18 @@ from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
 from shapely.ops import transform
-import os
 
 from . import parameters as pr
 from .utilib import download_re_ninja
 from .demand import Power, Heat
 from .renewables import Heat_Pumps, VRE_Capacity_Factor, Hydro, Area
 from .resources import Power_Plants
-from .classification import wind_offshore_to_nuts2, aggregation, round_coord, max_p_regions
+from .classification import disaggregation, aggregation, round_coord, max_p_regions
 from .model import create_location_yaml, create_timeseries_csv, create_model_yaml
 
 class EUSES():
 
-    def __init__(self,countries,year,import_ds=False):
+    def __init__(self,countries,year,import_ds=False,temperature_weighting='population'):
         '''
         countries : List of countries by name
         year : reference year
@@ -35,9 +34,10 @@ class EUSES():
         self.year = year
 
         if import_ds == False:
+            print('Building Areas dataset')
 
             nuts_geom_eu = gpd.read_file('https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_10M_2013_3035_LEVL_2.geojson')
-            
+
             time = pd.date_range(str(year), str(year+1), freq='1H')[:-1]
             self.ds.coords['time'] = time
             self.ds.coords['nuts_0'] = [pr.get_metadata(c,'nuts_id') for c in self.countries]
@@ -67,6 +67,11 @@ class EUSES():
             self.ds['geometry_54009'] = (('nuts_2'),(nuts_2['geometry'].to_crs({'proj': 'moll'}).to_xarray()))
             self.ds['geometry'].attrs['crs'] = 'epsg:3035'
 
+            print('  - {} added'.format('NUTS 2 ID and geometry'))
+            eu_gdp = pd.read_csv('data/input_data/nuts2_gdp.csv',header=2,index_col=0)
+            self.ds['gdp'] = eu_gdp.loc[self.ds.coords['nuts_2'].values,'2015']
+            self.ds['gdp'] = self.ds['gdp'].fillna(0)
+
             # add population data
             if ['population'] not in list(self.ds.keys()):
                 temp = tempfile.TemporaryDirectory()
@@ -84,15 +89,27 @@ class EUSES():
                 self.ds['population'].attrs['unit'] = 'People'
                 self.ds = self.ds.drop('geometry_54009')
                 temp.cleanup()
+            print('  - {} variables added'.format('Population and gdp'))
 
             # add temperature data
-            temperature_data = []
-            for c in self.countries:
-                re_id = pr.get_metadata(c,'renewables_nj_id')
-                weather = download_re_ninja(year,re_id,'weather')
-                temperature_data.append(weather['temperature'].to_list())
-            self.ds['temperature'] =  (('nuts_0','time'),(np.array(temperature_data)))
-            self.ds['temperature'].attrs['unit'] = 'Degrees Celsius'
+            r = urlopen("https://zenodo.org/record/4584576/files/era-nuts-t2m-nuts2-hourly.nc")
+            ds_t2m = xr.open_dataset(BytesIO(r.read())).load()
+            diff = list(set(self.ds.nuts_2.values).difference(set(ds_t2m['t2m'].region.values)))
+
+            nuts2_13_16 = pd.read_excel("https://ec.europa.eu/eurostat/documents/345175/629341/NUTS2013-NUTS2016.xlsx",engine='openpyxl',sheet_name='Correspondence NUTS-2',index_col=0,header=0)
+            corr = nuts2_13_16.loc[list(set(diff).intersection(set(nuts2_13_16.index))),'Code 2016'].dropna()
+
+            self.ds['temperature'] = (('nuts_2','time'),(np.empty((len(self.ds.nuts_2),len(self.ds.time)))))
+            common_nuts2 = list(set(self.ds.nuts_2.values).intersection(set(ds_t2m['t2m'].region.values)))
+            self.ds['temperature'].loc[common_nuts2,:] = ds_t2m['t2m'].loc[self.ds.time,common_nuts2].transpose().values
+            self.ds['temperature'].loc[corr.index,:] = ds_t2m['t2m'].loc[self.ds.time,corr.values].transpose().values
+
+            realocated = {'HU10':['HU11','HU12'],'LT00':['LT01','LT02'],'PL12':['PL91','PL91'],'UKM3':['UKM9','UKM8'],
+            'IE02':['IE05','IE06'],'IE01':['IE04']}
+            for code_2013, code_2016 in realocated.items():
+                if code_2013 in self.ds.nuts_2.values:
+                    self.ds['temperature'].loc[code_2013,:] = ds_t2m['t2m'].loc[self.ds.time,code_2016].mean(axis=1).transpose().values
+            print('  - {} variables added'.format('Temperature'))
 
     def add(self, component,  **kwargs):
         comp_class = eval(component)
@@ -108,18 +125,18 @@ class EUSES():
         self.ds.to_netcdf("data/saved_dataset/" + dir_name, encoding=encoding)
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
 
-    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1):
+    def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1,disaggr_var='preset', aggr_var ='preset'):
 
         ds = self.ds.copy(deep=True)
-
-        wind_offshore_to_nuts2(ds) # add wind-offshore capacity factor to nuts_2 areas
+        disaggregation(ds,disaggr_var) # add wind-offshore capacity factor to nuts_2 areas
 
         island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
 
-        ds = aggregation(ds, island_groups)
+        ds = aggregation(ds, island_groups,aggr_var)
 
-        if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
-            ds = aggregation(ds, [['BE34','LU00']])
+        if method not in ['nuts0','nuts1','nuts2']:
+            if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
+                ds = aggregation(ds, [['BE34','LU00']],aggr_var)
 
         zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
         zones['id'] = ds.coords['nuts_2'].values
@@ -139,7 +156,7 @@ class EUSES():
         zones['minimum_threshold'] = zones.geometry.area
 
         method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','storage'],
-                        'poli_regions':2,'poli_regions_nuts1':3}
+                        'nuts0':2,'nuts1':3,'nuts2':4}
 
         if method in ['rdm_regions','max_p_regions']:
             np.random.seed(initial_seed)
@@ -151,7 +168,7 @@ class EUSES():
                 nuts_array = zones['nuts'].unique()
                 class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
 
-        if method in ['poli_regions','poli_regions_nuts1']:
+        if method in ['nuts0','nuts1','nuts2']:
             zones['nuts'] = zones['id'].str[:method_dir.get(method)]
             nuts_array = zones['nuts'].unique()
             class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
@@ -159,10 +176,13 @@ class EUSES():
 
         class_regions = [zones.loc[c].id.to_list() for c in class_regions_int]
 
-        ds = aggregation(ds,class_regions)
+        ds = aggregation(ds,class_regions,aggr_var)
         ds.coords['regions'] = ('nuts_2', ds.coords['nuts_2'].values)
         ds = ds.swap_dims({'nuts_2': 'regions'})
         ds = ds.drop('nuts_2')
+        if type(ds['country_code'][0].values) == np.ndarray:
+            country_codes = [c.item() for c in ds['country_code']]
+            ds['country_code'].values = country_codes
 
         self.ds_regions = ds
 
@@ -204,6 +224,9 @@ class EUSES():
         filt_ds.ds = filt_ds.ds.drop(nuts_0s_invers,dim='nuts_0')
         filt_ds.ds = filt_ds.ds.drop(nuts_2s_invers,dim='nuts_2')
         filt_ds.countries = countries
+        if type(filt_ds.ds['country_code'][0].values) == np.ndarray:
+            country_codes = [c.item() for c in filt_ds.ds['country_code']]
+            filt_ds.ds['country_code'].values = country_codes
 
         return filt_ds
 
@@ -223,14 +246,21 @@ def build_dataset(countries, year=2010, save=True, dir_name = 'dataset.nc'):
         countries = [country.get('name') for country in countries_metadata]
 
     # Build NUTS 2 dataset in EUSES dataset for the year
+
     self = EUSES(countries, year)
     # Add data components
-    data_components_list = ['Power_Plants','Area','Hydro','Heat_Pumps',
-                                'VRE_Capacity_Factor','Power','Heat']
-    print('Start building data variables')
-    for data_component in data_components_list:
+    data_components_list = {'Power_Plants':'Power plants',
+                            'Area':'Onshore wind, offshore wind, and solar PV area',
+                            'Hydro':'Hydropower capacity and availability',
+                            'Heat_Pumps': 'Air-sourced HP capacity factor',
+                            'VRE_Capacity_Factor':'Onshore wind, offshore wind, and solar PV capacity factor',
+                            'Power': 'Electricity demand',
+                            'Heat': 'Hot water and space heating demand'}
+    for data_component, decription in data_components_list.items():
         self.add(data_component)
-        print(data_component + ' addition complete')
+        print('  - {} variables added'.format(decription))
+
+    print('Areas dataset complete')
     # export dataset
     if save==True:
         self.save_dataset(dir_name)

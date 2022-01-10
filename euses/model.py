@@ -9,13 +9,13 @@ import os
 
 vre_dic = {'Wind':['onshore_wind',5],'Solar':['rooftop_pv',170],'Wind Offshore':['offshore_wind',5.36]}
 
-dc_links = pd.read_csv('data/links/dc_links.csv')
+dc_links = pd.read_csv('data/input_data/links/dc_links.csv')
 
 def export_timeseries(regions_geo, ds_regions,data_name,sign):
     df = pd.DataFrame(index= ds_regions.time.values)
     for i,rows in regions_geo.iterrows():
-        if len(ds_regions[data_name].loc[rows.nuts_2s].values) != 0:
-            df[rows.id] = ds_regions[data_name].loc[rows.nuts_2s].values
+        if len(ds_regions[data_name].loc[{'regions':rows.nuts_2s}].values) != 0:
+            df[rows.id] = ds_regions[data_name].loc[{'regions':rows.nuts_2s}].values
     df = df * sign
     df.to_csv('calliope_model/timeseries_data/{}.csv'.format(data_name))
 
@@ -77,7 +77,8 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
                         dict_file['locations'][rows.id]['techs'][tech.lower().replace(' ','_')] = {'constraints':{'energy_cap_equals':installed_capacity}}
 
 
-        for techs in ['battery', 'hydrogen']:
+        # for techs in ['battery', 'hydrogen']:
+        for techs in ['hydrogen']:
             dict_file['locations'][rows.id]['techs'][techs] = None
 
         for j, rows_2 in regions_geo.iterrows():
@@ -88,6 +89,7 @@ def create_location_yaml(regions_geo, ds_regions, sectors):
             length = int(distance.distance((fr.y,fr.x), (to.y,to.x)).km*1.25)
             if g1_geo.intersects(g2_geo) == True and length not in line_lenght:
                 line_lenght.append(length)
+                # trans_dic = {'techs':{'ac_transmission': {'constraints':{'energy_cap_equals':rows.capacity},'distance':rows.length/1e2} }}
                 trans_dic = {'techs':{'ac_transmission': {'distance':length/1e2} }}
                 dict_file['links']['{},{}'.format(rows.id, rows_2.id)] = trans_dic
 
@@ -121,7 +123,7 @@ def create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor):
 
     dict_file['run']['solver'] = 'cbc'
     dict_file['run']['ensure_feasibility'] = 'false'
-    dict_file['run']['bigM'] = 1e9
+    dict_file['run']['bigM'] = 1e10
     dict_file['run']['zero_threshold'] = 1e-15
     dict_file['run']['mode'] = op_mode
     dict_file['run']['objective_options.cost_class'] = {'monetary': 1}

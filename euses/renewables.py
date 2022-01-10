@@ -24,7 +24,7 @@ class Hydro():
         r = urlopen("https://zenodo.org/record/804244/files/Hydro_Inflow.zip")
         zipfile = ZipFile(BytesIO(r.read()))
 
-        df_jrc = pd.read_csv('https://raw.githubusercontent.com/energy-modelling-toolkit/hydro-power-database/v7/data/jrc-hydro-power-plant-database.csv')
+        df_jrc = pd.read_csv('https://raw.githubusercontent.com/energy-modelling-toolkit/hydro-power-database/v10/data/jrc-hydro-power-plant-database.csv')
 
 
         tech_list = [tech for tech in df_jrc.type.unique()]
@@ -86,32 +86,15 @@ class Hydro():
                     ds['hydro_inflow'].loc[nuts_2_id] = df_inflow_norm_h
 
 class Heat_Pumps():
-    def __init__(self, EUSES, cop_max_air=3.2, temp_room = 21):
-        year =  EUSES.year
+    def __init__(self, EUSES, temp_sink = 50,correction_factor=0.85):
         ds = EUSES.ds
-        time_range = ds.coords['time']
 
-        cop_air = []
-        ds['cop_air'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
+        ds['temp_diff'] = temp_sink - ds['temperature']
+        ds['cop_air'] = 6.08 - 0.09*ds['temp_diff'] + 5e-4*(ds['temp_diff']**2)
+        ds['cop_air'] = ds.cop_air.where(ds.cop_air>1,1)
+        ds['cop_air'] = ds['cop_air']*correction_factor
 
-        for c in EUSES.countries:
-            ds_c = EUSES.filter_countries([c]).ds
-            temperature_to_load = pd.DataFrame(
-                index=time_range.values,
-                columns=['temp_air', 'cop_air'])
-
-            temperature_to_load['temp_air'] = ds_c['temperature'].sum(axis=0)
-            temperature_to_load['temp_room'] = temp_room
-
-            for v,k in set(zip(['air'],[cop_max_air])):
-                base = (temperature_to_load.temp_room + 273) / ((temperature_to_load.temp_room + 274) - (
-                            temperature_to_load[['temp_room', 'temp_{}'.format(v)]].min(axis=1) + 273))
-                temperature_to_load['cop_{}'.format(v)] = (base/base.mean())
-                temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] > 1,'cop_{}'.format(v)]  = 1
-                temperature_to_load.loc[temperature_to_load['cop_{}'.format(v)] < 1/cop_max_air,'cop_{}'.format(v)] = 1/k
-
-            for nuts_2_id in ds_c.coords['nuts_2'].values:
-                ds['cop_air'].loc[nuts_2_id] = (temperature_to_load.cop_air*cop_max_air).to_list()
+        ds = ds.drop('temp_diff')
 
 class VRE_Capacity_Factor():
     def __init__(self, EUSES, technologies = ['wind','pv','wind_offshore']):
@@ -129,7 +112,6 @@ class VRE_Capacity_Factor():
 
         for tech in technologies:
             for c in EUSES.countries:
-                print(tech,c)
                 re_id = pr.get_metadata(c,'renewables_nj_id')
                 nuts0_id = pr.get_metadata(c,'nuts_id')
                 ds_c = EUSES.filter_countries([c]).ds
@@ -160,13 +142,12 @@ class Area():
         building_af_no = pd.Series(building_no)*0.49
 
 
-        solar_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_SOLAR_PV_CSP.XLSX',sheet_name='Raw Data Available Areas',index_col=1,header=2)
+        solar_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_SOLAR_PV_CSP.XLSX',sheet_name='Raw Data Available Areas',index_col=1,header=2, engine='openpyxl')
 
-        wind_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_WIND_ONSHORE_OFFSHORE.XLSX',sheet_name='Raw data',index_col=1,header=5)
+        wind_jrc = pd.read_excel('https://cidportal.jrc.ec.europa.eu/ftp/jrc-opendata/ENSPRESO/ENSPRESO_WIND_ONSHORE_OFFSHORE.XLSX',sheet_name='Raw data',index_col=1,header=5,engine='openpyxl')
 
         rooftop_pv = solar_jrc[["SURARTRESROO","SURARTINDROO","SURARTRESFAC","SURARTINDFAC"]].sum(axis=1)
-        utility_pv = solar_jrc[["SURNATAGRHIG", "SURNATAGRLOW",
-                                "SURNATOGRHIG", "SURNATOGRLOW"]].sum(axis=1)
+        utility_pv = solar_jrc[["SURNATAGRLOW","SURNATOGRLOW"]].sum(axis=1)
 
         rooftop_pv = rooftop_pv.append([building_af_ch,building_af_no])
         utility_pv = utility_pv.append([(building_af_ch*144),(building_af_no*176)])
@@ -198,8 +179,10 @@ class Area():
                         zipfile = ZipFile(BytesIO(resp.read()))
                         path = temp.name + '/rastermap_v200605_einfarbig.tif'
                         open(path, 'wb').write(zipfile.read(zipfile.namelist()[5]))
-                        area = zonal_stats(ds['geometry'].loc[nuts_2_id].values.item(), path, stats='count')[0].get('count')
-                        ds[c].loc[nuts_2_id] = area*6250/1e6
+                        gpd_shape = gpd.GeoDataFrame(geometry=[ds['geometry'].loc[nuts_2_id].values.item()],crs = {'init': 'epsg:3035'})
+                        geo_shape = gpd_shape.to_crs({'init': 'epsg:21781'}).loc[0]
+                        area = zonal_stats(geo_shape, path, stats='count')[0].get('count')
+                        ds[c].loc[nuts_2_id] = area*6.5
                     if nuts_0_id['country_code'] == 'NO':
                         r = requests.get('https://gitlab.com/hotmaps/potential/potential_wind/-/raw/master/data/wind_100m.tif?inline=false')
                         path = temp.name+'/wind_100m.tif'

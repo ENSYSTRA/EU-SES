@@ -16,10 +16,11 @@ class Power():
         year = EUSES.year
         time_range = ds.coords['time']
 
-        load_excel = pd.read_excel('https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Publications/Statistics/Monthly-hourly-load-values_2006-2015.xlsx', header=3)
+        load_excel = pd.read_excel('https://eepublicdownloads.blob.core.windows.net/public-cdn-container/clean-documents/Publications/Statistics/Monthly-hourly-load-values_2006-2015.xlsx', header=3, engine='openpyxl')
 
-        ds['power'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
+        ds['power'] = (('nuts_0','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_0']))))
         ds['power'].attrs['unit'] = 'MW'
+        ds['power'].attrs['source'] = 'ENTSOE'
 
         def entsoe_hourly(id,year):
             if id == 'UK':
@@ -35,19 +36,17 @@ class Power():
             load_profile.index = time_range.values
             return load_profile.fillna(load_profile.load_in_MW.mean())
 
-
         for c in EUSES.countries:
             id = pr.get_metadata(c,'renewables_nj_id')
-            ds_c = EUSES.filter_countries([c]).ds
-
-            # ds_c = ds.where(ds['country_code'] == id, drop = True)
+            nuts0_id = pr.get_metadata(c,'nuts_id')
             load_profile = entsoe_hourly(id,year)
+            ds['power'].loc[nuts0_id] = load_profile.load_in_MW
 
-            population_sum = ds_c['population'].sum().item()
-
-            for nuts_2_id in ds_c.coords['nuts_2']:
-                power_profile = [round(ds_c['population'].loc[nuts_2_id].values.item()/population_sum * int(x),3) for x in load_profile.load_in_MW]
-                ds['power'].loc[nuts_2_id] = power_profile
+            # sum_var = ds_c[disaggregation_var].sum().item()
+            # ds_c = EUSES.filter_countries([c]).ds
+            # for nuts_2_id in ds_c.coords['nuts_2']:
+            #     power_profile = [round(ds_c[disaggregation_var].loc[nuts_2_id].values.item()/sum_var * int(x),3) for x in load_profile.load_in_MW]
+            #     ds['power'].loc[nuts_2_id] = power_profile
 
 class Heat():
 
@@ -132,7 +131,7 @@ class Heat():
                         if nuts0_id in country:
                             nuts0_id = replacement
 
-                    temperature_to_load = ds['temperature'].loc[nuts0_id].to_dataframe()
+                    temperature_to_load = ds['temperature'].loc[nuts2_id,:].to_dataframe()
                     temperature_to_load['hour'] = temperature_to_load.index.hour
 
                     generic_profile.hour = generic_profile.hour.replace(24,0)

@@ -6,11 +6,25 @@ from shapely import wkt
 import numpy as np
 import spopt, libpysal
 
-def wind_offshore_to_nuts2(ds):
+def disaggregation(ds, disaggr_var = 'preset'):
+    if disaggr_var == 'preset':
+        disaggr_var = {'power':'population'}
     time_range = ds.time.values
     dsc = ds.copy()
+    cc_nuts0_id = dict(zip(np.unique(dsc['country_code'].values),dsc.coords['nuts_0'].values))
+    cc_nuts0_id['EL'] = 'GR'
+    cc_nuts0_id['EE'] = 'EE00'
 
     ds['wind_offshore_cf'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
+    ds['power'] = (('nuts_2','time'),(np.array([[t*0.0 for t in range(len(time_range))]]*len(ds.coords['nuts_2']))))
+
+    ds_sum_var = dsc[disaggr_var['power']].groupby(dsc['country_code']).sum()
+    for nuts2_id in dsc.coords['nuts_2']:
+        cc_id = dsc['country_code'].loc[nuts2_id].values.item()
+        sum_var = ds_sum_var.loc[cc_id].item()
+        weighting_factor = dsc[disaggr_var['power']].loc[nuts2_id].values.item()/sum_var
+        power_profile = dsc['power'].loc[cc_nuts0_id[cc_id]] * weighting_factor
+        ds['power'].loc[nuts2_id] = power_profile
 
     ds_c = ds.where(ds['offshore_wind'] > 0, drop = True)
     for nuts2_id in ds_c.coords['nuts_2'].values:
@@ -18,33 +32,45 @@ def wind_offshore_to_nuts2(ds):
         ds['wind_offshore_cf'].loc[nuts2_id] = dsc['wind_offshore_cf'].loc[nuts0_id]
 
 
-def aggregation(ds, groups):
+def aggregation(ds, groups, aggr_var = 'preset'):
 
+    if aggr_var == 'preset':
+        aggr_var = {'wind_cf':'onshore_wind','pv_cf':'area_pv','cop_air':'population'}
+
+    aggr_var['wind_offshore_cf']='offshore_wind'
+    aggr_var['hydro_inflow']='hydro_capacity_all'
     dsc = ds.copy()
+
+    dsc['hydro_capacity_all'] = dsc['hydro_capacity'].sum(dim='hydro_tech')
+    dsc['area_pv'] = dsc['rooftop_pv'] + dsc['utility_pv']
+    dsc['area'] = dsc['geometry']
+    dsc['area'].values = [a.area for a in dsc['geometry'].values]
 
     sums_vars = ['power', 'population', 'heat', 'power_plants', 'onshore_wind','offshore_wind',
                   'rooftop_pv','utility_pv','hydro_capacity', 'hydro_storage']
-    area_weighted_vars = ['wind_cf', 'pv_cf', 'wind_offshore_cf',
-                          'cop_air','hydro_inflow']
+    # area_weighted_vars = ['wind_cf', 'pv_cf', 'wind_offshore_cf',
+    #                       'cop_air','hydro_inflow']
 
     sep=','
     new_coords = dsc.coords['nuts_2'].values
     for nuts in groups:
         if nuts[0] in dsc.coords['nuts_2']:
             ds_is =  dsc.sel(nuts_2=nuts)
-            group_area = sum([i.area for i in ds_is['geometry'].values])
-            offshore_area_sum = ds_is['offshore_wind'].sum()
+            # group_area = sum([i.area for i in ds_is['geometry'].values])
+            # offshore_area_sum = ds_is['offshore_wind'].sum()
 
-            for var in area_weighted_vars:
+            for var, weight_var in  aggr_var.items():
+                sum_weighted_var = ds_is[weight_var].sum()
                 for n in nuts:
-                    if var == 'wind_offshore_cf':
-                        ds_is[var].loc[n] = dsc[var].loc[n] * dsc['offshore_wind'].loc[n] / offshore_area_sum
+                    if sum_weighted_var == 0:
+                        ds_is[var].loc[{'nuts_2':n}] = dsc[var].loc[{'nuts_2':n}]
                     else:
-                        ds_is[var].loc[n] = dsc[var].loc[n] * dsc['geometry'].loc[n].values.item().area / group_area
-                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+                        ds_is[var].loc[{'nuts_2':n}] = dsc[var].loc[{'nuts_2':n}] * dsc[weight_var].loc[{'nuts_2':n}].sum() / sum_weighted_var
+
+                dsc[var].loc[{'nuts_2':nuts[0]}] = ds_is[var].sum(dim='nuts_2')
 
             for var in sums_vars:
-                dsc[var].loc[nuts[0]] = ds_is[var].sum(axis=0)
+                dsc[var].loc[{'nuts_2':nuts[0]}] = ds_is[var].sum(dim='nuts_2')
 
             dsc['geometry'].loc[nuts[0]] = np.array(str(unary_union(ds_is['geometry'].loc[nuts].values)))
 
