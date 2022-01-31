@@ -1,8 +1,8 @@
 locations:
-  region_0:
+  DE:
     coordinates:
-      lat: 48.4
-      lon: 10.97
+      lat: 51.11
+      lon: 10.39
     techs:
       demand_electricity:
         constraints:
@@ -12,425 +12,516 @@ locations:
           resource: file=heat.csv
       supply_gas:
       supply_biogas:
-      heat_pump_air:
+      heat_pump_air_DE11:
+        constraints:
+          energy_eff: file=cop_air.csv:DE11
+      heat_pump_air_DE12:
+        constraints:
+          energy_eff: file=cop_air.csv:DE12
+      heat_pump_air_DE13:
+        constraints:
+          energy_eff: file=cop_air.csv:DE13
+      heat_pump_air_DE22:
+        constraints:
+          energy_eff: file=cop_air.csv:DE22
+      heat_pump_air_DE23:
+        constraints:
+          energy_eff: file=cop_air.csv:DE23
+      heat_pump_air_DE24:
+        constraints:
+          energy_eff: file=cop_air.csv:DE24
+      heat_pump_air_DE25:
+        constraints:
+          energy_eff: file=cop_air.csv:DE25
+      heat_pump_air_DE26:
+        constraints:
+          energy_eff: file=cop_air.csv:DE26
+      heat_pump_air_DE14:
+        constraints:
+          energy_eff: file=cop_air.csv:DE14
+      heat_pump_air_DE21:
+        constraints:
+          energy_eff: file=cop_air.csv:DE21
+      heat_pump_air_DE91:
+        constraints:
+          energy_eff: file=cop_air.csv:DE91
+      heat_pump_air_DE92:
+        constraints:
+          energy_eff: file=cop_air.csv:DE92
+      heat_pump_air_DE93:
+        constraints:
+          energy_eff: file=cop_air.csv:DE93
+      heat_pump_air_DE94:
+        constraints:
+          energy_eff: file=cop_air.csv:DE94
+      heat_pump_air_DEA1:
+        constraints:
+          energy_eff: file=cop_air.csv:DEA1
+      heat_pump_air_DE27:
+        constraints:
+          energy_eff: file=cop_air.csv:DE27
+      heat_pump_air_DE30:
+        constraints:
+          energy_eff: file=cop_air.csv:DE30
+      heat_pump_air_DE40:
+        constraints:
+          energy_eff: file=cop_air.csv:DE40
+      heat_pump_air_DE50:
+        constraints:
+          energy_eff: file=cop_air.csv:DE50
+      heat_pump_air_DE60:
+        constraints:
+          energy_eff: file=cop_air.csv:DE60
+      heat_pump_air_DE71:
+        constraints:
+          energy_eff: file=cop_air.csv:DE71
+      heat_pump_air_DE72:
+        constraints:
+          energy_eff: file=cop_air.csv:DE72
+      heat_pump_air_DE73:
+        constraints:
+          energy_eff: file=cop_air.csv:DE73
+      heat_pump_air_DE80:
+        constraints:
+          energy_eff: file=cop_air.csv:DE80
+      heat_pump_air_DEA2:
+        constraints:
+          energy_eff: file=cop_air.csv:DEA2
+      heat_pump_air_DEA3:
+        constraints:
+          energy_eff: file=cop_air.csv:DEA3
+      heat_pump_air_DEA4:
+        constraints:
+          energy_eff: file=cop_air.csv:DEA4
+      heat_pump_air_DEB2:
+        constraints:
+          energy_eff: file=cop_air.csv:DEB2
+      heat_pump_air_DEB3:
+        constraints:
+          energy_eff: file=cop_air.csv:DEB3
+      heat_pump_air_DEC0:
+        constraints:
+          energy_eff: file=cop_air.csv:DEC0
+      heat_pump_air_DED2:
+        constraints:
+          energy_eff: file=cop_air.csv:DED2
+      heat_pump_air_DED4:
+        constraints:
+          energy_eff: file=cop_air.csv:DED4
+      heat_pump_air_DED5:
+        constraints:
+          energy_eff: file=cop_air.csv:DED5
+      heat_pump_air_DEE0:
+        constraints:
+          energy_eff: file=cop_air.csv:DEE0
+      heat_pump_air_DEF0:
+        constraints:
+          energy_eff: file=cop_air.csv:DEF0
+      heat_pump_air_DEG0:
+        constraints:
+          energy_eff: file=cop_air.csv:DEG0
+      heat_pump_air_DEA5:
+        constraints:
+          energy_eff: file=cop_air.csv:DEA5
+      heat_pump_air_DEB1:
+        constraints:
+          energy_eff: file=cop_air.csv:DEB1
       combined_cycle:
         constraints:
-          energy_cap_min: 3640.4085
-      solar:
-        constraints:
-          energy_cap_min: 12177.528221102379
-          resource_area_max: 13559.0
-      wind:
-        constraints:
-          energy_cap_min: 1356.4531129999987
-          resource_area_max: 15019.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 169.5
-          storage_cap_equals: 1017.0
-      hphs:
-        constraints:
-          energy_cap_equals: 90.0
-          storage_cap_equals: 566.0
-      hror:
-        constraints:
-          energy_cap_equals: 1698.3215
-      battery:
-      hydrogen:
-  region_1:
-    coordinates:
-      lat: 49.72
-      lon: 8.21
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 6008.995
-      solar:
-        constraints:
-          energy_cap_min: 5065.570452000508
-          resource_area_max: 6378.5
-      wind:
-        constraints:
-          energy_cap_min: 2902.3732169999976
-          resource_area_max: 6856.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 13.3
-          storage_cap_equals: 79.80000000000001
-      hphs:
-        constraints:
-          energy_cap_equals: 2397.42
-          storage_cap_equals: 12087.0
-      hror:
-        constraints:
-          energy_cap_equals: 1066.13083
-      battery:
-      hydrogen:
-  region_2:
-    coordinates:
-      lat: 50.05
-      lon: 10.52
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 1724.0534
-      solar:
-        constraints:
-          energy_cap_min: 6803.6948120007055
-          resource_area_max: 7648.0
-      wind:
-        constraints:
-          energy_cap_min: 3070.5655449999967
-          resource_area_max: 9973.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 20.0
-          storage_cap_equals: 120.0
-      hphs:
-        constraints:
-          energy_cap_equals: 1078.0
-          storage_cap_equals: 4851.0
-      hror:
-        constraints:
-          energy_cap_equals: 188.96418000000003
-      battery:
-      hydrogen:
-  region_3:
-    coordinates:
-      lat: 51.17
-      lon: 11.81
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 1158.9399999999998
-      solar:
-        constraints:
-          energy_cap_min: 3814.7578390001736
-          resource_area_max: 9412.0
-      wind:
-        constraints:
-          energy_cap_min: 2806.588300000001
-          resource_area_max: 12994.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 2824.6
-          storage_cap_equals: 16705.0
-      hror:
-        constraints:
-          energy_cap_equals: 96.78334000000001
-      battery:
-      hydrogen:
-  region_4:
-    coordinates:
-      lat: 52.57
-      lon: 8.46
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 5127.099999999999
-      solar:
-        constraints:
-          energy_cap_min: 4267.90134800042
-          resource_area_max: 7989.5
-      wind:
-        constraints:
-          energy_cap_min: 7777.297500000006
-          resource_area_max: 9846.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 2445.1
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 20.874999999999996
-      battery:
-      hydrogen:
-  region_5:
-    coordinates:
-      lat: 52.55
-      lon: 10.84
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 1579.67
-      solar:
-        constraints:
-          energy_cap_min: 3776.1192310001325
-          resource_area_max: 9221.5
-      wind:
-        constraints:
-          energy_cap_min: 6547.886700000033
-          resource_area_max: 13522.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 3255.92
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 79.7
-          storage_cap_equals: 551.0
-      hror:
-        constraints:
-          energy_cap_equals: 12.360000000000001
-      battery:
-      hydrogen:
-  region_6:
-    coordinates:
-      lat: 50.66
-      lon: 7.12
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 6793.208
-      solar:
-        constraints:
-          energy_cap_min: 5565.198727192381
-          resource_area_max: 6422.0
-      wind:
-        constraints:
-          energy_cap_min: 5950.771941999991
-          resource_area_max: 6910.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 176.722
-      battery:
-      hydrogen:
-  region_7:
-    coordinates:
-      lat: 52.35
-      lon: 13.32
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 2715.2000000000003
-      solar:
-        constraints:
-          energy_cap_min: 4856.014673000095
-          resource_area_max: 6867.5
-      wind:
-        constraints:
-          energy_cap_min: 5448.908530000011
-          resource_area_max: 9821.0
-      wind_offshore:
-        constraints:
-          energy_cap_min: 0.0
-          resource_area_max: 0.0
-      hdam:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hphs:
-        constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
-      hror:
-        constraints:
-          energy_cap_equals: 41.575
-      battery:
-      hydrogen:
-  region_8:
-    coordinates:
-      lat: 53.92
-      lon: 11.43
-    techs:
-      demand_electricity:
-        constraints:
-          resource: file=power.csv
-      demand_heat:
-        constraints:
-          resource: file=heat.csv
-      supply_gas:
-      supply_biogas:
-      heat_pump_air:
-      combined_cycle:
-        constraints:
-          energy_cap_min: 662.8000000000001
-      solar:
-        constraints:
-          energy_cap_min: 3941.8458020002186
-          resource_area_max: 10630.5
-      wind:
-        constraints:
-          energy_cap_min: 8902.461990000065
-          resource_area_max: 15204.0
+          energy_cap_min: 29410.37
+      solar_DE11:
+        constraints:
+          energy_cap_min: 2155.0030480004025
+          resource_area_max: 5330.033723179435
+          resource: file=pv_cf.csv:DE11
+      solar_DE12:
+        constraints:
+          energy_cap_min: 1210.8207170001397
+          resource_area_max: 2193.5457706473912
+          resource: file=pv_cf.csv:DE12
+      solar_DE13:
+        constraints:
+          energy_cap_min: 1334.7859540001991
+          resource_area_max: 3731.3113540983777
+          resource: file=pv_cf.csv:DE13
+      solar_DE22:
+        constraints:
+          energy_cap_min: 2995.54235400044
+          resource_area_max: 4936.331974491122
+          resource: file=pv_cf.csv:DE22
+      solar_DE23:
+        constraints:
+          energy_cap_min: 1463.7981770002277
+          resource_area_max: 3063.324507512823
+          resource: file=pv_cf.csv:DE23
+      solar_DE24:
+        constraints:
+          energy_cap_min: 1042.800618000052
+          resource_area_max: 1784.906176866077
+          resource: file=pv_cf.csv:DE24
+      solar_DE25:
+        constraints:
+          energy_cap_min: 1506.1452390001998
+          resource_area_max: 2515.981435049465
+          resource: file=pv_cf.csv:DE25
+      solar_DE26:
+        constraints:
+          energy_cap_min: 1347.145599000143
+          resource_area_max: 2782.2432865317137
+          resource: file=pv_cf.csv:DE26
+      solar_DE14:
+        constraints:
+          energy_cap_min: 1766.9840680002997
+          resource_area_max: 4571.75892678651
+          resource: file=pv_cf.csv:DE14
+      solar_DE21:
+        constraints:
+          energy_cap_min: 2804.925435000768
+          resource_area_max: 7485.085693543807
+          resource: file=pv_cf.csv:DE21
+      solar_DE91:
+        constraints:
+          energy_cap_min: 519.2138010000104
+          resource_area_max: 3758.2209396894846
+          resource: file=pv_cf.csv:DE91
+      solar_DE92:
+        constraints:
+          energy_cap_min: 782.9832240000521
+          resource_area_max: 4755.610705852336
+          resource: file=pv_cf.csv:DE92
+      solar_DE93:
+        constraints:
+          energy_cap_min: 826.641531000043
+          resource_area_max: 8348.150923381905
+          resource: file=pv_cf.csv:DE93
+      solar_DE94:
+        constraints:
+          energy_cap_min: 2270.1514790002916
+          resource_area_max: 8256.876948712936
+          resource: file=pv_cf.csv:DE94
+      solar_DEA1:
+        constraints:
+          energy_cap_min: 1004.0332910319822
+          resource_area_max: 2200.992728930184
+          resource: file=pv_cf.csv:DEA1
+      solar_DE27:
+        constraints:
+          energy_cap_min: 2455.0733161004678
+          resource_area_max: 5023.287336759043
+          resource: file=pv_cf.csv:DE27
+      solar_DE30:
+        constraints:
+          energy_cap_min: 115.20098099999915
+          resource_area_max: 110.13440587791796
+          resource: file=pv_cf.csv:DE30
+      solar_DE40:
+        constraints:
+          energy_cap_min: 4085.1441790000863
+          resource_area_max: 11318.168184654918
+          resource: file=pv_cf.csv:DE40
+      solar_DE50:
+        constraints:
+          energy_cap_min: 45.359607000000146
+          resource_area_max: 83.59224824340737
+          resource: file=pv_cf.csv:DE50
+      solar_DE60:
+        constraints:
+          energy_cap_min: 53.50661299999988
+          resource_area_max: 213.13803045963286
+          resource: file=pv_cf.csv:DE60
+      solar_DE71:
+        constraints:
+          energy_cap_min: 829.7965280000584
+          resource_area_max: 1823.5899007945218
+          resource: file=pv_cf.csv:DE71
+      solar_DE72:
+        constraints:
+          energy_cap_min: 519.1207130000121
+          resource_area_max: 2135.309427213552
+          resource: file=pv_cf.csv:DE72
+      solar_DE73:
+        constraints:
+          energy_cap_min: 924.6844660000706
+          resource_area_max: 3145.5053150898893
+          resource: file=pv_cf.csv:DE73
+      solar_DE80:
+        constraints:
+          energy_cap_min: 2130.715795000066
+          resource_area_max: 12015.182987430737
+          resource: file=pv_cf.csv:DE80
+      solar_DEA2:
+        constraints:
+          energy_cap_min: 921.2917200000961
+          resource_area_max: 2111.8195496403832
+          resource: file=pv_cf.csv:DEA2
+      solar_DEA3:
+        constraints:
+          energy_cap_min: 1585.297669370204
+          resource_area_max: 4192.967205095016
+          resource: file=pv_cf.csv:DEA3
+      solar_DEA4:
+        constraints:
+          energy_cap_min: 1169.4070380000762
+          resource_area_max: 3011.203093993022
+          resource: file=pv_cf.csv:DEA4
+      solar_DEB2:
+        constraints:
+          energy_cap_min: 585.4049540000042
+          resource_area_max: 1584.3124790005918
+          resource: file=pv_cf.csv:DEB2
+      solar_DEB3:
+        constraints:
+          energy_cap_min: 971.8205602900883
+          resource_area_max: 2580.9969547471865
+          resource: file=pv_cf.csv:DEB3
+      solar_DEC0:
+        constraints:
+          energy_cap_min: 497.35053250000635
+          resource_area_max: 434.7319053703204
+          resource: file=pv_cf.csv:DEC0
+      solar_DED2:
+        constraints:
+          energy_cap_min: 930.0600610000164
+          resource_area_max: 3528.5698645322723
+          resource: file=pv_cf.csv:DED2
+      solar_DED4:
+        constraints:
+          energy_cap_min: 634.980508000021
+          resource_area_max: 3513.3549310206813
+          resource: file=pv_cf.csv:DED4
+      solar_DED5:
+        constraints:
+          energy_cap_min: 655.66951300001
+          resource_area_max: 2425.6935272050523
+          resource: file=pv_cf.csv:DED5
+      solar_DEE0:
+        constraints:
+          energy_cap_min: 2895.9710870000895
+          resource_area_max: 9980.86778100861
+          resource: file=pv_cf.csv:DEE0
+      solar_DEF0:
+        constraints:
+          energy_cap_min: 1811.1300070001519
+          resource_area_max: 9325.46903507381
+          resource: file=pv_cf.csv:DEF0
+      solar_DEG0:
+        constraints:
+          energy_cap_min: 1730.5034690001257
+          resource_area_max: 8145.804948495831
+          resource: file=pv_cf.csv:DEG0
+      solar_DEA5:
+        constraints:
+          energy_cap_min: 877.7971000000676
+          resource_area_max: 2224.118542406741
+          resource: file=pv_cf.csv:DEA5
+      solar_DEB1:
+        constraints:
+          energy_cap_min: 812.3701530000438
+          resource_area_max: 3018.3958397013207
+          resource: file=pv_cf.csv:DEB1
+      wind_DE11:
+        constraints:
+          energy_cap_min: 852.4259429999984
+          resource_area_max: 3133.0
+          resource: file=wind_cf.csv:DE11
+      wind_DE12:
+        constraints:
+          energy_cap_min: 201.7270499999999
+          resource_area_max: 1121.0
+          resource: file=wind_cf.csv:DE12
+      wind_DE13:
+        constraints:
+          energy_cap_min: 241.67590000000013
+          resource_area_max: 2122.0
+          resource: file=wind_cf.csv:DE13
+      wind_DE22:
+        constraints:
+          energy_cap_min: 38.162890000000004
+          resource_area_max: 2752.0
+          resource: file=wind_cf.csv:DE22
+      wind_DE23:
+        constraints:
+          energy_cap_min: 265.55275000000006
+          resource_area_max: 2005.0
+          resource: file=wind_cf.csv:DE23
+      wind_DE24:
+        constraints:
+          energy_cap_min: 549.0234599999991
+          resource_area_max: 1086.0
+          resource: file=wind_cf.csv:DE24
+      wind_DE25:
+        constraints:
+          energy_cap_min: 446.26802499999945
+          resource_area_max: 1518.0
+          resource: file=wind_cf.csv:DE25
+      wind_DE26:
+        constraints:
+          energy_cap_min: 445.1951099999996
+          resource_area_max: 1945.0
+          resource: file=wind_cf.csv:DE26
+      wind_DE14:
+        constraints:
+          energy_cap_min: 133.23682
+          resource_area_max: 2784.0
+          resource: file=wind_cf.csv:DE14
+      wind_DE21:
+        constraints:
+          energy_cap_min: 173.74623000000014
+          resource_area_max: 3259.0
+          resource: file=wind_cf.csv:DE21
+      wind_DE91:
+        constraints:
+          energy_cap_min: 767.4745000000013
+          resource_area_max: 2584.0
+          resource: file=wind_cf.csv:DE91
+      wind_DE92:
+        constraints:
+          energy_cap_min: 1528.9279999999933
+          resource_area_max: 2818.0
+          resource: file=wind_cf.csv:DE92
+      wind_DE93:
+        constraints:
+          energy_cap_min: 2418.535399999992
+          resource_area_max: 5628.0
+          resource: file=wind_cf.csv:DE93
+      wind_DE94:
+        constraints:
+          energy_cap_min: 4722.6863000000185
+          resource_area_max: 5368.0
+          resource: file=wind_cf.csv:DE94
+      wind_DEA1:
+        constraints:
+          energy_cap_min: 659.7560400000003
+          resource_area_max: 671.0
+          resource: file=wind_cf.csv:DEA1
+      wind_DE27:
+        constraints:
+          energy_cap_min: 158.88123000000007
+          resource_area_max: 3091.0
+          resource: file=wind_cf.csv:DE27
+      wind_DE30:
+        constraints:
+          energy_cap_min: 12.411200000000003
+          resource_area_max: 14.0
+          resource: file=wind_cf.csv:DE30
+      wind_DE40:
+        constraints:
+          energy_cap_min: 5236.726600000011
+          resource_area_max: 8254.0
+          resource: file=wind_cf.csv:DE40
+      wind_DE50:
+        constraints:
+          energy_cap_min: 188.91899999999993
+          resource_area_max: 38.783799999999985
+          resource: file=wind_cf.csv:DE50
+      wind_DE60:
+        constraints:
+          energy_cap_min: 99.75120000000001
+          resource_area_max: 61.0
+          resource: file=wind_cf.csv:DE60
+      wind_DE71:
+        constraints:
+          energy_cap_min: 445.7544999999998
+          resource_area_max: 841.0
+          resource: file=wind_cf.csv:DE71
+      wind_DE72:
+        constraints:
+          energy_cap_min: 775.1233499999987
+          resource_area_max: 1325.0
+          resource: file=wind_cf.csv:DE72
+      wind_DE73:
+        constraints:
+          energy_cap_min: 589.4028499999997
+          resource_area_max: 2094.0
+          resource: file=wind_cf.csv:DE73
+      wind_DE80:
+        constraints:
+          energy_cap_min: 3134.0152500000027
+          resource_area_max: 9374.0
+          resource: file=wind_cf.csv:DE80
+      wind_DEA2:
+        constraints:
+          energy_cap_min: 1117.6465999999957
+          resource_area_max: 864.0
+          resource: file=wind_cf.csv:DEA2
+      wind_DEA3:
+        constraints:
+          energy_cap_min: 1576.8729999999987
+          resource_area_max: 2593.0
+          resource: file=wind_cf.csv:DEA3
+      wind_DEA4:
+        constraints:
+          energy_cap_min: 1336.7641999999946
+          resource_area_max: 1630.0
+          resource: file=wind_cf.csv:DEA4
+      wind_DEB2:
+        constraints:
+          energy_cap_min: 918.3249999999983
+          resource_area_max: 892.0
+          resource: file=wind_cf.csv:DEB2
+      wind_DEB3:
+        constraints:
+          energy_cap_min: 1274.9789019999978
+          resource_area_max: 1657.0
+          resource: file=wind_cf.csv:DEB3
+      wind_DEC0:
+        constraints:
+          energy_cap_min: 403.1924000000001
+          resource_area_max: 233.0
+          resource: file=wind_cf.csv:DEC0
+      wind_DED2:
+        constraints:
+          energy_cap_min: 470.5556000000007
+          resource_area_max: 2241.0
+          resource: file=wind_cf.csv:DED2
+      wind_DED4:
+        constraints:
+          energy_cap_min: 415.15960000000007
+          resource_area_max: 2397.0
+          resource: file=wind_cf.csv:DED4
+      wind_DED5:
+        constraints:
+          energy_cap_min: 199.77073000000004
+          resource_area_max: 1553.0
+          resource: file=wind_cf.csv:DED5
+      wind_DEE0:
+        constraints:
+          energy_cap_min: 4029.6001000000406
+          resource_area_max: 7833.0
+          resource: file=wind_cf.csv:DEE0
+      wind_DEF0:
+        constraints:
+          energy_cap_min: 5768.446740000062
+          resource_area_max: 5830.0
+          resource: file=wind_cf.csv:DEF0
+      wind_DEG0:
+        constraints:
+          energy_cap_min: 1153.3985999999986
+          resource_area_max: 5772.0
+          resource: file=wind_cf.csv:DEG0
+      wind_DEA5:
+        constraints:
+          energy_cap_min: 768.8914670000003
+          resource_area_max: 1045.0
+          resource: file=wind_cf.csv:DEA5
+      wind_DEB1:
+        constraints:
+          energy_cap_min: 1244.3242999999973
+          resource_area_max: 1727.0
+          resource: file=wind_cf.csv:DEB1
       wind_offshore:
         constraints:
           energy_cap_min: 1072.8
-          resource_area_max: 10340.990000000002
+          resource_area_max: 16042.010000000002
       hdam:
         constraints:
-          energy_cap_equals: 0.0
-          storage_cap_equals: 0.0
+          energy_cap_equals: 202.8
+          storage_cap_equals: 1216.8
       hphs:
         constraints:
-          energy_cap_equals: 120.0
-          storage_cap_equals: 640.0
+          energy_cap_equals: 6589.72
+          storage_cap_equals: 35400.0
       hror:
         constraints:
-          energy_cap_equals: 0.475
-      battery:
+          energy_cap_equals: 3302.21
       hydrogen:
-links:
-  region_0,region_1:
-    techs:
-      ac_transmission:
-        distance: 3.12
-  region_0,region_2:
-    techs:
-      ac_transmission:
-        distance: 2.34
-  region_1,region_2:
-    techs:
-      ac_transmission:
-        distance: 2.12
-  region_1,region_4:
-    techs:
-      ac_transmission:
-        distance: 3.97
-  region_1,region_6:
-    techs:
-      ac_transmission:
-        distance: 1.63
-  region_2,region_3:
-    techs:
-      ac_transmission:
-        distance: 1.92
-  region_2,region_4:
-    techs:
-      ac_transmission:
-        distance: 3.93
-  region_3,region_4:
-    techs:
-      ac_transmission:
-        distance: 3.48
-  region_3,region_5:
-    techs:
-      ac_transmission:
-        distance: 2.09
-  region_3,region_7:
-    techs:
-      ac_transmission:
-        distance: 2.08
-  region_4,region_5:
-    techs:
-      ac_transmission:
-        distance: 2.01
-  region_4,region_6:
-    techs:
-      ac_transmission:
-        distance: 2.9
-  region_5,region_8:
-    techs:
-      ac_transmission:
-        distance: 1.97
-  region_7,region_8:
-    techs:
-      ac_transmission:
-        distance: 2.7

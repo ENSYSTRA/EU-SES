@@ -126,39 +126,33 @@ class EUSES():
         self.ds['geometry'] = (('nuts_2'),pd.Series(self.ds['geometry']).apply(wkt.loads))
 
     def create_regions(self, method, area_factor=None, initial_val=1, initial_seed=1,disaggr_var='preset', aggr_var ='preset'):
+        method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','storage'],
+                        'nuts0':2,'nuts1':3,'nuts2':4}
 
         ds = self.ds.copy(deep=True)
         disaggregation(ds,disaggr_var) # add wind-offshore capacity factor to nuts_2 areas
 
-        island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
-
-        ds = aggregation(ds, island_groups,aggr_var)
-
         if method not in ['nuts0','nuts1','nuts2']:
+            island_groups = [['DK01','DK02','DK03'],['FI20','FI1B'],['ITG2','ITG1','ITF6'],['UKM3','UKN0'], ]
+            ds = aggregation(ds, island_groups,aggr_var)
+
             if 'BE34' and 'LU00' in ds.coords['nuts_2'].values:
                 ds = aggregation(ds, [['BE34','LU00']],aggr_var)
 
-        zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
-        zones['id'] = ds.coords['nuts_2'].values
+            zones['pv_pot_e'] = (ds['rooftop_pv']+ds['utility_pv']).values * ds['pv_cf'].values.sum(axis=1)
+            zones['wind_on_pot_e'] = ds['onshore_wind'].values * ds['wind_cf'].values.sum(axis=1)
+            zones['wind_off_pot_e'] = ds['offshore_wind'].values * ds['wind_offshore_cf'].values.sum(axis=1)
 
-        zones['pv_pot_e'] = (ds['rooftop_pv']+ds['utility_pv']).values * ds['pv_cf'].values.sum(axis=1)
-        zones['wind_on_pot_e'] = ds['onshore_wind'].values * ds['wind_cf'].values.sum(axis=1)
-        zones['wind_off_pot_e'] = ds['offshore_wind'].values * ds['wind_offshore_cf'].values.sum(axis=1)
+            zones['flh_max']=zones.loc[zones.pv_pot_e<zones.wind_on_pot_e].wind_on_pot_e
+            zones.update(pd.Series(zones.loc[zones.pv_pot_e>zones.wind_on_pot_e].pv_pot_e, name='flh_max'))
+            zones.update(pd.Series(zones.loc[zones.wind_off_pot_e>zones.flh_max].wind_off_pot_e, name='flh_max'))
+            zones['flh_max'] = zones['flh_max'].fillna(0)
 
-        zones['flh_max']=zones.loc[zones.pv_pot_e<zones.wind_on_pot_e].wind_on_pot_e
-        zones.update(pd.Series(zones.loc[zones.pv_pot_e>zones.wind_on_pot_e].pv_pot_e, name='flh_max'))
-        zones.update(pd.Series(zones.loc[zones.wind_off_pot_e>zones.flh_max].wind_off_pot_e, name='flh_max'))
-        zones['flh_max'] = zones['flh_max'].fillna(0)
+            zones['storage'] = ds['hydro_storage'].sum(axis=1)
+            zones['population'] = ds['population']
 
-        zones['storage'] = ds['hydro_storage'].sum(axis=1)
-        zones['population'] = ds['population']
+            zones['minimum_threshold'] = zones.geometry.area
 
-        zones['minimum_threshold'] = zones.geometry.area
-
-        method_dir = {'rdm_regions':['rdm_values'],'max_p_regions':['population','flh_max','storage'],
-                        'nuts0':2,'nuts1':3,'nuts2':4}
-
-        if method in ['rdm_regions','max_p_regions']:
             np.random.seed(initial_seed)
             zones['rdm_values'] = np.random.rand(len(zones.index))
             feature = method_dir.get(method)
@@ -169,6 +163,8 @@ class EUSES():
                 class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
 
         if method in ['nuts0','nuts1','nuts2']:
+            zones = gpd.GeoDataFrame(geometry=ds['geometry'].values)
+            zones['id'] = ds.coords['nuts_2'].values
             zones['nuts'] = zones['id'].str[:method_dir.get(method)]
             nuts_array = zones['nuts'].unique()
             class_regions_int = [np.where(zones['nuts']==x)[0].tolist() for x in nuts_array]
@@ -186,11 +182,12 @@ class EUSES():
 
         self.ds_regions = ds
 
-    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap_factor=None, national=False):
+    def create_calliope_model(self, op_mode='plan',sectors = ['power','heat'],co2_cap_factor=None, national=False, multi_tech=False):
         '''
         op_mode: either 'plan' or 'operate'
         '''
         ds_regions = self.ds_regions
+        ds = self.ds
 
         regions_geo = gpd.GeoDataFrame(columns=['geometry'], geometry=ds_regions['geometry'].values)
         regions_geo['id'] = ['region_'+str(e) for e,id in enumerate(ds_regions['geometry'].coords['regions'].values)]
@@ -203,9 +200,9 @@ class EUSES():
 
         regions_geo = regions_geo.to_crs({'init': 'epsg:4326'})
 
-        create_timeseries_csv(regions_geo, ds_regions)
-        create_location_yaml(regions_geo, ds_regions,sectors)
-        create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor)
+        create_timeseries_csv(regions_geo,ds_regions,multi_tech, ds)
+        create_location_yaml(regions_geo,ds_regions,sectors,multi_tech, ds)
+        create_model_yaml(self, regions_geo, sectors, op_mode, co2_cap_factor,multi_tech)
 
     def filter_countries(self, countries):
         filt_ds = copy.deepcopy(self)

@@ -1,5 +1,5 @@
 import:
-- model_config/techs_elec_heat.yaml
+- model_config/techs_elec_heat_multi_tech.yaml
 - model_config/locations.yaml
 - scenarios.yaml
 model:
@@ -7,12 +7,12 @@ model:
   calliope_version: 0.6.5
   timeseries_data_path: timeseries_data
   subset_time:
-  - '2010-01-01'
-  - '2010-12-31'
+  - '2011-01-01'
+  - '2011-12-31'
 run:
   solver: cbc
   ensure_feasibility: 'false'
-  bigM: 1000000000.0
+  bigM: 10000000000.0
   zero_threshold: 1e-15
   mode: plan
   objective_options.cost_class:
@@ -26,3 +26,346 @@ group_constraints:
     - supply_biogas
     carrier_prod_max:
       gas: 18737429.014324218
+techs:
+  heat_pump_air_DE11:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE12:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE13:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE22:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE23:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE24:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE25:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE26:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE14:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE21:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE91:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE92:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE93:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE94:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEA1:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE27:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE30:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE40:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE50:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE60:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE71:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE72:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE73:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DE80:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEA2:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEA3:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEA4:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEB2:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEB3:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEC0:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DED2:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DED4:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DED5:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEE0:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEF0:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEG0:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEA5:
+    essentials:
+      parent: heat_pump_air
+  heat_pump_air_DEB1:
+    essentials:
+      parent: heat_pump_air
+  solar_DE11:
+    essentials:
+      parent: solar
+  solar_DE12:
+    essentials:
+      parent: solar
+  solar_DE13:
+    essentials:
+      parent: solar
+  solar_DE22:
+    essentials:
+      parent: solar
+  solar_DE23:
+    essentials:
+      parent: solar
+  solar_DE24:
+    essentials:
+      parent: solar
+  solar_DE25:
+    essentials:
+      parent: solar
+  solar_DE26:
+    essentials:
+      parent: solar
+  solar_DE14:
+    essentials:
+      parent: solar
+  solar_DE21:
+    essentials:
+      parent: solar
+  solar_DE91:
+    essentials:
+      parent: solar
+  solar_DE92:
+    essentials:
+      parent: solar
+  solar_DE93:
+    essentials:
+      parent: solar
+  solar_DE94:
+    essentials:
+      parent: solar
+  solar_DEA1:
+    essentials:
+      parent: solar
+  solar_DE27:
+    essentials:
+      parent: solar
+  solar_DE30:
+    essentials:
+      parent: solar
+  solar_DE40:
+    essentials:
+      parent: solar
+  solar_DE50:
+    essentials:
+      parent: solar
+  solar_DE60:
+    essentials:
+      parent: solar
+  solar_DE71:
+    essentials:
+      parent: solar
+  solar_DE72:
+    essentials:
+      parent: solar
+  solar_DE73:
+    essentials:
+      parent: solar
+  solar_DE80:
+    essentials:
+      parent: solar
+  solar_DEA2:
+    essentials:
+      parent: solar
+  solar_DEA3:
+    essentials:
+      parent: solar
+  solar_DEA4:
+    essentials:
+      parent: solar
+  solar_DEB2:
+    essentials:
+      parent: solar
+  solar_DEB3:
+    essentials:
+      parent: solar
+  solar_DEC0:
+    essentials:
+      parent: solar
+  solar_DED2:
+    essentials:
+      parent: solar
+  solar_DED4:
+    essentials:
+      parent: solar
+  solar_DED5:
+    essentials:
+      parent: solar
+  solar_DEE0:
+    essentials:
+      parent: solar
+  solar_DEF0:
+    essentials:
+      parent: solar
+  solar_DEG0:
+    essentials:
+      parent: solar
+  solar_DEA5:
+    essentials:
+      parent: solar
+  solar_DEB1:
+    essentials:
+      parent: solar
+  wind_DE11:
+    essentials:
+      parent: wind
+  wind_DE12:
+    essentials:
+      parent: wind
+  wind_DE13:
+    essentials:
+      parent: wind
+  wind_DE22:
+    essentials:
+      parent: wind
+  wind_DE23:
+    essentials:
+      parent: wind
+  wind_DE24:
+    essentials:
+      parent: wind
+  wind_DE25:
+    essentials:
+      parent: wind
+  wind_DE26:
+    essentials:
+      parent: wind
+  wind_DE14:
+    essentials:
+      parent: wind
+  wind_DE21:
+    essentials:
+      parent: wind
+  wind_DE91:
+    essentials:
+      parent: wind
+  wind_DE92:
+    essentials:
+      parent: wind
+  wind_DE93:
+    essentials:
+      parent: wind
+  wind_DE94:
+    essentials:
+      parent: wind
+  wind_DEA1:
+    essentials:
+      parent: wind
+  wind_DE27:
+    essentials:
+      parent: wind
+  wind_DE30:
+    essentials:
+      parent: wind
+  wind_DE40:
+    essentials:
+      parent: wind
+  wind_DE50:
+    essentials:
+      parent: wind
+  wind_DE60:
+    essentials:
+      parent: wind
+  wind_DE71:
+    essentials:
+      parent: wind
+  wind_DE72:
+    essentials:
+      parent: wind
+  wind_DE73:
+    essentials:
+      parent: wind
+  wind_DE80:
+    essentials:
+      parent: wind
+  wind_DEA2:
+    essentials:
+      parent: wind
+  wind_DEA3:
+    essentials:
+      parent: wind
+  wind_DEA4:
+    essentials:
+      parent: wind
+  wind_DEB2:
+    essentials:
+      parent: wind
+  wind_DEB3:
+    essentials:
+      parent: wind
+  wind_DEC0:
+    essentials:
+      parent: wind
+  wind_DED2:
+    essentials:
+      parent: wind
+  wind_DED4:
+    essentials:
+      parent: wind
+  wind_DED5:
+    essentials:
+      parent: wind
+  wind_DEE0:
+    essentials:
+      parent: wind
+  wind_DEF0:
+    essentials:
+      parent: wind
+  wind_DEG0:
+    essentials:
+      parent: wind
+  wind_DEA5:
+    essentials:
+      parent: wind
+  wind_DEB1:
+    essentials:
+      parent: wind
