@@ -54,7 +54,7 @@ example.ds = example.ds.drop(techs_removed,dim='tech')
 # The areas dataset and the preferred regionalisation method is used to build the regions dataset.
 # The supported regionalisation methods include using national (poli_regions) and administrative boundaries (poli_regions_nuts1). It also possible to define the regions using the max-p regions method (max_p_regions).
 # In this example the national boundaries method is selected.
-example.create_regions('poli_regions')
+example.create_regions('nuts0')
 
 # Build a power and heat optimisation calliope model with a limitation on CO2 emission.  
 # The specifications of the technologies within the model are in the calliope_model folder.
